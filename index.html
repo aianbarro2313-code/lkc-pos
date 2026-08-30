@@ -222,6 +222,10 @@
                     </button>
                 </div>
             </div>
+
+            <!-- CATEGORY FILTER TABS FOR MENU MANAGEMENT -->
+            <div class="flex gap-2 overflow-x-auto pb-1" id="menu-mgmt-cat-tabs"></div>
+
             <div class="bg-white rounded-xl shadow overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead class="bg-brand-brown text-white">
@@ -318,6 +322,7 @@
         let orders = JSON.parse(localStorage.getItem('lkc_orders') || '[]');
         let currentCart = [];
         let activeCategory = 'SILOG';
+        let activeMgmtCategory = 'ALL'; // Filter para sa Menu Management View
 
         function forceResetData() {
             localStorage.removeItem('lkc_menu');
@@ -341,7 +346,6 @@
         }
 
         function initApp() {
-            // Load Categories
             let storedCats = localStorage.getItem('lkc_categories');
             if(!storedCats) {
                 categoriesList = [...defaultCategories];
@@ -350,7 +354,6 @@
                 categoriesList = JSON.parse(storedCats);
             }
 
-            // Load Menu Items
             let storedMenu = localStorage.getItem('lkc_menu');
             if(!storedMenu || JSON.parse(storedMenu).length < defaultMasterMenu.length) {
                 menu = JSON.parse(JSON.stringify(defaultMasterMenu));
@@ -523,11 +526,36 @@
 
         function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
 
+        // RENDER MENU MANAGEMENT BY CATEGORY
+        function setMgmtCategory(cat) {
+            activeMgmtCategory = cat;
+            renderMenuManagement();
+        }
+
         function renderMenuManagement() {
+            const catTabsContainer = document.getElementById('menu-mgmt-cat-tabs');
+            if(catTabsContainer) {
+                const allCats = ['ALL', ...categoriesList];
+                catTabsContainer.innerHTML = allCats.map(cat => `
+                    <button onclick="setMgmtCategory('${cat}')" class="px-2.5 py-1 rounded text-xs font-bold whitespace-nowrap border ${activeMgmtCategory === cat ? 'bg-brand-brown text-white' : 'bg-white text-brand-dark'}">
+                        ${cat}
+                    </button>
+                `).join('');
+            }
+
             const table = document.getElementById('menu-management-table');
             if(!table) return;
+
+            const filteredMenu = activeMgmtCategory === 'ALL' 
+                ? menu 
+                : menu.filter(m => m.category === activeMgmtCategory);
+
+            if (filteredMenu.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">Walang items sa category na ito.</td></tr>`;
+                return;
+            }
             
-            table.innerHTML = menu.map(item => {
+            table.innerHTML = filteredMenu.map(item => {
                 const itemPrice = parseFloat(item.price) || 0;
                 return `
                 <tr class="border-b hover:bg-gray-50">
@@ -568,7 +596,6 @@
             }
         }
 
-        // BAGONG FUNCTION: PAG-ADD NG BAGONG CATEGORY
         function addNewCategory() {
             const catName = prompt("Ipasok ang pangalan ng BAGONG CATEGORY (Halimbawa: DESSERTS, BEVERAGES):");
             if (!catName || catName.trim() === "") return;
@@ -582,10 +609,10 @@
             saveLocalCategories();
             renderCategoryTabs();
             setCategory(upperCat);
-            alert(`Nadd na ang kategoryang "${upperCat}"! Maaari ka nang magdagdag ng pagkain sa ilalim nito.`);
+            setMgmtCategory(upperCat);
+            alert(`Na-add na ang kategoryang "${upperCat}"!`);
         }
 
-        // PAG-ADD NG BAGONG ITEM NA MAY DYNAMIC CATEGORY CHOICES
         function addNewProduct() {
             const name = prompt("Pangalan ng pagkain/inumin:");
             if(!name || name.trim() === "") return;
@@ -599,7 +626,6 @@
             if(!categoryInput) return;
             const chosenCategory = categoryInput.trim().toUpperCase();
 
-            // Kapag wala pa sa listahan ang kategorya, automatic itong idagdag
             if (!categoriesList.includes(chosenCategory)) {
                 categoriesList.push(chosenCategory);
                 saveLocalCategories();
@@ -617,7 +643,7 @@
             saveLocalMenu();
             renderCategoryTabs();
             setCategory(chosenCategory);
-            renderMenuManagement();
+            setMgmtCategory(chosenCategory);
         }
 
         function renderDashboard() {
