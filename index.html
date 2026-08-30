@@ -61,10 +61,14 @@
             </nav>
         </div>
 
-        <!-- RESET BUTTON -->
-        <div class="p-3 border-t border-white/10">
-            <button onclick="resetMenuToDefault()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition uppercase">
-                ⚠️ RESET ALL MENU
+        <!-- GOOGLE SHEET SYNC STATUS INDICATOR -->
+        <div class="p-3 border-t border-white/10 space-y-2">
+            <div id="sync-status" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-green-900/50 text-green-300 border border-green-700/50 flex items-center justify-between">
+                <span>📊 Sheet Sync: Ready</span>
+                <span class="animate-pulse">🟢</span>
+            </div>
+            <button onclick="resetMenuToDefault()" class="w-full bg-red-600/80 hover:bg-red-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-2 transition uppercase">
+                ⚠️ Reset Menu
             </button>
         </div>
     </aside>
@@ -85,7 +89,7 @@
                 </div>
                 
                 <div id="pos-menu-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    <!-- Dynamic Menu Cards Inserted Here -->
+                    <!-- Dynamic Menu Cards -->
                 </div>
             </div>
 
@@ -138,7 +142,7 @@
                         </div>
                     </div>
 
-                    <!-- ACTION BUTTONS DYNAMICALLY RENDERED -->
+                    <!-- ACTION BUTTONS -->
                     <div id="cart-action-buttons" class="grid grid-cols-2 gap-2">
                         <!-- Rendered by JS -->
                     </div>
@@ -250,8 +254,11 @@
 
     </main>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC WITH GOOGLE SHEET REALTIME SYNC -->
     <script>
+        // ⚠️ ILAGAY DITO ANG GOOGLE APPS SCRIPT URL MO:
+        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz52ppZkqfMjfp7ssXhaG8kUbctYQLdno7il5Y7ikJS8iqr0qvJKPiwEFpSBniar0JK/exec";
+
         const defaultMenu = [
             { id: 1, name: "Lomi Regular", category: "Lomi", price: 80 },
             { id: 2, name: "Lomi Special", category: "Lomi", price: 110 },
@@ -278,6 +285,50 @@
             renderOrdersHistory();
             renderMenuManagement();
             updateActiveBadge();
+        }
+
+        // REAL-TIME FUNCTION TO SEND DATA TO GOOGLE SHEET
+        async function syncOrderToGoogleSheet(order) {
+            const statusDiv = document.getElementById('sync-status');
+            if (GOOGLE_SHEET_SCRIPT_URL.includes("AKfycbx...")) {
+                console.log("Google Sheet URL not configured yet.");
+                return;
+            }
+
+            statusDiv.innerHTML = `<span>⏳ Syncing to Sheet...</span><span class="animate-spin">🔄</span>`;
+            statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-amber-900/50 text-amber-300 border border-amber-700/50 flex items-center justify-between";
+
+            const itemsSummary = order.items.map(i => `${i.name} x${i.qty} (${i.type})`).join(", ");
+
+            const payload = {
+                orderNum: `#${order.orderNum}`,
+                itemsSummary: itemsSummary,
+                paymentMethod: order.paymentMethod || 'Cash',
+                total: order.total,
+                amountPaid: order.amountPaid || 0,
+                change: order.change || 0,
+                status: order.status
+            };
+
+            try {
+                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Avoid CORS block
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                statusDiv.innerHTML = `<span>📊 Sheet Sync: Updated</span><span>✅</span>`;
+                statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-green-900/50 text-green-300 border border-green-700/50 flex items-center justify-between";
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = `<span>📊 Sheet Sync: Ready</span><span class="animate-pulse">🟢</span>`;
+                }, 4000);
+            } catch (err) {
+                console.error("Sheet sync error:", err);
+                statusDiv.innerHTML = `<span>❌ Sync Failed</span><span>⚠️</span>`;
+                statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-red-900/50 text-red-300 border border-red-700/50 flex items-center justify-between";
+            }
         }
 
         function switchTab(tab) {
@@ -377,9 +428,7 @@
 
         function updateCartItemType(cartKey, newType) {
             const item = cart.find(c => c.cartKey === cartKey);
-            if (item) {
-                item.type = newType;
-            }
+            if (item) item.type = newType;
         }
 
         function renderCart() {
@@ -400,20 +449,19 @@
                 const order = activeOrders.find(o => o.id === editingOrderId);
                 document.getElementById('editing-order-label').innerText = `Editing Order #${order ? order.orderNum : ''}`;
                 
-                // EDIT MODE BUTTONS: SAVE ONLY VS UPDATE & PAY NOW
                 actionButtons.innerHTML = `
                     <button onclick="saveEditedOrder(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
                         💾 Save & Update
                     </button>
                     <button onclick="saveEditedOrder(true)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        💵 Update & Pay Now
+                        💵 Update & Pay
                     </button>
                 `;
             } else {
                 editIndicator.classList.add('hidden');
                 actionButtons.innerHTML = `
                     <button onclick="submitOrder('Unpaid')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        ⏳ Save as Active
+                        ⏳ Save Active
                     </button>
                     <button onclick="submitOrder('Paid')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
                         💵 Pay & Complete
@@ -449,7 +497,6 @@
             `).join('');
         }
 
-        // EDIT ACTIVE ORDER
         function editActiveOrder(orderId) {
             const order = activeOrders.find(o => o.id === orderId);
             if (!order) return;
@@ -470,7 +517,6 @@
             renderCart();
         }
 
-        // SAVE EDITED ORDER (WITH OPTIONAL PAY DIRECTLY)
         function saveEditedOrder(payNow = false) {
             if (cart.length === 0) {
                 alert("Hindi pwedeng mag-save ng blankong order.");
@@ -489,15 +535,13 @@
             order.paymentMethod = method;
 
             if (payNow) {
-                // ASK FOR PAYMENT AND CALCULATE CHANGE
                 const paidInput = prompt(`Order #${order.orderNum} | Total: ₱${total.toFixed(2)}\nPayment Method: ${method}\n\nMagkano ang Bayad / Inabot ng Customer?`, total);
-                
-                if (paidInput === null) return; // User cancelled
+                if (paidInput === null) return;
                 
                 const amountPaid = parseFloat(paidInput);
 
                 if (isNaN(amountPaid) || amountPaid < total) {
-                    alert("⚠️ Kulang o hindi valid ang ibinayad! Isinave muna bilang Active Order.");
+                    alert("⚠️ Kulang ang ibinayad! Na-update muna ang items sa Active Order.");
                     localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
                 } else {
                     const change = amountPaid - total;
@@ -505,12 +549,14 @@
                     order.change = change;
                     order.status = 'Paid';
 
-                    // Transfer to completed orders
                     completedOrders.unshift(order);
                     activeOrders.splice(index, 1);
 
                     localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
                     localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
+
+                    // AUTOMATIC SYNC TO GOOGLE SHEET
+                    syncOrderToGoogleSheet(order);
 
                     alert(`✅ Order #${order.orderNum} Updated & Paid!\n\nTotal: ₱${total.toFixed(2)}\nBayad: ₱${amountPaid.toFixed(2)}\nSUKLI: ₱${change.toFixed(2)}`);
                 }
@@ -527,7 +573,6 @@
             updateActiveBadge();
         }
 
-        // SUBMIT NEW ORDER
         function submitOrder(initialStatus) {
             if (cart.length === 0) {
                 alert("Please add items to cart before completing an order.");
@@ -550,7 +595,7 @@
                 amountPaid = parseFloat(paidInput);
 
                 if (isNaN(amountPaid) || amountPaid < total) {
-                    alert("⚠️ Kulang o hindi valid ang ibinayad! Isinave muna bilang Active / Unpaid Order.");
+                    alert("⚠️ Kulang ang ibinayad! Isinave muna bilang Active Order (Unpaid).");
                     initialStatus = 'Unpaid';
                     amountPaid = 0;
                 } else {
@@ -574,6 +619,8 @@
             if (initialStatus === 'Paid') {
                 completedOrders.unshift(newOrder);
                 localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
+                // REALTIME SYNC TO GOOGLE SHEET FOR PAID ORDERS
+                syncOrderToGoogleSheet(newOrder);
             } else {
                 activeOrders.unshift(newOrder);
                 localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
@@ -585,21 +632,20 @@
             updateActiveBadge();
         }
 
-        // MARK ACTIVE ORDER AS PAID
         function markAsPaid(orderId) {
             const index = activeOrders.findIndex(o => o.id === orderId);
             if (index === -1) return;
 
             const order = activeOrders[index];
-            const method = prompt(`Pumili o I-confirm ang Payment Method:\n(Cash, GCash, Maya, Bank Transfer)`, order.paymentMethod || "Cash") || order.paymentMethod;
+            const method = prompt(`Confirm Payment Method:`, order.paymentMethod || "Cash") || order.paymentMethod;
             
             const paidInput = prompt(`Order #${order.orderNum} | Total: ₱${order.total.toFixed(2)}\n\nMagkano ang Bayad / Inabot ng Customer?`, order.total);
-            
             if (paidInput === null) return;
+            
             const amountPaid = parseFloat(paidInput);
 
             if (isNaN(amountPaid) || amountPaid < order.total) {
-                alert("⚠️ Kulang o hindi valid ang bayad! Hindi maaring markahang Paid.");
+                alert("⚠️ Kulang ang bayad! Hindi na-mark bilang Paid.");
                 return;
             }
 
@@ -614,15 +660,17 @@
             localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
             localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
 
+            // REALTIME SYNC TO GOOGLE SHEET
+            syncOrderToGoogleSheet(order);
+
             alert(`✅ Order #${order.orderNum} Paid!\n\nTotal: ₱${order.total.toFixed(2)}\nBayad: ₱${amountPaid.toFixed(2)}\nSUKLI: ₱${order.change.toFixed(2)}`);
             renderActiveOrders();
             renderOrdersHistory();
             updateActiveBadge();
         }
 
-        // VOID ACTIVE ORDER
         function voidOrder(orderId) {
-            if (confirm("Sigurado ka bang gusto mong i-VOID / CANCEL ang order na ito?")) {
+            if (confirm("Sigurado ka bang gusto mong i-VOID ang order na ito?")) {
                 activeOrders = activeOrders.filter(o => o.id !== orderId);
                 localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
                 renderActiveOrders();
@@ -640,7 +688,6 @@
             }
         }
 
-        // RENDER ACTIVE ORDERS
         function renderActiveOrders() {
             const grid = document.getElementById('active-orders-grid');
             if (activeOrders.length === 0) {
@@ -693,7 +740,6 @@
             `).join('');
         }
 
-        // RENDER DASHBOARD
         function renderDashboard() {
             const gross = completedOrders.reduce((sum, o) => sum + o.total, 0);
             document.getElementById('dash-gross').innerText = `₱${gross.toFixed(2)}`;
@@ -733,7 +779,6 @@
             `).join('');
         }
 
-        // RENDER COMPLETED ORDERS HISTORY
         function renderOrdersHistory() {
             const container = document.getElementById('orders-history-list');
             if (completedOrders.length === 0) {
@@ -747,18 +792,11 @@
                     <td class="p-3 text-gray-500">${o.time}</td>
                     <td class="p-3">
                         <div class="flex flex-wrap gap-1.5">
-                            ${o.items.map(i => {
-                                const isTakeOut = i.type === 'Take-Out';
-                                return `
-                                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${
-                                        isTakeOut 
-                                            ? 'bg-amber-100 text-amber-900 border border-amber-300' 
-                                            : 'bg-blue-50 text-blue-800 border border-blue-200'
-                                    }">
-                                        ${i.name} x${i.qty}${isTakeOut ? ' (Take-Out)' : ''}
-                                    </span>
-                                `;
-                            }).join('')}
+                            ${o.items.map(i => `
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${i.type === 'Take-Out' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-50 text-blue-800 border border-blue-200'}">
+                                    ${i.name} x${i.qty}${i.type === 'Take-Out' ? ' (Take-Out)' : ''}
+                                </span>
+                            `).join('')}
                         </div>
                     </td>
                     <td class="p-3 text-gray-600">
@@ -788,16 +826,12 @@
         function promptAddMenuItem() {
             const name = prompt("Enter Menu Item Name:");
             if (!name) return;
-            const category = prompt("Enter Category (e.g. Lomi, Drinks, Kambingan):") || "General";
+            const category = prompt("Enter Category:") || "General";
             const price = parseFloat(prompt("Enter Price (₱):"));
 
-            if (isNaN(price)) {
-                alert("Invalid price!");
-                return;
-            }
+            if (isNaN(price)) return alert("Invalid price!");
 
-            const newItem = { id: Date.now(), name, category, price };
-            menu.push(newItem);
+            menu.push({ id: Date.now(), name, category, price });
             localStorage.setItem('lkc_menu', JSON.stringify(menu));
             populateCategories();
             renderPOSMenu();
@@ -805,7 +839,7 @@
         }
 
         function deleteMenuItem(id) {
-            if (confirm("Are you sure you want to delete this menu item?")) {
+            if (confirm("Delete this menu item?")) {
                 menu = menu.filter(m => m.id !== id);
                 localStorage.setItem('lkc_menu', JSON.stringify(menu));
                 populateCategories();
