@@ -3,862 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leonardo's Kambingan sa Chapel</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Leonardo's Kambingan - POS & Inventory</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            dark: '#2A1A10',
-                            brown: '#3D2415',
-                            accent: '#D97706',
-                            orange: '#EA580C',
-                            bg: '#F5EFEB'
-                        }
+                        'brand-dark': '#2C1810',
+                        'brand-orange': '#D9531E',
+                        'brand-cream': '#FDFBF7',
+                        'brand-bg': '#F4EFEB'
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Custom Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4EFEB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D9531E;
+            border-radius: 4px;
+        }
+    </style>
 </head>
-<body class="bg-brand-bg text-brand-dark flex flex-col md:flex-row h-screen overflow-hidden font-sans">
+<body class="bg-brand-bg font-sans antialiased h-screen flex overflow-hidden">
 
-    <!-- SIDEBAR / NAVIGATION -->
-    <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col justify-between shrink-0 shadow-lg">
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-brand-dark text-white flex flex-col justify-between p-4 flex-shrink-0">
         <div>
-            <!-- LOGO & BRAND NAME -->
-            <div class="p-4 flex md:flex-col items-center gap-3 border-b border-white/10 text-center">
-                <div class="w-16 h-16 rounded-full bg-brand-accent/20 flex items-center justify-center text-2xl border-2 border-brand-accent overflow-hidden shrink-0">
-                    👨‍🍳
-                </div>
-                <div>
-                    <h1 class="font-black text-sm md:text-base tracking-wider leading-tight uppercase text-amber-200">
-                        LEONARDO'S
-                    </h1>
-                    <p class="font-bold text-xs text-amber-400">KAMBINGAN</p>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">SA CHAPEL</p>
-                </div>
+            <!-- LOGO / HEADER -->
+            <div class="mb-8 text-center pt-2">
+                <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+                <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan & Restaurant</p>
             </div>
 
-            <!-- MENU BUTTONS -->
-            <nav class="p-3 space-y-1">
-                <button onclick="switchTab('pos')" id="tab-btn-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all bg-brand-accent text-white shadow">
-                    <span>🛒</span> POS
+            <!-- NAVIGATION MENU -->
+            <nav class="space-y-2">
+                <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">
+                    🛒 <span>POS System</span>
                 </button>
-                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all text-gray-300 hover:bg-white/10">
-                    <span>📊</span> Sales
+                <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
+                    📋 <span>Order History</span>
                 </button>
-                <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all text-gray-300 hover:bg-white/10">
-                    <span class="flex items-center gap-3"><span>📜</span> Orders</span>
-                    <span id="badge-active-count" class="bg-amber-500 text-brand-dark text-[10px] font-black px-2 py-0.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="switchTab('menu')" id="tab-btn-menu" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all text-gray-300 hover:bg-white/10">
-                    <span>🍲</span> Menu
+                <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
+                    📦 <span>Inventory</span>
                 </button>
             </nav>
         </div>
 
-        <!-- GOOGLE SHEET SYNC STATUS INDICATOR -->
-        <div class="p-3 border-t border-white/10 space-y-2">
-            <div id="sync-status" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-green-900/50 text-green-300 border border-green-700/50 flex items-center justify-between">
-                <span>📊 Sheet Sync: Ready</span>
-                <span class="animate-pulse">🟢</span>
-            </div>
-            <button onclick="resetMenuToDefault()" class="w-full bg-red-600/80 hover:bg-red-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-2 transition uppercase">
-                ⚠️ Reset Menu
-            </button>
+        <!-- SYNC STATUS INDICATOR -->
+        <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs">
+            <span id="sync-status" class="text-amber-300 font-medium">📊 Sheet Sync: Ready</span>
         </div>
     </aside>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-
-        <!-- 1. POS VIEW -->
-        <section id="view-pos" class="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
-            <!-- MENU ITEMS GRID -->
-            <div class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-brand-dark">Select Menu Items</h2>
-                    <!-- Category Filter -->
-                    <select id="category-filter" onchange="renderPOSMenu()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm focus:outline-none">
-                        <option value="All">All Categories</option>
-                    </select>
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- POS TAB -->
+        <div id="tab-pos" class="flex-1 flex p-6 gap-6 overflow-hidden">
+            
+            <!-- LEFT: MENU ITEMS (BY CATEGORY SCROLL) -->
+            <div class="flex-1 flex flex-col min-w-0">
+                <div class="mb-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-black text-brand-dark">Select Menu Items</h2>
+                        <p class="text-xs text-gray-500">Scroll down to view items by category</p>
+                    </div>
                 </div>
-                
-                <div id="pos-menu-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    <!-- Dynamic Menu Cards -->
+
+                <!-- CATEGORIES CONTAINER (VERTICAL SCROLL) -->
+                <div id="pos-menu-grid" class="space-y-6 flex-1 overflow-y-auto pr-2">
+                    <!-- Dynamic rendering by category will happen here -->
                 </div>
             </div>
 
-            <!-- CART / ORDER PANEL -->
-            <div class="w-full md:w-80 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col h-1/2 md:h-full shadow-md">
-                <div class="p-3 border-b border-gray-100 bg-brand-brown text-white space-y-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-sm" id="cart-header-title">Current Order</h3>
-                        <span id="cart-count" class="text-xs bg-brand-accent px-2 py-0.5 rounded-full">0 items</span>
-                    </div>
-                    
-                    <!-- EDIT MODE BANNER -->
-                    <div id="edit-mode-indicator" class="hidden bg-amber-500 text-brand-dark px-2.5 py-1 rounded-lg text-xs font-black flex justify-between items-center shadow">
-                        <span id="editing-order-label">Editing Order #0</span>
-                        <button onclick="cancelEditingOrder()" class="text-[10px] bg-black/20 hover:bg-black/30 px-2 py-0.5 rounded text-white transition">Cancel</button>
-                    </div>
-
-                    <!-- DEFAULT ORDER TYPE SELECTION -->
-                    <div class="flex items-center gap-2 bg-black/20 p-1.5 rounded-lg text-xs">
-                        <span class="text-[11px] font-semibold text-amber-200">Default Type:</span>
-                        <select id="default-order-type" class="bg-white text-brand-dark font-bold text-xs rounded px-2 py-1 flex-1 focus:outline-none">
-                            <option value="Dine-In">🍽️ Dine-In</option>
-                            <option value="Take-Out">🛍️ Take-Out</option>
-                        </select>
-                    </div>
+            <!-- RIGHT: CART / ORDER SUMMARY -->
+            <div class="w-96 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
+                    <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
                 </div>
 
                 <!-- CART ITEMS LIST -->
-                <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-3 divide-y divide-gray-100">
-                    <p class="text-center text-xs text-gray-400 py-8">Empty Order Cart</p>
+                <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
                 </div>
 
-                <!-- CART FOOTER & CHECKOUT -->
-                <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-3">
-                    <!-- PAYMENT METHOD SELECTION -->
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-gray-600 block">Payment Method:</label>
-                        <select id="payment-method" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-brand-dark focus:outline-none shadow-sm">
-                            <option value="Cash">💵 Cash</option>
-                            <option value="GCash">📱 GCash</option>
-                            <option value="Maya">💳 Maya</option>
-                            <option value="Bank Transfer">🏦 Bank Transfer</option>
-                        </select>
+                <!-- ORDER TOTAL & PAYMENT -->
+                <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-3 rounded-b-2xl">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 font-medium">Subtotal</span>
+                        <span id="cart-subtotal" class="font-bold text-brand-dark">₱0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
+                        <span>Total</span>
+                        <span id="cart-total" class="text-brand-orange">₱0.00</span>
                     </div>
 
-                    <div class="space-y-1 text-xs">
-                        <div class="flex justify-between font-bold text-sm text-brand-dark border-t pt-2">
-                            <span>TOTAL:</span>
-                            <span id="cart-total" class="text-brand-orange text-base font-black">₱0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- ACTION BUTTONS -->
-                    <div id="cart-action-buttons" class="grid grid-cols-2 gap-2">
-                        <!-- Rendered by JS -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. SALES / DASHBOARD VIEW -->
-        <section id="view-dashboard" class="hidden flex-1 p-4 md:p-6 space-y-6 overflow-y-auto">
-            <h2 class="text-xl md:text-2xl font-bold text-brand-dark">Daily Summary Dashboard</h2>
-            
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-amber-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">GROSS SALES</p>
-                    <p class="text-2xl font-black text-brand-dark mt-1" id="dash-gross">₱0.00</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-green-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">NET SALES</p>
-                    <p class="text-2xl font-black text-green-600 mt-1" id="dash-net">₱0.00</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">TOTAL ORDERS</p>
-                    <p class="text-2xl font-black text-brand-dark mt-1" id="dash-orders">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-purple-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">AVG ORDER</p>
-                    <p class="text-2xl font-black text-brand-dark mt-1" id="dash-aov">₱0.00</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
-                <h3 class="font-bold text-base text-brand-dark flex items-center gap-2">
-                    <span>🍲</span> Item Sales Breakdown
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-brand-brown text-white">
-                            <tr>
-                                <th class="p-3">Item Name</th>
-                                <th class="p-3 text-center">Qty Sold (Pcs)</th>
-                                <th class="p-3 text-right">Total Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dash-item-summary" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. ORDERS VIEW -->
-        <section id="view-orders" class="hidden flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-3">
-                <h2 class="text-xl font-bold text-brand-dark">Orders Management</h2>
-                
-                <div class="flex bg-gray-200 p-1 rounded-xl text-xs font-bold w-fit">
-                    <button id="subtab-btn-active" onclick="switchOrdersSubtab('active')" class="px-4 py-2 rounded-lg bg-white shadow text-brand-dark transition">
-                        🔥 Active / Open Orders
-                    </button>
-                    <button id="subtab-btn-history" onclick="switchOrdersSubtab('history')" class="px-4 py-2 rounded-lg text-gray-600 transition">
-                        ✅ Completed History
+                    <button id="pay-button" onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3.5 rounded-xl shadow-md transition transform active:scale-95 text-center mt-2">
+                        Pay & Complete Order
                     </button>
                 </div>
             </div>
+        </div>
 
-            <div id="subtab-content-active" class="space-y-4">
-                <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-
-            <div id="subtab-content-history" class="hidden space-y-4">
-                <div class="bg-white rounded-xl shadow overflow-hidden">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-brand-brown text-white">
-                            <tr>
-                                <th class="p-3">Order #</th>
-                                <th class="p-3">Time</th>
-                                <th class="p-3">Items & Type</th>
-                                <th class="p-3">Payment Info & Sukli</th>
-                                <th class="p-3 text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-history-list" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. MENU MANAGEMENT VIEW -->
-        <section id="view-menu" class="hidden flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-brand-dark">Menu Management</h2>
-                <button onclick="promptAddMenuItem()" class="bg-brand-accent text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">
-                    + Add New Item
-                </button>
-            </div>
-            <div class="bg-white rounded-xl shadow overflow-hidden">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-brand-brown text-white">
+        <!-- ORDERS TAB -->
+        <div id="tab-orders" class="flex-1 p-6 overflow-y-auto hidden">
+            <h2 class="text-2xl font-black text-brand-dark mb-4">Order History</h2>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
                         <tr>
-                            <th class="p-3">Item Name</th>
-                            <th class="p-3">Category</th>
-                            <th class="p-3">Price</th>
-                            <th class="p-3 text-center">Action</th>
+                            <th class="p-3">Order #</th>
+                            <th class="p-3">Date/Time</th>
+                            <th class="p-3">Items</th>
+                            <th class="p-3 text-right">Total Amount</th>
                         </tr>
                     </thead>
-                    <tbody id="menu-management-list" class="divide-y divide-gray-100"></tbody>
+                    <tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-gray-400">No past orders yet.</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
-        </section>
+        </div>
+
+        <!-- INVENTORY TAB -->
+        <div id="tab-inventory" class="flex-1 p-6 overflow-y-auto hidden">
+            <h2 class="text-2xl font-black text-brand-dark mb-4">Inventory Management</h2>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <p class="text-gray-500 text-sm">Inventory features are under maintenance.</p>
+            </div>
+        </div>
 
     </main>
 
-    <!-- JAVASCRIPT LOGIC WITH GOOGLE SHEET REALTIME SYNC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ⚠️ ILAGAY DITO ANG GOOGLE APPS SCRIPT URL MO:
-        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz52ppZkqfMjfp7ssXhaG8kUbctYQLdno7il5Y7ikJS8iqr0qvJKPiwEFpSBniar0JK/exec";
+        // ⚠️ ILAGAY DITO ANG GOOGLE APPS SCRIPT WEB APP URL MO:
+        const GOOGLE_SHEET_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
-        const defaultMenu = [
-            { id: 1, name: "Lomi Regular", category: "Lomi", price: 80 },
-            { id: 2, name: "Lomi Special", category: "Lomi", price: 110 },
-            { id: 3, name: "Chamisca", category: "Noodles", price: 90 },
-            { id: 4, name: "Papaitan Kambing", category: "Kambingan", price: 140 },
-            { id: 5, name: "Kambing Kilawin", category: "Kambingan", price: 150 },
-            { id: 6, name: "Goto Batangas", category: "Soup", price: 90 },
-            { id: 7, name: "Plain Rice", category: "Extras", price: 15 },
-            { id: 8, name: "Coke Mismo", category: "Drinks", price: 20 }
+        // MENU DATA
+        const menu = [
+            { id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00 },
+            { id: 2, name: "Lomi Special", category: "LOMI", price: 100.00 },
+            { id: 3, name: "Lomi Jumbo", category: "LOMI", price: 120.00 },
+            { id: 4, name: "Double Toppings", category: "LOMI", price: 80.00 },
+            
+            { id: 5, name: "Pancit Guisado", category: "PANCIT", price: 100.00 },
+            { id: 6, name: "Pancit Chami", category: "PANCIT", price: 100.00 },
+            { id: 7, name: "Pancit Chami Tamis Anghang", category: "PANCIT", price: 100.00 },
+            { id: 8, name: "Pancit Canton", category: "PANCIT", price: 100.00 },
+            { id: 9, name: "Pancit Bihon", category: "PANCIT", price: 100.00 },
+            { id: 10, name: "Pancit Canton Bihon", category: "PANCIT", price: 100.00 },
+
+            { id: 11, name: "Tapsilog", category: "SILOG", price: 95.00 },
+            { id: 12, name: "Tosilog", category: "SILOG", price: 85.00 },
+            { id: 13, name: "Porksilog", category: "SILOG", price: 90.00 },
+            { id: 14, name: "Hotsilog", category: "SILOG", price: 70.00 },
+            { id: 15, name: "Chicksilog", category: "SILOG", price: 95.00 },
+            { id: 16, name: "Bangsilog", category: "SILOG", price: 95.00 },
+
+            { id: 17, name: "Sisig", category: "SIZZLING", price: 150.00 },
+            { id: 18, name: "Porkchop with Gravy", category: "SIZZLING", price: 120.00 },
+            { id: 19, name: "Fried Chicken with Gravy", category: "SIZZLING", price: 120.00 },
+            { id: 20, name: "Hungarian with Gravy", category: "SIZZLING", price: 110.00 },
+
+            { id: 21, name: "Kalderetang Kambing", category: "OTHER", price: 150.00 }
         ];
 
-        let menu = JSON.parse(localStorage.getItem('lkc_menu')) || defaultMenu;
-        let activeOrders = JSON.parse(localStorage.getItem('lkc_active_orders')) || [];
-        let completedOrders = JSON.parse(localStorage.getItem('lkc_completed_orders')) || [];
         let cart = [];
-        let editingOrderId = null;
+        let orderHistory = [];
 
-        function initApp() {
-            populateCategories();
-            renderPOSMenu();
-            renderCart();
-            renderDashboard();
-            renderActiveOrders();
-            renderOrdersHistory();
-            renderMenuManagement();
-            updateActiveBadge();
-        }
-
-        // REAL-TIME FUNCTION TO SEND DATA TO GOOGLE SHEET
-        async function syncOrderToGoogleSheet(order) {
-            const statusDiv = document.getElementById('sync-status');
-            if (GOOGLE_SHEET_SCRIPT_URL.includes("AKfycbx...")) {
-                console.log("Google Sheet URL not configured yet.");
-                return;
-            }
-
-            statusDiv.innerHTML = `<span>⏳ Syncing to Sheet...</span><span class="animate-spin">🔄</span>`;
-            statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-amber-900/50 text-amber-300 border border-amber-700/50 flex items-center justify-between";
-
-            const itemsSummary = order.items.map(i => `${i.name} x${i.qty} (${i.type})`).join(", ");
-
-            const payload = {
-                orderNum: `#${order.orderNum}`,
-                itemsSummary: itemsSummary,
-                paymentMethod: order.paymentMethod || 'Cash',
-                total: order.total,
-                amountPaid: order.amountPaid || 0,
-                change: order.change || 0,
-                status: order.status
-            };
-
-            try {
-                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Avoid CORS block
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                statusDiv.innerHTML = `<span>📊 Sheet Sync: Updated</span><span>✅</span>`;
-                statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-green-900/50 text-green-300 border border-green-700/50 flex items-center justify-between";
-                
-                setTimeout(() => {
-                    statusDiv.innerHTML = `<span>📊 Sheet Sync: Ready</span><span class="animate-pulse">🟢</span>`;
-                }, 4000);
-            } catch (err) {
-                console.error("Sheet sync error:", err);
-                statusDiv.innerHTML = `<span>❌ Sync Failed</span><span>⚠️</span>`;
-                statusDiv.className = "text-[11px] font-bold px-3 py-1.5 rounded-lg bg-red-900/50 text-red-300 border border-red-700/50 flex items-center justify-between";
-            }
-        }
-
-        function switchTab(tab) {
-            ['pos', 'dashboard', 'orders', 'menu'].forEach(t => {
-                const view = document.getElementById(`view-${t}`);
-                const btn = document.getElementById(`tab-btn-${t}`);
-                if (t === tab) {
-                    view.classList.remove('hidden');
-                    btn.classList.add('bg-brand-accent', 'text-white', 'shadow');
-                    btn.classList.remove('text-gray-300');
-                } else {
-                    view.classList.add('hidden');
-                    btn.classList.remove('bg-brand-accent', 'text-white', 'shadow');
-                    btn.classList.add('text-gray-300');
-                }
-            });
-
-            if (tab === 'dashboard') renderDashboard();
-            if (tab === 'orders') {
-                renderActiveOrders();
-                renderOrdersHistory();
-            }
-            if (tab === 'menu') renderMenuManagement();
-        }
-
-        function switchOrdersSubtab(subtab) {
-            const activeBtn = document.getElementById('subtab-btn-active');
-            const historyBtn = document.getElementById('subtab-btn-history');
-            const activeContent = document.getElementById('subtab-content-active');
-            const historyContent = document.getElementById('subtab-content-history');
-
-            if (subtab === 'active') {
-                activeBtn.classList.add('bg-white', 'shadow', 'text-brand-dark');
-                activeBtn.classList.remove('text-gray-600');
-                historyBtn.classList.remove('bg-white', 'shadow', 'text-brand-dark');
-                historyBtn.classList.add('text-gray-600');
-                activeContent.classList.remove('hidden');
-                historyContent.classList.add('hidden');
-            } else {
-                historyBtn.classList.add('bg-white', 'shadow', 'text-brand-dark');
-                historyBtn.classList.remove('text-gray-600');
-                activeBtn.classList.remove('bg-white', 'shadow', 'text-brand-dark');
-                activeBtn.classList.add('text-gray-600');
-                historyContent.classList.remove('hidden');
-                activeContent.classList.add('hidden');
-            }
-        }
-
-        function populateCategories() {
-            const categories = ['All', ...new Set(menu.map(item => item.category))];
-            const filter = document.getElementById('category-filter');
-            filter.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
+        // RENDER MENU BY CATEGORY (VERTICAL SCROLL)
         function renderPOSMenu() {
-            const selectedCat = document.getElementById('category-filter').value;
             const grid = document.getElementById('pos-menu-grid');
-            const filtered = selectedCat === 'All' ? menu : menu.filter(m => m.category === selectedCat);
-
-            grid.innerHTML = filtered.map(item => `
-                <div onclick="addToCart(${item.id})" class="bg-white p-3 rounded-xl shadow hover:shadow-md cursor-pointer border border-gray-100 flex flex-col justify-between transition transform active:scale-95">
-                    <div>
-                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">${item.category}</span>
-                        <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
-                    </div>
-                    <div class="mt-3 flex justify-between items-center">
-                        <span class="font-black text-xs text-brand-orange">₱${item.price.toFixed(2)}</span>
-                        <span class="text-xs bg-brand-bg text-brand-dark p-1 rounded-full">➕</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(itemId) {
-            const item = menu.find(m => m.id === itemId);
-            if (!item) return;
-
-            const defaultType = document.getElementById('default-order-type').value;
-
-            const existing = cart.find(c => c.id === itemId && c.type === defaultType);
-            if (existing) {
-                existing.qty++;
-            } else {
-                cart.push({ ...item, qty: 1, type: defaultType, cartKey: Date.now() + Math.random() });
-            }
-            renderCart();
-        }
-
-        function updateCartQty(cartKey, change) {
-            const index = cart.findIndex(c => c.cartKey === cartKey);
-            if (index !== -1) {
-                cart[index].qty += change;
-                if (cart[index].qty <= 0) cart.splice(index, 1);
-            }
-            renderCart();
-        }
-
-        function updateCartItemType(cartKey, newType) {
-            const item = cart.find(c => c.cartKey === cartKey);
-            if (item) item.type = newType;
-        }
-
-        function renderCart() {
-            const cartContainer = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const cartTotal = document.getElementById('cart-total');
-            const actionButtons = document.getElementById('cart-action-buttons');
-            const editIndicator = document.getElementById('edit-mode-indicator');
-
-            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-            cartCount.innerText = `${totalQty} items`;
-            cartTotal.innerText = `₱${totalPrice.toFixed(2)}`;
-
-            if (editingOrderId) {
-                editIndicator.classList.remove('hidden');
-                const order = activeOrders.find(o => o.id === editingOrderId);
-                document.getElementById('editing-order-label').innerText = `Editing Order #${order ? order.orderNum : ''}`;
-                
-                actionButtons.innerHTML = `
-                    <button onclick="saveEditedOrder(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        💾 Save & Update
-                    </button>
-                    <button onclick="saveEditedOrder(true)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        💵 Update & Pay
-                    </button>
-                `;
-            } else {
-                editIndicator.classList.add('hidden');
-                actionButtons.innerHTML = `
-                    <button onclick="submitOrder('Unpaid')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        ⏳ Save Active
-                    </button>
-                    <button onclick="submitOrder('Paid')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-                        💵 Pay & Complete
-                    </button>
-                `;
-            }
-
-            if (cart.length === 0) {
-                cartContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Empty Order Cart</p>`;
-                return;
-            }
-
-            cartContainer.innerHTML = cart.map(item => `
-                <div class="pt-2 space-y-1">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 pr-2">
-                            <p class="font-bold text-xs text-brand-dark leading-tight">${item.name}</p>
-                            <p class="text-[10px] text-gray-400">₱${item.price.toFixed(2)} x ${item.qty}</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-gray-100 rounded-lg p-0.5">
-                            <button onclick="updateCartQty(${item.cartKey}, -1)" class="w-5 h-5 bg-white rounded text-xs font-bold shadow-sm flex items-center justify-center">-</button>
-                            <span class="text-xs font-bold px-1">${item.qty}</span>
-                            <button onclick="updateCartQty(${item.cartKey}, 1)" class="w-5 h-5 bg-white rounded text-xs font-bold shadow-sm flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <select onchange="updateCartItemType(${item.cartKey}, this.value)" class="text-[10px] font-bold bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5 text-brand-dark focus:outline-none">
-                            <option value="Dine-In" ${item.type === 'Dine-In' ? 'selected' : ''}>🍽️ Dine-In</option>
-                            <option value="Take-Out" ${item.type === 'Take-Out' ? 'selected' : ''}>🛍️ Take-Out</option>
-                        </select>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function editActiveOrder(orderId) {
-            const order = activeOrders.find(o => o.id === orderId);
-            if (!order) return;
-
-            editingOrderId = orderId;
-            cart = order.items.map(i => ({ ...i, cartKey: Date.now() + Math.random() }));
-            if (order.paymentMethod) {
-                document.getElementById('payment-method').value = order.paymentMethod;
-            }
-
-            switchTab('pos');
-            renderCart();
-        }
-
-        function cancelEditingOrder() {
-            editingOrderId = null;
-            cart = [];
-            renderCart();
-        }
-
-        function saveEditedOrder(payNow = false) {
-            if (cart.length === 0) {
-                alert("Hindi pwedeng mag-save ng blankong order.");
-                return;
-            }
-
-            const index = activeOrders.findIndex(o => o.id === editingOrderId);
-            if (index === -1) return;
-
-            const order = activeOrders[index];
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const method = document.getElementById('payment-method').value;
-
-            order.items = [...cart];
-            order.total = total;
-            order.paymentMethod = method;
-
-            if (payNow) {
-                const paidInput = prompt(`Order #${order.orderNum} | Total: ₱${total.toFixed(2)}\nPayment Method: ${method}\n\nMagkano ang Bayad / Inabot ng Customer?`, total);
-                if (paidInput === null) return;
-                
-                const amountPaid = parseFloat(paidInput);
-
-                if (isNaN(amountPaid) || amountPaid < total) {
-                    alert("⚠️ Kulang ang ibinayad! Na-update muna ang items sa Active Order.");
-                    localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-                } else {
-                    const change = amountPaid - total;
-                    order.amountPaid = amountPaid;
-                    order.change = change;
-                    order.status = 'Paid';
-
-                    completedOrders.unshift(order);
-                    activeOrders.splice(index, 1);
-
-                    localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-                    localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
-
-                    // AUTOMATIC SYNC TO GOOGLE SHEET
-                    syncOrderToGoogleSheet(order);
-
-                    alert(`✅ Order #${order.orderNum} Updated & Paid!\n\nTotal: ₱${total.toFixed(2)}\nBayad: ₱${amountPaid.toFixed(2)}\nSUKLI: ₱${change.toFixed(2)}`);
-                }
-            } else {
-                localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-                alert(`Order #${order.orderNum} items updated successfully!`);
-            }
-
-            editingOrderId = null;
-            cart = [];
-            renderCart();
-            renderActiveOrders();
-            renderOrdersHistory();
-            updateActiveBadge();
-        }
-
-        function submitOrder(initialStatus) {
-            if (cart.length === 0) {
-                alert("Please add items to cart before completing an order.");
-                return;
-            }
-
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const method = document.getElementById('payment-method').value;
-            const now = new Date();
-            const orderNum = activeOrders.length + completedOrders.length + 1;
-            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            let amountPaid = 0;
-            let change = 0;
-
-            if (initialStatus === 'Paid') {
-                const paidInput = prompt(`Total Amount: ₱${total.toFixed(2)}\nPayment Method: ${method}\n\nMagkano ang Bayad / Inabot ng Customer?`, total);
-                if (paidInput === null) return;
-                
-                amountPaid = parseFloat(paidInput);
-
-                if (isNaN(amountPaid) || amountPaid < total) {
-                    alert("⚠️ Kulang ang ibinayad! Isinave muna bilang Active Order (Unpaid).");
-                    initialStatus = 'Unpaid';
-                    amountPaid = 0;
-                } else {
-                    change = amountPaid - total;
-                    alert(`✅ Order #${orderNum} Completed!\n\nTotal: ₱${total.toFixed(2)}\nBayad: ₱${amountPaid.toFixed(2)}\nSUKLI: ₱${change.toFixed(2)}`);
-                }
-            }
-
-            const newOrder = {
-                id: Date.now(),
-                orderNum: orderNum,
-                time: time,
-                items: [...cart],
-                total: total,
-                paymentMethod: method,
-                status: initialStatus,
-                amountPaid: amountPaid,
-                change: change
-            };
-
-            if (initialStatus === 'Paid') {
-                completedOrders.unshift(newOrder);
-                localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
-                // REALTIME SYNC TO GOOGLE SHEET FOR PAID ORDERS
-                syncOrderToGoogleSheet(newOrder);
-            } else {
-                activeOrders.unshift(newOrder);
-                localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-                alert(`Order #${orderNum} saved as Active Order (Unpaid).`);
-            }
-
-            cart = [];
-            renderCart();
-            updateActiveBadge();
-        }
-
-        function markAsPaid(orderId) {
-            const index = activeOrders.findIndex(o => o.id === orderId);
-            if (index === -1) return;
-
-            const order = activeOrders[index];
-            const method = prompt(`Confirm Payment Method:`, order.paymentMethod || "Cash") || order.paymentMethod;
             
-            const paidInput = prompt(`Order #${order.orderNum} | Total: ₱${order.total.toFixed(2)}\n\nMagkano ang Bayad / Inabot ng Customer?`, order.total);
-            if (paidInput === null) return;
-            
-            const amountPaid = parseFloat(paidInput);
+            // Get unique categories
+            const categories = [...new Set(menu.map(item => item.category))];
 
-            if (isNaN(amountPaid) || amountPaid < order.total) {
-                alert("⚠️ Kulang ang bayad! Hindi na-mark bilang Paid.");
-                return;
-            }
-
-            order.paymentMethod = method;
-            order.amountPaid = amountPaid;
-            order.change = amountPaid - order.total;
-            order.status = 'Paid';
-
-            completedOrders.unshift(order);
-            activeOrders.splice(index, 1);
-
-            localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-            localStorage.setItem('lkc_completed_orders', JSON.stringify(completedOrders));
-
-            // REALTIME SYNC TO GOOGLE SHEET
-            syncOrderToGoogleSheet(order);
-
-            alert(`✅ Order #${order.orderNum} Paid!\n\nTotal: ₱${order.total.toFixed(2)}\nBayad: ₱${amountPaid.toFixed(2)}\nSUKLI: ₱${order.change.toFixed(2)}`);
-            renderActiveOrders();
-            renderOrdersHistory();
-            updateActiveBadge();
-        }
-
-        function voidOrder(orderId) {
-            if (confirm("Sigurado ka bang gusto mong i-VOID ang order na ito?")) {
-                activeOrders = activeOrders.filter(o => o.id !== orderId);
-                localStorage.setItem('lkc_active_orders', JSON.stringify(activeOrders));
-                renderActiveOrders();
-                updateActiveBadge();
-            }
-        }
-
-        function updateActiveBadge() {
-            const badge = document.getElementById('badge-active-count');
-            if (activeOrders.length > 0) {
-                badge.innerText = activeOrders.length;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        function renderActiveOrders() {
-            const grid = document.getElementById('active-orders-grid');
-            if (activeOrders.length === 0) {
-                grid.innerHTML = `<div class="col-span-full bg-white p-8 rounded-xl text-center text-gray-400 font-bold text-xs">Walang Active / Open Orders sa ngayon.</div>`;
-                return;
-            }
-
-            grid.innerHTML = activeOrders.map(o => `
-                <div class="bg-white rounded-xl shadow p-4 border border-amber-200 flex flex-col justify-between space-y-3">
+            grid.innerHTML = categories.map(cat => {
+                const items = menu.filter(m => m.category === cat);
+                
+                return `
                     <div class="space-y-2">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <div>
-                                <span class="font-black text-sm text-brand-dark">Order #${o.orderNum}</span>
-                                <span class="text-[10px] text-gray-400 ml-2">${o.time}</span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-700">
-                                UNPAID
-                            </span>
+                        <!-- Sticky Category Header -->
+                        <div class="sticky top-0 bg-brand-bg/95 backdrop-blur py-1 z-10 border-b border-amber-900/10 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
+                            <h3 class="font-black text-xs uppercase tracking-widest text-brand-dark">${cat}</h3>
+                            <span class="text-[10px] text-gray-400 font-bold">(${items.length})</span>
                         </div>
 
-                        <div class="space-y-1 py-1">
-                            ${o.items.map(i => `
-                                <div class="flex justify-between text-xs">
-                                    <span class="font-bold text-gray-700">${i.name} x${i.qty}</span>
-                                    <span class="text-[10px] font-semibold ${i.type === 'Take-Out' ? 'text-amber-700 bg-amber-50 px-1 rounded border border-amber-200' : 'text-blue-700'}">${i.type}</span>
+                        <!-- Items Grid for this Category -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                            ${items.map(item => `
+                                <div onclick="addToCart(${item.id})" class="bg-white p-3 rounded-xl shadow-sm hover:shadow-md cursor-pointer border border-gray-100 flex flex-col justify-between transition transform active:scale-95">
+                                    <div>
+                                        <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">${item.category}</span>
+                                        <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
+                                    </div>
+                                    <div class="mt-3 flex justify-between items-center">
+                                        <span class="font-black text-xs text-brand-orange">₱${item.price.toFixed(2)}</span>
+                                        <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border border-gray-200">+</span>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
+                `;
+            }).join('');
+        }
 
-                    <div class="pt-2 border-t space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-gray-500">Method: ${o.paymentMethod || 'Cash'}</span>
-                            <span class="text-base font-black text-brand-orange">₱${o.total.toFixed(2)}</span>
+        // CART LOGIC
+        function addToCart(itemId) {
+            const item = menu.find(m => m.id === itemId);
+            const existing = cart.find(c => c.id === itemId);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartQty(itemId, delta) {
+            const index = cart.findIndex(c => c.id === itemId);
+            if (index !== -1) {
+                cart[index].qty += delta;
+                if (cart[index].qty <= 0) {
+                    cart.splice(index, 1);
+                }
+            }
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>`;
+                document.getElementById('cart-subtotal').innerText = '₱0.00';
+                document.getElementById('cart-total').innerText = '₱0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="flex items-center justify-between bg-brand-cream p-2.5 rounded-xl border border-gray-100">
+                        <div class="flex-1 pr-2">
+                            <h5 class="font-bold text-xs text-brand-dark leading-tight">${item.name}</h5>
+                            <p class="text-[10px] text-gray-500">₱${item.price.toFixed(2)}</p>
                         </div>
-                        
-                        <div class="grid grid-cols-3 gap-1.5 pt-1">
-                            <button onclick="editActiveOrder(${o.id})" class="bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-[11px] py-2 rounded-lg transition border border-amber-300">
-                                ✏️ Edit
-                            </button>
-                            <button onclick="voidOrder(${o.id})" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold text-[11px] py-2 rounded-lg transition border border-red-200">
-                                🚫 Void
-                            </button>
-                            <button onclick="markAsPaid(${o.id})" class="bg-green-600 hover:bg-green-700 text-white font-bold text-[11px] py-2 rounded-lg transition shadow">
-                                💵 Pay
-                            </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:bg-gray-100">-</button>
+                            <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
+                            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:bg-gray-100">+</button>
                         </div>
                     </div>
-                </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-subtotal').innerText = `₱${total.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `₱${total.toFixed(2)}`;
+        }
+
+        // CHECKOUT & SYNC TO GOOGLE SHEETS
+        async function checkout() {
+            if (cart.length === 0) {
+                alert("Please add items to cart first!");
+                return;
+            }
+
+            const payBtn = document.getElementById('pay-button');
+            const syncStatus = document.getElementById('sync-status');
+            
+            payBtn.disabled = true;
+            payBtn.innerText = "Processing Order...";
+            syncStatus.innerText = "⏳ Syncing to Sheet...";
+
+            const orderTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const orderSummary = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+
+            const orderData = {
+                orderId: "ORD-" + Date.now().toString().slice(-6),
+                dateTime: new Date().toLocaleString(),
+                items: orderSummary,
+                total: orderTotal
+            };
+
+            // Local history update
+            orderHistory.unshift(orderData);
+            renderOrdersTable();
+
+            // Sync with Google Sheets
+            try {
+                if (GOOGLE_SHEET_SCRIPT_URL && !GOOGLE_SHEET_SCRIPT_URL.includes("PASTE_YOUR")) {
+                    await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderData)
+                    });
+                    syncStatus.innerText = "📊 Sheet Sync: Updated ✅";
+                } else {
+                    syncStatus.innerText = "⚠️ Sheet Sync: URL Missing";
+                }
+            } catch (err) {
+                console.error("Sync Error:", err);
+                syncStatus.innerText = "❌ Sheet Sync: Failed";
+            }
+
+            alert(`Order #${orderData.orderId} completed! Total: ₱${orderTotal.toFixed(2)}`);
+            clearCart();
+            payBtn.disabled = false;
+            payBtn.innerText = "Pay & Complete Order";
+        }
+
+        // RENDER ORDER HISTORY TABLE
+        function renderOrdersTable() {
+            const tbody = document.getElementById('orders-table-body');
+            if (orderHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orderHistory.map(o => `
+                <tr class="hover:bg-brand-cream/50 transition">
+                    <td class="p-3 font-bold text-brand-orange">${o.orderId}</td>
+                    <td class="p-3 text-gray-500 text-xs">${o.dateTime}</td>
+                    <td class="p-3 font-medium text-brand-dark">${o.items}</td>
+                    <td class="p-3 text-right font-black text-brand-dark">₱${o.total.toFixed(2)}</td>
+                </tr>
             `).join('');
         }
 
-        function renderDashboard() {
-            const gross = completedOrders.reduce((sum, o) => sum + o.total, 0);
-            document.getElementById('dash-gross').innerText = `₱${gross.toFixed(2)}`;
-            document.getElementById('dash-net').innerText = `₱${gross.toFixed(2)}`;
-            document.getElementById('dash-orders').innerText = completedOrders.length;
-            document.getElementById('dash-aov').innerText = completedOrders.length ? `₱${(gross / completedOrders.length).toFixed(2)}` : '₱0.00';
-
-            const itemSales = {};
-            completedOrders.forEach(order => {
-                if (order.items && Array.isArray(order.items)) {
-                    order.items.forEach(item => {
-                        if (!itemSales[item.name]) {
-                            itemSales[item.name] = { qty: 0, total: 0 };
-                        }
-                        itemSales[item.name].qty += item.qty;
-                        itemSales[item.name].total += (item.price * item.qty);
-                    });
-                }
+        // NAVIGATION LOGIC
+        function switchTab(tab) {
+            ['pos', 'orders', 'inventory'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition";
             });
 
-            const summaryTable = document.getElementById('dash-item-summary');
-            const itemsArray = Object.keys(itemSales);
-
-            if (itemsArray.length === 0) {
-                summaryTable.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Walang pang nababayarang benta ngayong araw.</td></tr>`;
-                return;
-            }
-
-            itemsArray.sort((a, b) => itemSales[b].qty - itemSales[a].qty);
-
-            summaryTable.innerHTML = itemsArray.map(itemName => `
-                <tr class="hover:bg-gray-50">
-                    <td class="p-3 font-bold text-brand-dark">${itemName}</td>
-                    <td class="p-3 text-center font-semibold text-blue-600 bg-blue-50/50 rounded">${itemSales[itemName].qty} pcs</td>
-                    <td class="p-3 text-right font-black text-brand-accent">₱${itemSales[itemName].total.toFixed(2)}</td>
-                </tr>
-            `).join('');
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
         }
 
-        function renderOrdersHistory() {
-            const container = document.getElementById('orders-history-list');
-            if (completedOrders.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Walang pang completed orders history.</td></tr>`;
-                return;
-            }
-
-            container.innerHTML = completedOrders.map(o => `
-                <tr>
-                    <td class="p-3 font-bold">#${o.orderNum}</td>
-                    <td class="p-3 text-gray-500">${o.time}</td>
-                    <td class="p-3">
-                        <div class="flex flex-wrap gap-1.5">
-                            ${o.items.map(i => `
-                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${i.type === 'Take-Out' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-50 text-blue-800 border border-blue-200'}">
-                                    ${i.name} x${i.qty}${i.type === 'Take-Out' ? ' (Take-Out)' : ''}
-                                </span>
-                            `).join('')}
-                        </div>
-                    </td>
-                    <td class="p-3 text-gray-600">
-                        <p class="font-bold text-xs text-brand-dark">💳 ${o.paymentMethod || 'Cash'}</p>
-                        <p class="font-semibold text-[11px] text-gray-500">Bayad: ₱${(o.amountPaid || o.total).toFixed(2)}</p>
-                        <p class="text-[11px] font-bold text-green-700">Sukli: ₱${(o.change || 0).toFixed(2)}</p>
-                    </td>
-                    <td class="p-3 text-right font-black text-brand-orange">₱${o.total.toFixed(2)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderMenuManagement() {
-            const container = document.getElementById('menu-management-list');
-            container.innerHTML = menu.map(m => `
-                <tr>
-                    <td class="p-3 font-bold">${m.name}</td>
-                    <td class="p-3 text-gray-500">${m.category}</td>
-                    <td class="p-3 font-bold text-brand-orange">₱${m.price.toFixed(2)}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteMenuItem(${m.id})" class="text-red-500 hover:text-red-700 font-bold text-xs">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function promptAddMenuItem() {
-            const name = prompt("Enter Menu Item Name:");
-            if (!name) return;
-            const category = prompt("Enter Category:") || "General";
-            const price = parseFloat(prompt("Enter Price (₱):"));
-
-            if (isNaN(price)) return alert("Invalid price!");
-
-            menu.push({ id: Date.now(), name, category, price });
-            localStorage.setItem('lkc_menu', JSON.stringify(menu));
-            populateCategories();
+        // INITIAL LOAD
+        window.onload = () => {
             renderPOSMenu();
-            renderMenuManagement();
-        }
-
-        function deleteMenuItem(id) {
-            if (confirm("Delete this menu item?")) {
-                menu = menu.filter(m => m.id !== id);
-                localStorage.setItem('lkc_menu', JSON.stringify(menu));
-                populateCategories();
-                renderPOSMenu();
-                renderMenuManagement();
-            }
-        }
-
-        function resetMenuToDefault() {
-            if (confirm("Reset menu to default items?")) {
-                menu = defaultMenu;
-                localStorage.setItem('lkc_menu', JSON.stringify(menu));
-                populateCategories();
-                renderPOSMenu();
-                renderMenuManagement();
-            }
-        }
-
-        window.onload = initApp;
+        };
     </script>
 </body>
 </html>
