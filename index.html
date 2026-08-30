@@ -230,9 +230,14 @@
         <section id="view-menu" class="hidden p-4 md:p-6 space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-brand-dark">Menu Management</h2>
-                <button onclick="addNewProduct()" class="px-3 py-1.5 bg-brand-accent text-white font-bold rounded-lg text-xs shadow hover:bg-orange-600">
-                    + Add Item
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="resetToMasterMenu()" class="px-3 py-1.5 bg-red-700 text-white font-bold rounded-lg text-xs shadow hover:bg-red-800">
+                        🔄 Reset All Menu
+                    </button>
+                    <button onclick="addNewProduct()" class="px-3 py-1.5 bg-brand-accent text-white font-bold rounded-lg text-xs shadow hover:bg-orange-600">
+                        + Add Item
+                    </button>
+                </div>
             </div>
             <div class="bg-white rounded-xl shadow overflow-x-auto">
                 <table class="w-full text-left text-xs">
@@ -282,70 +287,71 @@
     <!-- APPLICATION LOGIC -->
     <script>
         const defaultMasterMenu = [
+            // LOMI
             { id: 1, name: 'Lomi Regular', category: 'LOMI', price: 80, available: true },
             { id: 2, name: 'Lomi Special', category: 'LOMI', price: 100, available: true },
             { id: 3, name: 'Lomi Jumbo', category: 'LOMI', price: 120, available: true },
             { id: 4, name: 'Double Toppings', category: 'LOMI', price: 80, available: true },
+            
+            // PANCIT
             { id: 5, name: 'Pancit Guisado', category: 'PANCIT', price: 100, available: true },
             { id: 6, name: 'Pancit Chami', category: 'PANCIT', price: 100, available: true },
             { id: 7, name: 'Pancit Chami Tamis Anghang', category: 'PANCIT', price: 100, available: true },
             { id: 8, name: 'Pancit Canton', category: 'PANCIT', price: 100, available: true },
             { id: 9, name: 'Pancit Bihon', category: 'PANCIT', price: 100, available: true },
             { id: 10, name: 'Pancit Canton Bihon', category: 'PANCIT', price: 100, available: true },
-            { id: 11, name: 'Mismo', category: 'DRINKS', price: 22, available: true },
-            { id: 12, name: '1.5L Soda', category: 'DRINKS', price: 80, available: true },
+            
+            // SILOG
             { id: 13, name: 'Tapsilog', category: 'SILOG', price: 95, available: true },
             { id: 14, name: 'Tosilog', category: 'SILOG', price: 85, available: true },
             { id: 15, name: 'Porksilog', category: 'SILOG', price: 90, available: true },
+            { id: 16, name: 'Hotsilog', category: 'SILOG', price: 0, available: true },
+            { id: 17, name: 'Chicksilog', category: 'SILOG', price: 0, available: true },
+            { id: 18, name: 'Bangsilog', category: 'SILOG', price: 0, available: true },
+            { id: 19, name: 'Longsilog', category: 'SILOG', price: 0, available: true },
+            { id: 20, name: 'Hungariansilog', category: 'SILOG', price: 0, available: true },
+            { id: 21, name: 'Sisig Silog', category: 'SILOG', price: 0, available: true },
+
+            // SIZZLING PLATE
+            { id: 22, name: 'Sisig', category: 'SIZZLING', price: 0, available: true },
+            { id: 23, name: 'Porkchop with Gravy', category: 'SIZZLING', price: 0, available: true },
+            { id: 24, name: 'Fried Chicken with Gravy', category: 'SIZZLING', price: 0, available: true },
+            { id: 25, name: 'Hungarian with Gravy', category: 'SIZZLING', price: 0, available: true },
+
+            // OTHER / Ulam
             { id: 26, name: 'Kalderetang Kambing', category: 'OTHER', price: 150, available: true },
             { id: 27, name: 'Dinuguan', category: 'OTHER', price: 60, available: true },
-            { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true }
+            { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true },
+
+            // DRINKS
+            { id: 11, name: 'Mismo', category: 'DRINKS', price: 22, available: true },
+            { id: 12, name: '1.5L Soda', category: 'DRINKS', price: 80, available: true }
         ];
 
-        // Linisin ang lumang naka-cache na menu para mai-load ang lahat ng items
-        let storedMenu = localStorage.getItem('lkc_menu');
+        // Muling pilitin na i-load ang buong listahan
+        localStorage.setItem('lkc_menu', JSON.stringify(defaultMasterMenu));
         let menu = defaultMasterMenu;
 
-        if (storedMenu) {
-            try {
-                let parsed = JSON.parse(storedMenu);
-                if (Array.isArray(parsed) && parsed.length >= defaultMasterMenu.length) {
-                    menu = parsed;
-                }
-            } catch(e) {}
-        }
-        
         let orders = JSON.parse(localStorage.getItem('lkc_orders') || '[]');
         let currentCart = [];
         let activeCategory = 'LOMI';
-
-        try {
-            if (typeof firebase !== 'undefined' && firebase.apps.length) {
-                const db = firebase.database();
-                db.ref('menu').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if(data) {
-                        menu = Array.isArray(data) ? data : Object.values(data);
-                        saveLocalMenu();
-                        renderCategoryTabs(); renderProducts(); renderMenuManagement();
-                    }
-                });
-                db.ref('orders').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if(data) {
-                        orders = Array.isArray(data) ? data : Object.values(data);
-                        updateOrderCounter(); renderDashboard(); renderOrderHistory();
-                    }
-                });
-            }
-        } catch(e) {}
 
         function saveLocalMenu() {
             localStorage.setItem('lkc_menu', JSON.stringify(menu));
         }
 
+        function resetToMasterMenu() {
+            if(confirm('I-re-reset ba ang buong listahan sa default? Magsisimula uli ang lahat ng presyo sa baseline.')) {
+                menu = [...defaultMasterMenu];
+                saveLocalMenu();
+                renderCategoryTabs();
+                renderProducts();
+                renderMenuManagement();
+                alert('Naitama na ang buong listahan!');
+            }
+        }
+
         function initApp() {
-            saveLocalMenu();
             renderCategoryTabs();
             renderProducts();
             renderCart();
@@ -373,7 +379,7 @@
         }
 
         function renderCategoryTabs() {
-            const categories = ['LOMI', 'PANCIT', 'SILOG', 'DRINKS', 'OTHER'];
+            const categories = ['LOMI', 'PANCIT', 'SILOG', 'SIZZLING', 'OTHER', 'DRINKS'];
             document.getElementById('category-tabs').innerHTML = categories.map(cat => `
                 <button onclick="setCategory('${cat}')" class="px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap transition ${activeCategory === cat ? 'bg-brand-brown text-white' : 'bg-white text-brand-dark border'}">
                     ${cat}
@@ -388,7 +394,6 @@
         }
 
         function renderProducts() {
-            // Lalabas kahit 0 o walang nakalagay na price
             const items = menu.filter(m => m.category === activeCategory && m.available !== false);
             const container = document.getElementById('product-grid');
             if(items.length === 0) {
@@ -562,7 +567,7 @@
             if(!name) return;
             const priceInput = prompt("Presyo (₱) [Pwedeng 0 muna]:", "0");
             const price = parseFloat(priceInput) || 0;
-            const category = prompt("Category (LOMI, PANCIT, SILOG, DRINKS, OTHER):", "LOMI").toUpperCase();
+            const category = prompt("Category (LOMI, PANCIT, SILOG, SIZZLING, OTHER, DRINKS):", "SILOG").toUpperCase();
 
             const newItem = {
                 id: Date.now(),
