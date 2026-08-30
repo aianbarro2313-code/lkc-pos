@@ -37,7 +37,6 @@
             }
         }
 
-        // FIREBASE CONFIG (Palitan pag may totoong keys na)
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -62,7 +61,7 @@
 </head>
 <body class="bg-brand-cream text-brand-dark font-sans h-screen flex flex-col md:flex-row overflow-hidden select-none">
 
-    <!-- NAVIGATION (TOPBAR ON MOBILE / SIDEBAR ON DESKTOP) -->
+    <!-- NAVIGATION -->
     <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col justify-between shrink-0">
         <div>
             <!-- BRANDING LOGO -->
@@ -230,8 +229,8 @@
         <!-- MENU MANAGEMENT VIEW -->
         <section id="view-menu" class="hidden p-4 md:p-6 space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-brand-dark">Menu</h2>
-                <button onclick="addNewProduct()" class="px-3 py-1.5 bg-brand-accent text-white font-bold rounded-lg text-xs shadow">
+                <h2 class="text-xl font-bold text-brand-dark">Menu Management</h2>
+                <button onclick="addNewProduct()" class="px-3 py-1.5 bg-brand-accent text-white font-bold rounded-lg text-xs shadow hover:bg-orange-600">
                     + Add Item
                 </button>
             </div>
@@ -239,9 +238,10 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-brand-brown text-white">
                         <tr>
-                            <th class="p-2">Item</th>
-                            <th class="p-2">Price</th>
-                            <th class="p-2 text-right">Status</th>
+                            <th class="p-2.5">Item Name</th>
+                            <th class="p-2.5">Category</th>
+                            <th class="p-2.5">Price</th>
+                            <th class="p-2.5 text-right">Status</th>
                         </tr>
                     </thead>
                     <tbody id="menu-management-table" class="divide-y divide-gray-100"></tbody>
@@ -302,8 +302,19 @@
             { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true }
         ];
 
+        // Linisin ang lumang naka-cache na menu para mai-load ang lahat ng items
         let storedMenu = localStorage.getItem('lkc_menu');
-        let menu = storedMenu ? JSON.parse(storedMenu) : defaultMasterMenu;
+        let menu = defaultMasterMenu;
+
+        if (storedMenu) {
+            try {
+                let parsed = JSON.parse(storedMenu);
+                if (Array.isArray(parsed) && parsed.length >= defaultMasterMenu.length) {
+                    menu = parsed;
+                }
+            } catch(e) {}
+        }
+        
         let orders = JSON.parse(localStorage.getItem('lkc_orders') || '[]');
         let currentCart = [];
         let activeCategory = 'LOMI';
@@ -334,6 +345,7 @@
         }
 
         function initApp() {
+            saveLocalMenu();
             renderCategoryTabs();
             renderProducts();
             renderCart();
@@ -376,31 +388,35 @@
         }
 
         function renderProducts() {
+            // Lalabas kahit 0 o walang nakalagay na price
             const items = menu.filter(m => m.category === activeCategory && m.available !== false);
             const container = document.getElementById('product-grid');
             if(items.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400 text-xs">No available items in this category.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400 text-xs">Walang items sa category na ito.</div>`;
                 return;
             }
-            container.innerHTML = items.map(item => `
+            container.innerHTML = items.map(item => {
+                const itemPrice = parseFloat(item.price) || 0;
+                return `
                 <div class="bg-white rounded-lg p-2.5 border flex flex-col justify-between shadow-sm">
                     <div>
-                        <h3 class="font-bold text-xs text-brand-dark line-clamp-1">${item.name}</h3>
-                        <p class="text-brand-accent font-black text-xs mt-0.5">₱${parseFloat(item.price).toFixed(2)}</p>
+                        <h3 class="font-bold text-xs text-brand-dark line-clamp-2">${item.name}</h3>
+                        <p class="text-brand-accent font-black text-xs mt-0.5">₱${itemPrice.toFixed(2)}</p>
                     </div>
                     <button onclick="addToCart(${item.id})" class="mt-2 w-full py-1 rounded text-[10px] font-bold bg-brand-warm text-white hover:bg-brand-brown transition">
                         + ADD
                     </button>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function addToCart(productId) {
             const product = menu.find(p => p.id === productId);
             if (!product) return;
+            const price = parseFloat(product.price) || 0;
             const existing = currentCart.find(c => c.id === productId);
             if(existing) { existing.qty++; } 
-            else { currentCart.push({ id: product.id, name: product.name, price: parseFloat(product.price), qty: 1 }); }
+            else { currentCart.push({ id: product.id, name: product.name, price: price, qty: 1 }); }
             renderCart();
         }
 
@@ -500,17 +516,35 @@
             const table = document.getElementById('menu-management-table');
             if(!table) return;
             
-            table.innerHTML = menu.map(item => `
+            table.innerHTML = menu.map(item => {
+                const itemPrice = parseFloat(item.price) || 0;
+                return `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2.5 font-bold">${item.name} <span class="text-[10px] text-gray-400 font-normal">(${item.category})</span></td>
-                    <td class="p-2.5 font-semibold text-brand-warm">₱${parseFloat(item.price).toFixed(2)}</td>
+                    <td class="p-2.5 font-bold">${item.name}</td>
+                    <td class="p-2.5 text-gray-500 font-semibold">${item.category}</td>
+                    <td class="p-2.5 font-bold text-brand-warm">
+                        ₱${itemPrice.toFixed(2)}
+                        <button onclick="editPrice(${item.id})" class="ml-1 text-[10px] text-blue-600 underline">edit</button>
+                    </td>
                     <td class="p-2.5 text-right">
                         <button onclick="toggleAvailability(${item.id})" class="px-2.5 py-1 rounded text-[10px] font-bold ${item.available !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                             ${item.available !== false ? 'AVAILABLE' : 'OUT OF STOCK'}
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
+        }
+
+        function editPrice(id) {
+            const item = menu.find(m => m.id === id);
+            if(!item) return;
+            const newPrice = prompt(`Ipasok ang bagong presyo para sa ${item.name}:`, item.price || 0);
+            if(newPrice !== null && !isNaN(parseFloat(newPrice))) {
+                item.price = parseFloat(newPrice);
+                saveLocalMenu();
+                renderMenuManagement();
+                renderProducts();
+            }
         }
 
         function toggleAvailability(id) {
@@ -526,8 +560,8 @@
         function addNewProduct() {
             const name = prompt("Pangalan ng pagkain/inumin:");
             if(!name) return;
-            const price = parseFloat(prompt("Presyo (₱):"));
-            if(isNaN(price)) return alert("Maling presyo!");
+            const priceInput = prompt("Presyo (₱) [Pwedeng 0 muna]:", "0");
+            const price = parseFloat(priceInput) || 0;
             const category = prompt("Category (LOMI, PANCIT, SILOG, DRINKS, OTHER):", "LOMI").toUpperCase();
 
             const newItem = {
