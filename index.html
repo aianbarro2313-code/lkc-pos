@@ -265,7 +265,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // UPDATED GOOGLE SHEET SCRIPT URL
+        // GOOGLE SHEET DEPLOYMENT URL
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhLrnqJ99ET5tnMGMwNB5hletOYmE-PkyKqqvahBj0IHsy5td-U6kYjHTCWCPsT1PE/exec";
 
         let orderCounter = 1;
@@ -577,7 +577,7 @@
             }
         }
 
-        // CHECKOUT & GOOGLE SHEETS SYNC
+        // CHECKOUT & GOOGLE SHEETS SYNC (FORM-DATA FORMAT FOR ACCURATE SYNC)
         async function checkout() {
             if (cart.length === 0) {
                 alert("Please add items to cart first!");
@@ -607,32 +607,35 @@
 
             const currentNum = "#" + orderCounter++;
 
-            const orderData = {
-                dateTime: new Date().toLocaleString(),
-                orderNumber: currentNum,
-                itemsOrdered: `${plainSheetSummary} (${tableCustomer})`,
-                paymentMethod: paymentMethod,
-                totalAmount: orderTotal,
-                amountPaid: amountPaid,
-                change: change,
-                status: "Paid"
-            };
-
+            // Update UI history immediately
             orderHistory.unshift({
                 orderId: currentNum,
                 customer: tableCustomer,
-                dateTime: orderData.dateTime,
+                dateTime: new Date().toLocaleString(),
                 itemsHtml: htmlHistorySummary,
                 total: orderTotal
             });
             renderOrdersTable();
 
+            // Prepare URLSearchParams payload
+            const formData = new URLSearchParams();
+            formData.append('dateTime', new Date().toLocaleString());
+            formData.append('orderNumber', currentNum);
+            formData.append('itemsOrdered', `${plainSheetSummary} (${tableCustomer})`);
+            formData.append('paymentMethod', paymentMethod);
+            formData.append('totalAmount', orderTotal);
+            formData.append('amountPaid', amountPaid);
+            formData.append('change', change);
+            formData.append('status', "Paid");
+
             try {
                 await fetch(GOOGLE_SHEET_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderData)
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString()
                 });
                 syncStatus.innerText = "📊 Sheet Sync: Updated ✅";
             } catch (err) {
