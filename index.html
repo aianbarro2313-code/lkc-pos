@@ -7,33 +7,33 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans antialiased min-h-screen pb-12">
+<body class="bg-gray-100 font-sans antialiased">
 
     <!-- TOP BAR / HEADER -->
-    <header class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-xl font-bold flex items-center gap-2">🛒 POS Order System</h1>
-        <div id="sync-status" class="text-xs sm:text-sm bg-blue-700 px-3 py-1 rounded-full font-medium shadow-inner">
+    <header class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold">🛒 POS Order System</h1>
+        <div id="sync-status" class="text-sm bg-blue-700 px-3 py-1 rounded-full">
             📊 Sheet Sync: Ready
         </div>
     </header>
 
     <!-- MAIN CONTAINER -->
-    <div class="container mx-auto p-4 max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
+    <div class="container mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <!-- LEFT/CENTER: PRODUCT SELECTION & CART -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="md:col-span-2 space-y-6">
             
             <!-- ORDER DETAILS INPUT -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-                <h2 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center gap-2">📝 1. Order Details</h2>
+            <div class="bg-white p-4 rounded-lg shadow space-y-4">
+                <h2 class="font-semibold text-lg border-b pb-2">1. Order Details</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Table / Customer Reference</label>
-                        <input type="text" id="order-table" placeholder="e.g. Table 5 / Juan" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        <label class="block text-sm font-medium text-gray-700">Table / Customer Reference</label>
+                        <input type="text" id="order-table" placeholder="e.g. Table 5 / Juan" class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Payment Method</label>
-                        <select id="payment-method" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white">
+                        <label class="block text-sm font-medium text-gray-700">Payment Method</label>
+                        <select id="payment-method" class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="Cash">Cash</option>
                             <option value="GCash">GCash</option>
                             <option value="Maya">Maya</option>
@@ -44,67 +44,67 @@
             </div>
 
             <!-- ADD ITEM FORM -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-                <h2 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center gap-2">➕ 2. Add Item to Cart</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                    <div class="sm:col-span-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Item Name</label>
-                        <input type="text" id="item-name" placeholder="e.g. Lomi Special" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+            <div class="bg-white p-4 rounded-lg shadow space-y-4">
+                <h2 class="font-semibold text-lg border-b pb-2">2. Add Item to Cart</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Item Name</label>
+                        <input type="text" id="item-name" placeholder="e.g. Burger" class="mt-1 w-full p-2 border rounded-md">
                     </div>
-                    <div class="sm:col-span-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Price (₱)</label>
-                        <input type="number" id="item-price" placeholder="0.00" step="0.01" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Price (₱)</label>
+                        <input type="number" id="item-price" placeholder="0.00" step="0.01" class="mt-1 w-full p-2 border rounded-md">
                     </div>
-                    <div class="sm:col-span-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Qty</label>
-                        <input type="number" id="item-qty" value="1" min="1" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Qty</label>
+                        <input type="number" id="item-qty" value="1" min="1" class="mt-1 w-full p-2 border rounded-md">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Order Type</label>
-                    <select id="item-ordertype" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white">
+                    <label class="block text-sm font-medium text-gray-700">Order Type</label>
+                    <select id="item-ordertype" class="mt-1 w-full p-2 border rounded-md">
                         <option value="Dine-In">Dine-In</option>
                         <option value="Take-Out">Take-Out</option>
                     </select>
                 </div>
-                <button onclick="addToCart()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition shadow-sm text-sm">
-                    + Add to Cart
+                <button onclick="addToCart()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition">
+                    ➕ Add to Cart
                 </button>
             </div>
 
             <!-- CURRENT CART -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
-                <h2 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center gap-2">🛍️ 3. Current Cart</h2>
-                <div id="cart-list" class="divide-y divide-gray-100 max-h-60 overflow-y-auto pr-1">
-                    <p class="text-gray-400 text-center py-6 text-sm">Cart is empty.</p>
+            <div class="bg-white p-4 rounded-lg shadow space-y-4">
+                <h2 class="font-semibold text-lg border-b pb-2">3. Current Cart</h2>
+                <div id="cart-list" class="divide-y divide-gray-200">
+                    <p class="text-gray-500 text-center py-4">Cart is empty.</p>
                 </div>
 
-                <div class="border-t pt-4 space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <div class="flex justify-between text-lg font-bold text-gray-800">
+                <div class="border-t pt-4 space-y-2">
+                    <div class="flex justify-between text-lg font-bold">
                         <span>Total Amount:</span>
-                        <span id="cart-total" class="text-blue-600">₱0.00</span>
+                        <span id="cart-total">₱0.00</span>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Amount Paid (₱)</label>
-                        <input type="number" id="amount-paid" placeholder="0.00" step="0.01" oninput="calculateChange()" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-lg font-bold bg-white">
+                        <label class="block text-sm font-medium text-gray-700">Amount Paid (₱)</label>
+                        <input type="number" id="amount-paid" placeholder="0.00" step="0.01" oninput="calculateChange()" class="mt-1 w-full p-2 border rounded-md text-lg font-semibold">
                     </div>
-                    <div class="flex justify-between text-md font-semibold text-gray-700 items-center bg-white p-2.5 rounded border border-gray-200">
-                        <span>Sukli / Change:</span>
-                        <span id="calculated-change" class="text-emerald-600 font-bold text-lg">₱0.00</span>
+                    <div class="flex justify-between text-md font-semibold text-gray-700">
+                        <span> Sukli / Change:</span>
+                        <span id="calculated-change" class="text-green-600">₱0.00</span>
                     </div>
                 </div>
 
-                <button id="pay-button" onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-lg transition shadow-md">
-                    💳 Pay & Complete Order
+                <button id="pay-button" onclick="checkout()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md text-lg transition shadow">
+                    💳 Pay & Complete
                 </button>
             </div>
         </div>
 
         <!-- RIGHT: RECENT ORDERS HISTORY -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4 h-fit">
-            <h2 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center gap-2">📜 Order History</h2>
-            <div id="order-history-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-                <p class="text-gray-400 text-sm text-center py-6">No completed orders yet.</p>
+        <div class="bg-white p-4 rounded-lg shadow space-y-4 h-fit">
+            <h2 class="font-semibold text-lg border-b pb-2">📜 Order History</h2>
+            <div id="order-history-list" class="space-y-3 max-h-[600px] overflow-y-auto">
+                <p class="text-gray-500 text-sm text-center py-4">No completed orders yet.</p>
             </div>
         </div>
 
@@ -112,19 +112,22 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // 1. YOUR GOOGLE APPS SCRIPT EXEC WEB APP URL
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdZhsm9d7_h-oRUZuavAZYLUdgKh_MeyOxle1ZRzah0iTuwZKOnlbYd0eNi-aA7adjxA/exec";
 
         let cart = [];
         let orderHistory = [];
         let orderCounter = 1;
 
+        // Badge Generator
         function getTypeBadgeHtml(type) {
             if (type === 'Take-Out') {
-                return `<span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-semibold">Take-Out</span>`;
+                return `<span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-medium">Take-Out</span>`;
             }
-            return `<span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-semibold">Dine-In</span>`;
+            return `<span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-medium">Dine-In</span>`;
         }
 
+        // Add Item
         function addToCart() {
             const nameInput = document.getElementById('item-name');
             const priceInput = document.getElementById('item-price');
@@ -143,6 +146,7 @@
 
             cart.push({ name, price, qty, orderType });
 
+            // Clear inputs
             nameInput.value = '';
             priceInput.value = '';
             qtyInput.value = '1';
@@ -150,17 +154,19 @@
             renderCart();
         }
 
+        // Remove Item
         function removeFromCart(index) {
             cart.splice(index, 1);
             renderCart();
         }
 
+        // Render Cart
         function renderCart() {
             const list = document.getElementById('cart-list');
             const totalElem = document.getElementById('cart-total');
 
             if (cart.length === 0) {
-                list.innerHTML = `<p class="text-gray-400 text-center py-6 text-sm">Cart is empty.</p>`;
+                list.innerHTML = `<p class="text-gray-500 text-center py-4">Cart is empty.</p>`;
                 totalElem.innerText = '₱0.00';
                 calculateChange();
                 return;
@@ -173,14 +179,14 @@
                 const subtotal = item.price * item.qty;
                 total += subtotal;
                 html += `
-                    <div class="py-2.5 flex justify-between items-center text-sm">
+                    <div class="py-2 flex justify-between items-center">
                         <div>
-                            <div class="font-semibold text-gray-800">${item.name} x${item.qty} ${getTypeBadgeHtml(item.orderType)}</div>
+                            <div class="font-medium">${item.name} x${item.qty} ${getTypeBadgeHtml(item.orderType)}</div>
                             <div class="text-xs text-gray-500">₱${item.price.toFixed(2)} each</div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="font-bold text-gray-700">₱${subtotal.toFixed(2)}</span>
-                            <button onclick="removeFromCart(${i})" class="text-red-400 hover:text-red-600 font-bold px-1.5 py-0.5 rounded">✕</button>
+                            <span class="font-bold">₱${subtotal.toFixed(2)}</span>
+                            <button onclick="removeFromCart(${i})" class="text-red-500 hover:text-red-700 text-sm font-semibold">✕</button>
                         </div>
                     </div>
                 `;
@@ -191,6 +197,14 @@
             calculateChange();
         }
 
+        // Clear Cart
+        function clearCart() {
+            cart = [];
+            document.getElementById('amount-paid').value = '';
+            renderCart();
+        }
+
+        // Calculate Change
         function calculateChange() {
             const orderTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
@@ -204,24 +218,25 @@
             }
         }
 
+        // Render Local History
         function renderOrdersTable() {
             const historyList = document.getElementById('order-history-list');
 
             if (orderHistory.length === 0) {
-                historyList.innerHTML = `<p class="text-gray-400 text-sm text-center py-6">No completed orders yet.</p>`;
+                historyList.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">No completed orders yet.</p>`;
                 return;
             }
 
             let html = '';
             orderHistory.forEach(ord => {
                 html += `
-                    <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 text-xs space-y-1.5 shadow-xs">
-                        <div class="flex justify-between font-bold text-gray-800 text-sm">
+                    <div class="border rounded-md p-3 bg-gray-50 text-sm space-y-1">
+                        <div class="flex justify-between font-bold text-gray-800">
                             <span>${ord.orderId} (${ord.customer})</span>
-                            <span class="text-emerald-600">₱${ord.total.toFixed(2)}</span>
+                            <span class="text-green-600">₱${ord.total.toFixed(2)}</span>
                         </div>
-                        <div class="text-gray-400">${ord.dateTime}</div>
-                        <div class="pt-1.5 border-t border-gray-200 text-gray-600">${ord.itemsHtml}</div>
+                        <div class="text-xs text-gray-500">${ord.dateTime}</div>
+                        <div class="text-xs pt-1 border-t">${ord.itemsHtml}</div>
                     </div>
                 `;
             });
@@ -229,6 +244,7 @@
             historyList.innerHTML = html;
         }
 
+        // CHECKOUT & GOOGLE SHEETS SYNC (100% RELIABLE GET METHOD)
         async function checkout() {
             if (cart.length === 0) {
                 alert("Please add items to cart first!");
@@ -246,7 +262,7 @@
 
             payBtn.disabled = true;
             payBtn.innerText = "Processing...";
-            syncStatus.innerText = "⏳ Syncing...";
+            syncStatus.innerText = "⏳ Syncing to Sheet...";
 
             const plainSheetSummary = cart.map(i => `${i.name} x${i.qty} [${i.orderType || 'Dine-In'}]`).join(', ');
 
@@ -258,6 +274,7 @@
 
             const currentNum = "#" + orderCounter++;
 
+            // Local History Update
             orderHistory.unshift({
                 orderId: currentNum,
                 customer: tableCustomer,
@@ -267,8 +284,10 @@
             });
             renderOrdersTable();
 
+            // Local Computer Exact Time
             const exactLocalTime = new Date().toLocaleString();
 
+            // URL Parameters for GET Request
             const queryParams = new URLSearchParams({
                 datetime: exactLocalTime,
                 ordernum: currentNum,
@@ -281,6 +300,7 @@
             }).toString();
 
             try {
+                // Send via GET method
                 await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?${queryParams}`, {
                     method: 'GET',
                     mode: 'no-cors'
@@ -294,7 +314,7 @@
             alert(`Order ${currentNum} completed!\nTotal: ₱${orderTotal.toFixed(2)}\nAmount Paid: ₱${amountPaid.toFixed(2)}\nChange: ₱${change.toFixed(2)}`);
             clearCart();
             payBtn.disabled = false;
-            payBtn.innerText = "💳 Pay & Complete Order";
+            payBtn.innerText = "💳 Pay & Complete";
         }
     </script>
 </body>
