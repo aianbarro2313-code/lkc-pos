@@ -31,7 +31,6 @@
     <!-- MOBILE TOP HEADER & NAVIGATION TOGGLE -->
     <header class="bg-brand-dark text-white p-3 flex justify-between items-center md:hidden border-b border-white/10 z-30">
         <div class="flex items-center gap-3">
-            <!-- MOBILE LOGO IMAGE -->
             <img src="logo.png" alt="Leonardo's Logo" class="w-10 h-10 object-contain rounded-full border border-brand-orange bg-white">
             <div>
                 <h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
@@ -48,7 +47,6 @@
         <div>
             <!-- LOGO / HEADER (DESKTOP) -->
             <div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
-                <!-- DESKTOP LOGO IMAGE -->
                 <img src="logo.png" alt="Leonardo's Logo" class="w-20 h-20 object-contain rounded-full border-2 border-brand-orange bg-white mb-2 shadow-md">
                 <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
                 <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
@@ -116,7 +114,6 @@
                 <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2">
                     <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
                     
-                    <!-- DEFAULT ORDER TYPE FOR NEW ITEMS -->
                     <div class="flex items-center justify-between text-xs pt-1">
                         <span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
                         <div class="flex gap-2">
@@ -193,7 +190,6 @@
         <div id="tab-orders" class="flex-1 p-4 md:p-6 overflow-y-auto hidden">
             <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
             
-            <!-- SUMMARY STATS -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
                 <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                     <p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p>
@@ -232,7 +228,6 @@
         <!-- EDIT MENU & CATEGORIES TAB -->
         <div id="tab-inventory" class="flex-1 p-4 md:p-6 overflow-y-auto hidden space-y-6">
             
-            <!-- CATEGORY MANAGER SECTION -->
             <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
                     <div>
@@ -248,7 +243,6 @@
                 </div>
             </div>
 
-            <!-- MENU ITEMS MANAGEMENT -->
             <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                     <div>
@@ -271,15 +265,14 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz52ppZkqfMjfp7ssXhaG8kUbctYQLdno7il5Y7ikJS8iqr0qvJKPiwEFpSBniar0JK/exec";
+        // UPDATED GOOGLE SHEET SCRIPT URL
+        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhLrnqJ99ET5tnMGMwNB5hletOYmE-PkyKqqvahBj0IHsy5td-U6kYjHTCWCPsT1PE/exec";
 
         let orderCounter = 1;
         let currentDefaultType = "Dine-In";
 
-        // INITIAL CATEGORIES LIST
         let categories = ["LOMI", "PANCIT", "SILOG", "SIZZLING", "DRINKS", "OTHER"];
 
-        // INITIAL MENU DATA
         let menu = [
             { id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00, available: true },
             { id: 2, name: "Lomi Special", category: "LOMI", price: 100.00, available: true },
@@ -317,7 +310,6 @@
         let activeOrders = [];
         let orderHistory = [];
 
-        // HELPER TO GENERATE HTML COLOR BADGES
         function getTypeBadgeHtml(type) {
             if (type === 'Take-Out') {
                 return `<span class="inline-block bg-red-100 text-red-700 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Take-Out</span>`;
@@ -325,7 +317,6 @@
             return `<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Dine-In</span>`;
         }
 
-        // MOBILE LAYOUT TOGGLES
         function toggleMobileMenu() {
             const sidebar = document.getElementById('sidebar-nav');
             sidebar.classList.toggle('hidden');
@@ -336,14 +327,12 @@
             drawer.classList.toggle('translate-y-full');
         }
 
-        // SET DEFAULT ORDER TYPE
         function setDefaultType(type) {
             currentDefaultType = type;
             cart.forEach(item => item.orderType = type);
             updateCartUI();
         }
 
-        // RENDER MENU BY CATEGORY IN POS
         function renderPOSMenu() {
             const grid = document.getElementById('pos-menu-grid');
             
@@ -390,7 +379,6 @@
             }).join('');
         }
 
-        // CART LOGIC
         function addToCart(itemId) {
             const item = menu.find(m => m.id === itemId);
             if (!item || item.available === false) return;
@@ -466,7 +454,6 @@
                             </div>
                         </div>
 
-                        <!-- PER-ITEM DINE IN / TAKE OUT DROPDOWN WITH COLORED BADGES -->
                         <div class="flex items-center justify-between pt-1.5 border-t border-gray-200/60 text-[10px]">
                             <span class="text-gray-400 font-bold uppercase">Type:</span>
                             <div class="flex items-center gap-2">
@@ -486,7 +473,6 @@
             calculateChange();
         }
 
-        // SAVE ACTIVE ORDER
         function saveActiveOrder() {
             if (cart.length === 0) {
                 alert("Please add items to cart first!");
@@ -508,7 +494,6 @@
             alert(`Order saved for ${tableName}! View it in 'Active Orders'.`);
         }
 
-        // RENDER ACTIVE ORDERS
         function renderActiveOrders() {
             const grid = document.getElementById('active-orders-grid');
             if (activeOrders.length === 0) {
@@ -612,10 +597,8 @@
             payBtn.innerText = "Processing...";
             syncStatus.innerText = "⏳ Syncing to Sheet...";
 
-            // PLAIN TEXT FOR GOOGLE SHEETS SYNC
             const plainSheetSummary = cart.map(i => `${i.name} x${i.qty} [${i.orderType || 'Dine-In'}]`).join(', ');
 
-            // VISUAL HTML BADGES FOR APP UI HISTORY
             const htmlHistorySummary = cart.map(i => `
                 <span class="inline-flex items-center gap-1 my-0.5">
                     <strong>${i.name}</strong> x${i.qty} ${getTypeBadgeHtml(i.orderType || 'Dine-In')}
@@ -664,7 +647,6 @@
             payBtn.innerText = "💳 Pay & Complete";
         }
 
-        // CATEGORY MANAGEMENT
         function renderCategoriesManager() {
             const container = document.getElementById('category-badge-list');
             container.innerHTML = categories.map(cat => `
@@ -699,7 +681,6 @@
             }
         }
 
-        // EDIT MENU & INVENTORY MANAGEMENT
         function renderInventoryTab() {
             renderCategoriesManager();
             const container = document.getElementById('inventory-list');
@@ -710,7 +691,6 @@
                         <div class="flex-1">
                             <input type="text" value="${item.name}" onchange="updateItemDetails(${item.id}, 'name', this.value)" class="font-bold text-xs text-brand-dark bg-transparent border-b border-transparent hover:border-gray-300 focus:outline-none focus:border-brand-orange w-full">
                             
-                            <!-- Category Select Dropdown -->
                             <select onchange="updateItemDetails(${item.id}, 'category', this.value)" class="mt-1 text-[10px] font-bold uppercase bg-white border border-gray-200 rounded px-1 py-0.5 text-gray-600 focus:outline-none">
                                 ${categories.map(c => `<option value="${c}" ${c === item.category ? 'selected' : ''}>${c}</option>`).join('')}
                             </select>
@@ -757,7 +737,6 @@
             if (!name) return;
             const price = parseFloat(prompt("Enter price (₱):") || "0");
             
-            // Choose Category
             let catPrompt = "Pumili ng Category number:\n" + categories.map((c, i) => `${i + 1}. ${c}`).join('\n');
             let catChoice = prompt(catPrompt, "1");
             let selectedCat = categories[parseInt(catChoice) - 1] || categories[0];
@@ -776,7 +755,6 @@
             }
         }
 
-        // ORDER HISTORY & SUMMARY
         function renderOrdersTable() {
             const tbody = document.getElementById('orders-table-body');
             const totalOrders = orderHistory.length;
@@ -803,7 +781,6 @@
             `).join('');
         }
 
-        // NAVIGATION LOGIC
         function switchTab(tab) {
             ['pos', 'active', 'orders', 'inventory'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -822,7 +799,6 @@
             if (tab === 'orders') renderOrdersTable();
         }
 
-        // INITIAL LOAD
         window.onload = () => {
             renderPOSMenu();
         };
