@@ -1,0 +1,16 @@
+{
+  "short_name": "LKC POS",
+  "name": "Leonardo's Kambingan sa Chapel POS",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23E67E22'/><text x='50' y='60' font-size='30' text-anchor='middle' fill='white' font-weight='bold'>LKC</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#2C1810",
+  "theme_color": "#2C1810",
+  "display": "standalone",
+  "orientation": "any"
+}

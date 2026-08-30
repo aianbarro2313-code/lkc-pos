@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonardo's Kambingan sa Chapel - POS</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2C1810">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LKC POS">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#2C1810',
+                            brown: '#4A2511',
+                            warm: '#8B4513',
+                            cream: '#FAF6F0',
+                            accent: '#E67E22',
+                            light: '#FFFDF9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #printable-receipt, #printable-receipt * { visibility: visible; }
+            #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-brand-cream text-brand-dark font-sans h-screen flex flex-col md:flex-row overflow-hidden select-none">
+
+    <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col justify-between shrink-0">
+        <div>
+            <div class="p-4 bg-brand-brown flex flex-col items-center text-center border-b border-brand-warm">
+                <div class="w-24 h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex flex-col items-center justify-center p-1 mb-2 shadow-md overflow-hidden relative">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="48" fill="#FCE8D5" stroke="#E67E22" stroke-width="2"/>
+                        <path d="M 35 35 Q 30 20 42 18 Q 50 12 58 18 Q 70 20 65 35 Z" fill="#FFFFFF" stroke="#4A2511" stroke-width="2"/>
+                        <rect x="37" y="33" width="26" height="8" fill="#FFFFFF" stroke="#4A2511" stroke-width="1.5"/>
+                        <circle cx="50" cy="48" r="14" fill="#FFDBAC"/>
+                        <path d="M 43 51 Q 50 57 57 51" fill="none" stroke="#4A2511" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="42" cy="49" r="2.5" fill="#FF8A8A"/>
+                        <circle cx="58" cy="49" r="2.5" fill="#FF8A8A"/>
+                    </svg>
+                </div>
+                <h1 class="font-black tracking-wider text-base uppercase text-brand-cream">LEONARDO’S KAMBINGAN</h1>
+                <p class="text-xs text-brand-accent font-semibold">SA CHAPEL</p>
+                <p class="text-[10px] italic mt-1 text-gray-300">“WARI KO’Y DI MO MAWARI.”</p>
+            </div>
+
+            <nav class="p-4 space-y-2">
+                <button onclick="switchView('pos')" id="nav-pos" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition bg-brand-accent text-white">
+                    <span>🛒</span> New Order / POS
+                </button>
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition hover:bg-brand-brown">
+                    <span>📊</span> Dashboard
+                </button>
+                <button onclick="switchView('orders')" id="nav-orders" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition hover:bg-brand-brown">
+                    <span>🧾</span> Order History
+                </button>
+                <button onclick="switchView('menu')" id="nav-menu" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition hover:bg-brand-brown">
+                    <span>🍲</span> Menu Management
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 text-xs text-center border-t border-brand-brown text-gray-400">
+            Mahabang Parang, Batangas City<br>
+            Tel: 0905-470-6347
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <section id="view-pos" class="flex-1 flex flex-col lg:flex-row h-full overflow-hidden">
+            <div class="flex-1 flex flex-col p-4 overflow-y-auto">
+                <div class="flex gap-2 overflow-x-auto pb-3 mb-3 border-b border-gray-300 shrink-0" id="category-tabs"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-1" id="product-grid"></div>
+            </div>
+
+            <div class="w-full lg:w-96 bg-white border-l border-gray-200 flex flex-col h-full shadow-lg shrink-0">
+                <div class="p-4 bg-brand-brown text-white flex justify-between items-center">
+                    <h2 class="font-bold text-lg">Current Order</h2>
+                    <span id="pos-order-number" class="text-xs bg-brand-accent px-2 py-1 rounded font-mono">#000001</span>
+                </div>
+
+                <div class="p-3 bg-brand-cream border-b border-gray-200 grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Customer Name</label>
+                        <input type="text" id="cust-name" placeholder="Optional" class="w-full p-1.5 border rounded">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Table No.</label>
+                        <input type="text" id="cust-table" placeholder="Optional" class="w-full p-1.5 border rounded">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block font-medium text-gray-600 mb-1">Order Type</label>
+                        <select id="cust-type" class="w-full p-1.5 border rounded">
+                            <option value="Dine-in">Dine-in</option>
+                            <option value="Takeout">Takeout</option>
+                            <option value="Delivery">Delivery</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 space-y-2" id="cart-items">
+                    <div class="text-center text-gray-400 mt-10 text-sm">No items added yet</div>
+                </div>
+
+                <div class="p-4 bg-brand-cream border-t border-gray-200 space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span>Subtotal:</span>
+                        <span id="summary-subtotal" class="font-semibold">₱0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm items-center">
+                        <span>Discount (₱):</span>
+                        <input type="number" id="summary-discount" value="0" min="0" onchange="renderCart()" class="w-20 p-1 text-right border rounded text-sm">
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-brand-dark pt-1 border-t">
+                        <span>TOTAL:</span>
+                        <span id="summary-total" class="text-brand-accent text-lg">₱0.00</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">Payment</label>
+                            <select id="payment-method" onchange="toggleCashInput()" class="w-full p-1.5 border rounded text-xs">
+                                <option value="Cash">Cash</option>
+                                <option value="GCash">GCash</option>
+                                <option value="Card">Card</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div id="cash-container">
+                            <label class="block text-xs font-medium text-gray-600">Cash Received</label>
+                            <input type="number" id="cash-received" placeholder="0.00" onkeyup="calculateChange()" class="w-full p-1.5 border rounded text-xs">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-xs font-semibold pt-1 text-gray-700" id="change-display">
+                        <span>Change:</span>
+                        <span id="summary-change">₱0.00</span>
+                    </div>
+
+                    <button onclick="completeOrder()" class="w-full py-3 bg-brand-accent hover:bg-orange-600 text-white font-bold rounded-lg shadow transition mt-2">
+                        COMPLETE ORDER
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-dashboard" class="hidden p-6 space-y-6">
+            <h2 class="text-2xl font-bold text-brand-dark">Daily Summary Dashboard</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-brand-accent">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Gross Sales Today</p>
+                    <p class="text-2xl font-black text-brand-dark" id="dash-gross">₱0.00</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-green-500">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Net Sales Today</p>
+                    <p class="text-2xl font-black text-green-600" id="dash-net">₱0.00</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Total Orders</p>
+                    <p class="text-2xl font-black text-brand-dark" id="dash-orders">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-purple-500">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Average Order Value</p>
+                    <p class="text-2xl font-black text-brand-dark" id="dash-aov">₱0.00</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <h3 class="font-bold text-base mb-3 text-brand-dark">Payment Breakdown</h3>
+                    <div id="dash-payments" class="space-y-2 text-sm"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-orders" class="hidden p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h2 class="text-2xl font-bold text-brand-dark">Order History</h2>
+                <input type="text" id="order-search" onkeyup="renderOrderHistory()" placeholder="Search Order # or Customer..." class="p-2 border rounded-lg w-full sm:w-64 text-sm">
+            </div>
+            <div class="bg-white rounded-xl shadow overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-brand-brown text-white">
+                        <tr>
+                            <th class="p-3">Order #</th>
+                            <th class="p-3">Date/Time</th>
+                            <th class="p-3">Customer</th>
+                            <th class="p-3">Type</th>
+                            <th class="p-3">Total</th>
+                            <th class="p-3">Payment</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-history-table" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-menu" class="hidden p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-brand-dark">Menu Management</h2>
+                <button onclick="addNewProduct()" class="px-4 py-2 bg-brand-accent text-white font-bold rounded-lg text-sm shadow hover:bg-orange-600">
+                    + Add New Product
+                </button>
+            </div>
+            <div class="bg-white rounded-xl shadow overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-brand-brown text-white">
+                        <tr>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Category</th>
+                            <th class="p-3">Price</th>
+                            <th class="p-3">Availability</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-management-table" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="receipt-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full space-y-4 max-h-[90vh] overflow-y-auto">
+            <div id="printable-receipt" class="font-mono text-xs space-y-2 p-2 text-black">
+                <div class="text-center flex flex-col items-center">
+                    <h2 class="font-bold text-sm">LEONARDO’S KAMBINGAN SA CHAPEL</h2>
+                    <p class="italic">“WARI KO’Y DI MO MAWARI.”</p>
+                    <p>Mahabang Parang, Batangas City</p>
+                    <p>Tel. 0905-470-6347</p>
+                    <p class="my-2">==============================</p>
+                </div>
+                <div id="receipt-meta"></div>
+                <p class="my-1">------------------------------</p>
+                <div id="receipt-items" class="space-y-1"></div>
+                <p class="my-1">------------------------------</p>
+                <div id="receipt-totals" class="space-y-0.5"></div>
+                <div class="text-center mt-4">
+                    <p>==============================</p>
+                    <p class="font-bold">THANK YOU FOR ORDERING!</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="flex-1 py-2 bg-brand-brown text-white text-xs font-bold rounded">PRINT</button>
+                <button onclick="closeReceiptModal()" class="flex-1 py-2 bg-gray-300 text-gray-800 text-xs font-bold rounded">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+            });
+        }
+
+        const fullMasterMenu = [
+            { id: 1, name: 'Lomi Regular', category: 'LOMI', price: 80, available: true, unconfirmed: false },
+            { id: 2, name: 'Lomi Special', category: 'LOMI', price: 100, available: true, unconfirmed: false },
+            { id: 3, name: 'Lomi Jumbo', category: 'LOMI', price: 120, available: true, unconfirmed: false },
+            { id: 4, name: 'Double Toppings', category: 'LOMI', price: 80, available: true, unconfirmed: false },
+            { id: 5, name: 'Pancit Guisado', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 6, name: 'Pancit Chami', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 7, name: 'Pancit Chami Tamis Anghang', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 8, name: 'Pancit Canton', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 9, name: 'Pancit Bihon', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 10, name: 'Pancit Canton Bihon', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
+            { id: 11, name: 'Mismo', category: 'DRINKS', price: 22, available: true, unconfirmed: false },
+            { id: 12, name: '1.5L Soda', category: 'DRINKS', price: 80, available: true, unconfirmed: false },
+            { id: 13, name: 'Tapsilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 14, name: 'Tosilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 15, name: 'Hotsilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 16, name: 'Porksilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 17, name: 'Chicksilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 18, name: 'Bangsilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 19, name: 'Longsilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 20, name: 'Hungariansilog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 21, name: 'Sisig Silog', category: 'SILOG', price: 0, available: true, unconfirmed: true },
+            { id: 22, name: 'Sisig Sizzling', category: 'SIZZLING PLATE', price: 0, available: true, unconfirmed: true },
+            { id: 23, name: 'Porkchop with Gravy', category: 'SIZZLING PLATE', price: 0, available: true, unconfirmed: true },
+            { id: 24, name: 'Fried Chicken with Gravy', category: 'SIZZLING PLATE', price: 0, available: true, unconfirmed: true },
+            { id: 25, name: 'Hungarian with Gravy', category: 'SIZZLING PLATE', price: 0, available: true, unconfirmed: true },
+            { id: 26, name: 'Kalderetang Kambing', category: 'OTHER', price: 150, available: true, unconfirmed: false },
+            { id: 27, name: 'Dinuguan', category: 'OTHER', price: 60, available: true, unconfirmed: false },
+            { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true, unconfirmed: false }
+        ];
+
+        let menu = fullMasterMenu;
+        let orders = JSON.parse(localStorage.getItem('lkc_orders')) || [];
+        let currentCart = [];
+        let activeCategory = 'LOMI';
+
+        window.onload = () => {
+            renderCategoryTabs();
+            renderProducts();
+            renderCart();
+            updateOrderCounter();
+        };
+
+        function saveMenu() { localStorage.setItem('lkc_menu_v3', JSON.stringify(menu)); }
+        function saveOrders() { localStorage.setItem('lkc_orders', JSON.stringify(orders)); }
+
+        function switchView(viewName) {
+            ['pos', 'dashboard', 'orders', 'menu'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`nav-${v}`).classList.remove('bg-brand-accent');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewName}`).classList.add('bg-brand-accent');
+
+            if(viewName === 'dashboard') renderDashboard();
+            if(viewName === 'orders') renderOrderHistory();
+            if(viewName === 'menu') renderMenuManagement();
+        }
+
+        function renderCategoryTabs() {
+            const categories = ['LOMI', 'PANCIT', 'SILOG', 'SIZZLING PLATE', 'DRINKS', 'OTHER'];
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition ${activeCategory === cat ? 'bg-brand-brown text-white' : 'bg-white text-brand-dark border'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategoryTabs();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('product-grid');
+            const items = menu.filter(m => m.category === activeCategory);
+
+            if(items.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">No items available in this category.</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="bg-white rounded-xl p-4 border flex flex-col justify-between shadow-sm hover:shadow transition">
+                    <div>
+                        <h3 class="font-bold text-sm text-brand-dark">${item.name}</h3>
+                        <p class="text-brand-accent font-black text-sm mt-1">
+                            ${item.unconfirmed ? '<span class="text-[11px] text-red-500 font-bold block">PRICE TO BE CONFIRMED</span>' : '₱' + item.price.toFixed(2)}
+                        </p>
+                    </div>
+                    <button onclick="addToCart(${item.id})" ${!item.available || item.unconfirmed ? 'disabled' : ''} 
+                            class="mt-3 w-full py-1.5 rounded text-xs font-bold transition ${item.available && !item.unconfirmed ? 'bg-brand-warm text-white hover:bg-brand-brown' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                        ${item.unconfirmed ? 'PENDING' : (!item.available ? 'UNAVAILABLE' : 'ADD')}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            const product = menu.find(p => p.id === productId);
+            if(product.unconfirmed) return;
+            
+            const existing = currentCart.find(c => c.id === productId);
+            if(existing) {
+                existing.qty++;
+            } else {
+                currentCart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function updateCartQty(id, delta) {
+            const item = currentCart.find(c => c.id === id);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) currentCart = currentCart.filter(c => c.id !== id);
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            if(currentCart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-400 mt-10 text-sm">No items added yet</div>`;
+            } else {
+                container.innerHTML = currentCart.map(item => `
+                    <div class="flex justify-between items-center bg-brand-light p-2 rounded border border-gray-100 text-xs">
+                        <div class="flex-1">
+                            <p class="font-bold">${item.name}</p>
+                            <p class="text-gray-500">₱${item.price.toFixed(2)} × ${item.qty}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 rounded font-bold">-</button>
+                            <span class="font-bold">${item.qty}</span>
+                            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 rounded font-bold">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const discount = parseFloat(document.getElementById('summary-discount').value) || 0;
+            const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('summary-subtotal').innerText = `₱${subtotal.toFixed(2)}`;
+            document.getElementById('summary-total').innerText = `₱${total.toFixed(2)}`;
+            calculateChange();
+        }
+
+        function calculateChange() {
+            const total = parseFloat(document.getElementById('summary-total').innerText.replace('₱', '')) || 0;
+            const cash = parseFloat(document.getElementById('cash-received').value) || 0;
+            const change = cash - total;
+            document.getElementById('summary-change').innerText = `₱${(change > 0 ? change : 0).toFixed(2)}`;
+        }
+
+        function toggleCashInput() {
+            const method = document.getElementById('payment-method').value;
+            const container = document.getElementById('cash-container');
+            container.style.display = method === 'Cash' ? 'block' : 'none';
+        }
+
+        function updateOrderCounter() {
+            const num = (orders.length + 1).toString().padStart(6, '0');
+            document.getElementById('pos-order-number').innerText = `#${num}`;
+        }
+
+        function completeOrder() {
+            if(currentCart.length === 0) return alert('PLEASE ADD AT LEAST ONE ITEM.');
+            
+            const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const discount = parseFloat(document.getElementById('summary-discount').value) || 0;
+            const total = Math.max(0, subtotal - discount);
+            const paymentMethod = document.getElementById('payment-method').value;
+            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
+
+            if(paymentMethod === 'Cash' && cashReceived < total) {
+                return alert('INSUFFICIENT PAYMENT.');
+            }
+
+            const order = {
+                orderNum: (orders.length + 1).toString().padStart(6, '0'),
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                customer: document.getElementById('cust-name').value || 'Walk-in',
+                table: document.getElementById('cust-table').value || 'N/A',
+                type: document.getElementById('cust-type').value,
+                items: [...currentCart],
+                subtotal, discount, total,
+                paymentMethod,
+                amountPaid: paymentMethod === 'Cash' ? cashReceived : total,
+                change: paymentMethod === 'Cash' ? Math.max(0, cashReceived - total) : 0,
+                status: 'COMPLETED'
+            };
+
+            orders.push(order);
+            saveOrders();
+            showReceiptModal(order);
+
+            currentCart = [];
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-table').value = '';
+            document.getElementById('cash-received').value = '';
+            document.getElementById('summary-discount').value = '0';
+            renderCart();
+            updateOrderCounter();
+        }
+
+        function showReceiptModal(order) {
+            document.getElementById('receipt-meta').innerHTML = `
+                <p>ORDER #: ${order.orderNum}</p>
+                <p>Date: ${order.date} | Time: ${order.time}</p>
+                <p>Customer: ${order.customer} (${order.type})</p>
+            `;
+            document.getElementById('receipt-items').innerHTML = order.items.map(i => `
+                <div class="flex justify-between">
+                    <span>${i.name} x${i.qty}</span>
+                    <span>₱${(i.price * i.qty).toFixed(2)}</span>
+                </div>
+            `).join('');
+            document.getElementById('receipt-totals').innerHTML = `
+                <div class="flex justify-between"><span>Subtotal:</span><span>₱${order.subtotal.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span>Discount:</span><span>₱${order.discount.toFixed(2)}</span></div>
+                <div class="flex justify-between font-bold text-sm"><span>TOTAL:</span><span>₱${order.total.toFixed(2)}</span></div>
+                <div class="flex justify-between mt-1"><span>Payment (${order.paymentMethod}):</span><span>₱${order.amountPaid.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span>Change:</span><span>₱${order.change.toFixed(2)}</span></div>
+            `;
+            document.getElementById('receipt-modal').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+        }
+
+        function renderOrderHistory() {
+            const query = document.getElementById('order-search').value.toLowerCase();
+            const filtered = orders.filter(o => o.orderNum.includes(query) || o.customer.toLowerCase().includes(query));
+            
+            document.getElementById('order-history-table').innerHTML = filtered.slice().reverse().map(o => `
+                <tr>
+                    <td class="p-3 font-mono font-bold">#${o.orderNum}</td>
+                    <td class="p-3">${o.date} ${o.time}</td>
+                    <td class="p-3">${o.customer}</td>
+                    <td class="p-3">${o.type}</td>
+                    <td class="p-3 font-bold">₱${o.total.toFixed(2)}</td>
+                    <td class="p-3">${o.paymentMethod}</td>
+                    <td class="p-3"><span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-bold">${o.status}</span></td>
+                    <td class="p-3 text-right">
+                        <button onclick='showReceiptModal(${JSON.stringify(o)})' class="text-xs bg-brand-warm text-white px-2 py-1 rounded">Receipt</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDashboard() {
+            const validOrders = orders.filter(o => o.status === 'COMPLETED');
+            const gross = validOrders.reduce((sum, o) => sum + o.subtotal, 0);
+            const net = validOrders.reduce((sum, o) => sum + o.total, 0);
+            const aov = validOrders.length ? net / validOrders.length : 0;
+
+            document.getElementById('dash-gross').innerText = `₱${gross.toFixed(2)}`;
+            document.getElementById('dash-net').innerText = `₱${net.toFixed(2)}`;
+            document.getElementById('dash-orders').innerText = validOrders.length;
+            document.getElementById('dash-aov').innerText = `₱${aov.toFixed(2)}`;
+
+            const methods = ['Cash', 'GCash', 'Card', 'Other'];
+            document.getElementById('dash-payments').innerHTML = methods.map(m => {
+                const total = validOrders.filter(o => o.paymentMethod === m).reduce((sum, o) => sum + o.total, 0);
+                return `<div class="flex justify-between border-b py-1"><span>${m}:</span><span class="font-bold">₱${total.toFixed(2)}</span></div>`;
+            }).join('');
+        }
+
+        function renderMenuManagement() {
+            document.getElementById('menu-management-table').innerHTML = menu.map(m => `
+                <tr>
+                    <td class="p-3 font-bold">${m.name}</td>
+                    <td class="p-3">${m.category}</td>
+                    <td class="p-3">${m.unconfirmed ? '<span class="text-xs text-red-500 font-bold">TO BE CONFIRMED</span>' : '₱' + m.price.toFixed(2)}</td>
+                    <td class="p-3">
+                        <button onclick="toggleAvailability(${m.id})" class="text-xs px-2 py-1 rounded font-bold ${m.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${m.available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                        </button>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="editPrice(${m.id})" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">Set / Edit Price</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleAvailability(id) {
+            const item = menu.find(m => m.id === id);
+            if(item) { item.available = !item.available; saveMenu(); renderMenuManagement(); renderProducts(); }
+        }
+
+        function editPrice(id) {
+            const item = menu.find(m => m.id === id);
+            const newPrice = prompt(`Enter new price for ${item.name}:`, item.price);
+            if(newPrice !== null && !isNaN(newPrice)) {
+                item.price = parseFloat(newPrice);
+                item.unconfirmed = false;
+                saveMenu();
+                renderMenuManagement();
+                renderProducts();
+            }
+        }
+
+        function addNewProduct() {
+            const name = prompt('Enter Product Name:');
+            if(!name) return;
+            const category = prompt('Enter Category (LOMI, PANCIT, SILOG, SIZZLING PLATE, DRINKS, OTHER):', 'DRINKS').toUpperCase();
+            const price = parseFloat(prompt('Enter Price (₱):', '0')) || 0;
+
+            const newItem = { id: Date.now(), name, category, price, available: true, unconfirmed: price === 0 };
+            menu.push(newItem);
+            saveMenu();
+            renderCategoryTabs();
+            renderMenuManagement();
+            renderProducts();
+        }
+    </script>
+</body>
+</html>
