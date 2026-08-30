@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leonardo's Kambingan - POS & Inventory</title>
+    <title>Leonardo's Kambingan sa Chapel - POS System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,146 +21,266 @@
         }
     </script>
     <style>
-        /* Custom Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F4EFEB;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D9531E;
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F4EFEB; }
+        ::-webkit-scrollbar-thumb { background: #D9531E; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-brand-bg font-sans antialiased h-screen flex overflow-hidden">
+<body class="bg-brand-bg font-sans antialiased h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <aside class="w-64 bg-brand-dark text-white flex flex-col justify-between p-4 flex-shrink-0">
+    <!-- MOBILE TOP HEADER & NAVIGATION TOGGLE -->
+    <header class="bg-brand-dark text-white p-3 flex justify-between items-center md:hidden border-b border-white/10 z-30">
+        <div class="flex items-center gap-3">
+            <!-- MOBILE LOGO IMAGE -->
+            <img src="https://via.placeholder.com/100?text=LOGO" alt="Leonardo's Logo" class="w-10 h-10 object-cover rounded-full border border-brand-orange bg-white">
+            <div>
+                <h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+                <p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
+            </div>
+        </div>
+        <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg focus:outline-none">
+            ☰
+        </button>
+    </header>
+
+    <!-- SIDEBAR (DESKTOP) & MOBILE DROPDOWN NAVIGATION -->
+    <aside id="sidebar-nav" class="hidden md:flex w-full md:w-64 bg-brand-dark text-white flex-col justify-between p-4 flex-shrink-0 z-20">
         <div>
-            <!-- LOGO / HEADER -->
-            <div class="mb-8 text-center pt-2">
+            <!-- LOGO / HEADER (DESKTOP) -->
+            <div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
+                <!-- DESKTOP LOGO IMAGE -->
+                <img src="https://via.placeholder.com/120?text=LOGO" alt="Leonardo's Logo" class="w-20 h-20 object-cover rounded-full border-2 border-brand-orange bg-white mb-2 shadow-md">
                 <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
-                <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan & Restaurant</p>
+                <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
             </div>
 
             <!-- NAVIGATION MENU -->
             <nav class="space-y-2">
                 <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">
-                    🛒 <span>POS System</span>
+                    🛒 <span>POS & Take Order</span>
+                </button>
+                <button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
+                    🍽️ <span>Active Orders</span>
                 </button>
                 <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-                    📋 <span>Order History</span>
+                    📋 <span>Order History & Summary</span>
                 </button>
                 <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-                    📦 <span>Item Availability</span>
+                    ⚙️ <span>Edit Menu & Categories</span>
                 </button>
             </nav>
         </div>
 
         <!-- SYNC STATUS INDICATOR -->
-        <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs">
+        <div class="mt-4 md:mt-0 p-3 bg-white/5 rounded-xl border border-white/10 text-xs">
             <span id="sync-status" class="text-amber-300 font-medium">📊 Sheet Sync: Ready</span>
         </div>
     </aside>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 flex overflow-hidden">
+    <main class="flex-1 flex overflow-hidden relative">
         
         <!-- POS TAB -->
-        <div id="tab-pos" class="flex-1 flex p-6 gap-6 overflow-hidden">
+        <div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6 overflow-hidden">
             
-            <!-- LEFT: MENU ITEMS (BY CATEGORY SCROLL) -->
+            <!-- LEFT: MENU ITEMS (BY CATEGORY) -->
             <div class="flex-1 flex flex-col min-w-0">
-                <div class="mb-4 flex justify-between items-center">
+                <div class="mb-3 md:mb-4 flex justify-between items-center">
                     <div>
-                        <h2 class="text-2xl font-black text-brand-dark">Select Menu Items</h2>
-                        <p class="text-xs text-gray-500">Scroll down to view items by category</p>
+                        <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
+                        <p class="text-[11px] md:text-xs text-gray-500">Pumili ng pagkain para idagdag sa order summary</p>
                     </div>
                 </div>
 
                 <!-- CATEGORIES CONTAINER (VERTICAL SCROLL) -->
-                <div id="pos-menu-grid" class="space-y-6 flex-1 overflow-y-auto pr-2">
-                    <!-- Dynamic rendering by category will happen here -->
-                </div>
+                <div id="pos-menu-grid" class="space-y-6 flex-1 overflow-y-auto pr-1 md:pr-2 pb-16 md:pb-0"></div>
             </div>
 
+            <!-- FLOATING BUTTON FOR MOBILE TO VIEW CART -->
+            <button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-20">
+                <span class="flex items-center gap-2">🛒 View Cart (<span id="mobile-cart-count">0</span>)</span>
+                <span id="mobile-cart-total">₱0.00</span>
+            </button>
+
             <!-- RIGHT: CART / ORDER SUMMARY -->
-            <div class="w-96 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+            <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-30 transition-transform transform translate-y-full md:translate-y-0">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl">
                     <h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
-                    <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
+                        <button onclick="toggleMobileCart()" class="md:hidden text-gray-500 font-bold text-lg">✕</button>
+                    </div>
+                </div>
+
+                <!-- TABLE / CUSTOMER INFO & SET ALL TYPE OPTION -->
+                <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2">
+                    <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
+                    
+                    <!-- DEFAULT ORDER TYPE FOR NEW ITEMS -->
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
+                        <div class="flex gap-2">
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')" class="text-red-600 focus:ring-red-500">
+                                <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- CART ITEMS LIST -->
-                <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5 min-h-[150px]">
                     <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
                 </div>
 
-                <!-- ORDER TOTAL & PAYMENT -->
+                <!-- ORDER TOTAL, PAYMENT & INPUTS AT THE BOTTOM -->
                 <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-3 rounded-b-2xl">
-                    <div class="flex justify-between items-center text-sm">
+                    <div class="flex justify-between items-center text-xs">
                         <span class="text-gray-600 font-medium">Subtotal</span>
                         <span id="cart-subtotal" class="font-bold text-brand-dark">₱0.00</span>
                     </div>
+
+                    <!-- PAYMENT METHOD & AMOUNT PAID -->
+                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-200/60">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
+                            <select id="payment-method" class="w-full p-2 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white font-bold text-gray-700">
+                                <option value="Cash">Cash</option>
+                                <option value="GCash">GCash</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
+                            <input type="number" id="amount-paid" oninput="calculateChange()" placeholder="₱0.00" class="w-full p-2 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white font-bold">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
+                        <span class="font-bold">Sukli / Change</span>
+                        <span id="cart-change" class="font-black text-sm">₱0.00</span>
+                    </div>
+
                     <div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
                         <span>Total</span>
                         <span id="cart-total" class="text-brand-orange">₱0.00</span>
                     </div>
 
-                    <button id="pay-button" onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3.5 rounded-xl shadow-md transition transform active:scale-95 text-center mt-2">
-                        Pay & Complete Order
-                    </button>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow transition">
+                            📌 Save Active Order
+                        </button>
+                        <button id="pay-button" onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow transition">
+                            💳 Pay & Complete
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ORDERS TAB -->
-        <div id="tab-orders" class="flex-1 p-6 overflow-y-auto hidden">
-            <h2 class="text-2xl font-black text-brand-dark mb-4">Order History</h2>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <table class="w-full text-left border-collapse">
+        <!-- ACTIVE ORDERS TAB -->
+        <div id="tab-active" class="flex-1 p-4 md:p-6 overflow-y-auto hidden">
+            <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables</h2>
+            <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamic active orders -->
+            </div>
+        </div>
+
+        <!-- ORDER HISTORY & SUMMARY TAB -->
+        <div id="tab-orders" class="flex-1 p-4 md:p-6 overflow-y-auto hidden">
+            <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
+            
+            <!-- SUMMARY STATS -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p>
+                    <p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p>
+                    <p id="stat-total-sales" class="text-2xl font-black text-brand-orange">₱0.00</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p>
+                    <p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">₱0.00</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[600px]">
                     <thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
                         <tr>
                             <th class="p-3">Order #</th>
+                            <th class="p-3">Table/Customer</th>
                             <th class="p-3">Date/Time</th>
-                            <th class="p-3">Items</th>
+                            <th class="p-3">Items & Order Type</th>
                             <th class="p-3 text-right">Total Amount</th>
                         </tr>
                     </thead>
                     <tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
                         <tr>
-                            <td colspan="4" class="p-4 text-center text-gray-400">No past orders yet.</td>
+                            <td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- INVENTORY / ITEM AVAILABILITY TAB -->
-        <div id="tab-inventory" class="flex-1 p-6 overflow-y-auto hidden">
-            <div class="mb-6">
-                <h2 class="text-2xl font-black text-brand-dark">Item Availability</h2>
-                <p class="text-xs text-gray-500">I-toggle ang switch para i-mark kung Available o Out of Stock ang pagkain.</p>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- Dynamic rendering for item toggles -->
+        <!-- EDIT MENU & CATEGORIES TAB -->
+        <div id="tab-inventory" class="flex-1 p-4 md:p-6 overflow-y-auto hidden space-y-6">
+            
+            <!-- CATEGORY MANAGER SECTION -->
+            <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                    <div>
+                        <h3 class="text-lg font-black text-brand-dark">Manage Categories</h3>
+                        <p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya sa POS</p>
+                    </div>
+                    <button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-black transition">
+                        + Add Category
+                    </button>
+                </div>
+                <div id="category-badge-list" class="flex flex-wrap gap-2">
+                    <!-- Dynamic Category Badges -->
                 </div>
             </div>
+
+            <!-- MENU ITEMS MANAGEMENT -->
+            <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                        <h3 class="text-lg font-black text-brand-dark">Menu Items & Stock Availability</h3>
+                        <p class="text-xs text-gray-500">I-edit ang pangalan, presyo, kategorya, o availability ng item.</p>
+                    </div>
+                    <button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:bg-orange-600 transition">
+                        + Add New Menu Item
+                    </button>
+                </div>
+
+                <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Dynamic rendering for item toggles and edit -->
+                </div>
+            </div>
+
         </div>
 
     </main>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // GOOGLE APPS SCRIPT WEB APP URL (NAILAGAY NA ULIT):
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz52ppZkqfMjfp7ssXhaG8kUbctYQLdno7il5Y7ikJS8iqr0qvJKPiwEFpSBniar0JK/exec";
 
-        // MENU DATA
-        const menu = [
+        let orderCounter = 1;
+        let currentDefaultType = "Dine-In";
+
+        // INITIAL CATEGORIES LIST
+        let categories = ["LOMI", "PANCIT", "SILOG", "SIZZLING", "DRINKS", "OTHER"];
+
+        // INITIAL MENU DATA
+        let menu = [
             { id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00, available: true },
             { id: 2, name: "Lomi Special", category: "LOMI", price: 100.00, available: true },
             { id: 3, name: "Lomi Jumbo", category: "LOMI", price: 120.00, available: true },
@@ -185,42 +305,71 @@
             { id: 19, name: "Fried Chicken with Gravy", category: "SIZZLING", price: 120.00, available: true },
             { id: 20, name: "Hungarian with Gravy", category: "SIZZLING", price: 110.00, available: true },
 
-            { id: 21, name: "Kalderetang Kambing", category: "OTHER", price: 150.00, available: true }
+            { id: 21, name: "Softdrinks 8oz", category: "DRINKS", price: 20.00, available: true },
+            { id: 22, name: "Softdrinks 1.5L", category: "DRINKS", price: 75.00, available: true },
+            { id: 23, name: "Iced Tea Pitcher", category: "DRINKS", price: 60.00, available: true },
+            { id: 24, name: "Bottled Water", category: "DRINKS", price: 15.00, available: true },
+
+            { id: 25, name: "Kalderetang Kambing", category: "OTHER", price: 150.00, available: true }
         ];
 
         let cart = [];
+        let activeOrders = [];
         let orderHistory = [];
 
-        // RENDER MENU BY CATEGORY (VERTICAL SCROLL)
+        // HELPER TO GENERATE HTML COLOR BADGES
+        function getTypeBadgeHtml(type) {
+            if (type === 'Take-Out') {
+                return `<span class="inline-block bg-red-100 text-red-700 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Take-Out</span>`;
+            }
+            return `<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Dine-In</span>`;
+        }
+
+        // MOBILE LAYOUT TOGGLES
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar-nav');
+            sidebar.classList.toggle('hidden');
+        }
+
+        function toggleMobileCart() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('translate-y-full');
+        }
+
+        // SET DEFAULT ORDER TYPE
+        function setDefaultType(type) {
+            currentDefaultType = type;
+            cart.forEach(item => item.orderType = type);
+            updateCartUI();
+        }
+
+        // RENDER MENU BY CATEGORY IN POS
         function renderPOSMenu() {
             const grid = document.getElementById('pos-menu-grid');
-            const categories = [...new Set(menu.map(item => item.category))];
-
+            
             grid.innerHTML = categories.map(cat => {
                 const items = menu.filter(m => m.category === cat);
-                
+                if (items.length === 0) return '';
+
                 return `
                     <div class="space-y-2">
-                        <!-- Sticky Category Header -->
                         <div class="sticky top-0 bg-brand-bg/95 backdrop-blur py-1 z-10 border-b border-amber-900/10 flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
                             <h3 class="font-black text-xs uppercase tracking-widest text-brand-dark">${cat}</h3>
                             <span class="text-[10px] text-gray-400 font-bold">(${items.length})</span>
                         </div>
-
-                        <!-- Items Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-3">
                             ${items.map(item => {
                                 const isAvail = item.available !== false;
                                 return `
                                     <div 
                                         ${isAvail ? `onclick="addToCart(${item.id})"` : ''} 
-                                        class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden
+                                        class="bg-white p-2.5 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden
                                         ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}"
                                     >
                                         ${!isAvail ? `
-                                            <div class="absolute inset-0 bg-gray-900/10 flex items-center justify-center z-10">
-                                                <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">OUT OF STOCK</span>
+                                            <div class="absolute inset-0 bg-gray-900/20 flex items-center justify-center z-10">
+                                                <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow uppercase">OUT OF STOCK</span>
                                             </div>
                                         ` : ''}
 
@@ -228,7 +377,7 @@
                                             <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">${item.category}</span>
                                             <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
                                         </div>
-                                        <div class="mt-3 flex justify-between items-center">
+                                        <div class="mt-2.5 flex justify-between items-center">
                                             <span class="font-black text-xs ${isAvail ? 'text-brand-orange' : 'text-gray-400'}">₱${item.price.toFixed(2)}</span>
                                             <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border border-gray-200">+</span>
                                         </div>
@@ -246,56 +395,87 @@
             const item = menu.find(m => m.id === itemId);
             if (!item || item.available === false) return;
 
-            const existing = cart.find(c => c.id === itemId);
-
+            const existing = cart.find(c => c.id === itemId && c.orderType === currentDefaultType);
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ ...item, qty: 1 });
+                cart.push({ ...item, qty: 1, orderType: currentDefaultType });
             }
             updateCartUI();
         }
 
-        function updateCartQty(itemId, delta) {
-            const index = cart.findIndex(c => c.id === itemId);
-            if (index !== -1) {
+        function updateCartQty(index, delta) {
+            if (cart[index]) {
                 cart[index].qty += delta;
-                if (cart[index].qty <= 0) {
-                    cart.splice(index, 1);
-                }
+                if (cart[index].qty <= 0) cart.splice(index, 1);
             }
             updateCartUI();
+        }
+
+        function updateItemOrderType(index, type) {
+            if (cart[index]) {
+                cart[index].orderType = type;
+                updateCartUI();
+            }
         }
 
         function clearCart() {
             cart = [];
+            document.getElementById('order-table').value = '';
+            document.getElementById('amount-paid').value = '';
+            document.getElementById('cart-change').innerText = '₱0.00';
             updateCartUI();
+        }
+
+        function calculateChange() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+            const change = amountPaid >= total ? amountPaid - total : 0;
+            document.getElementById('cart-change').innerText = `₱${change.toFixed(2)}`;
         }
 
         function updateCartUI() {
             const container = document.getElementById('cart-items');
-            
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            document.getElementById('mobile-cart-count').innerText = totalQty;
+            document.getElementById('mobile-cart-total').innerText = `₱${total.toFixed(2)}`;
+
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>`;
                 document.getElementById('cart-subtotal').innerText = '₱0.00';
                 document.getElementById('cart-total').innerText = '₱0.00';
+                document.getElementById('cart-change').innerText = '₱0.00';
                 return;
             }
 
-            let total = 0;
-            container.innerHTML = cart.map(item => {
-                const subtotal = item.price * item.qty;
-                total += subtotal;
+            container.innerHTML = cart.map((item, idx) => {
+                const isTakeout = item.orderType === 'Take-Out';
                 return `
-                    <div class="flex items-center justify-between bg-brand-cream p-2.5 rounded-xl border border-gray-100">
-                        <div class="flex-1 pr-2">
-                            <h5 class="font-bold text-xs text-brand-dark leading-tight">${item.name}</h5>
-                            <p class="text-[10px] text-gray-500">₱${item.price.toFixed(2)}</p>
+                    <div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 pr-2">
+                                <h5 class="font-bold text-xs text-brand-dark leading-tight">${item.name}</h5>
+                                <p class="text-[10px] text-gray-500">₱${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 rounded-lg bg-white border flex items-center justify-center font-bold text-xs hover:bg-gray-100">-</button>
+                                <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
+                                <button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 rounded-lg bg-white border flex items-center justify-center font-bold text-xs hover:bg-gray-100">+</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:bg-gray-100">-</button>
-                            <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
-                            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:bg-gray-100">+</button>
+
+                        <!-- PER-ITEM DINE IN / TAKE OUT DROPDOWN WITH COLORED BADGES -->
+                        <div class="flex items-center justify-between pt-1.5 border-t border-gray-200/60 text-[10px]">
+                            <span class="text-gray-400 font-bold uppercase">Type:</span>
+                            <div class="flex items-center gap-2">
+                                ${getTypeBadgeHtml(item.orderType)}
+                                <select onchange="updateItemOrderType(${idx}, this.value)" class="bg-white border rounded px-1.5 py-0.5 text-xs font-bold text-brand-dark focus:outline-none focus:border-brand-orange">
+                                    <option value="Dine-In" ${!isTakeout ? 'selected' : ''}>Dine-In</option>
+                                    <option value="Take-Out" ${isTakeout ? 'selected' : ''}>Take-Out</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -303,9 +483,116 @@
 
             document.getElementById('cart-subtotal').innerText = `₱${total.toFixed(2)}`;
             document.getElementById('cart-total').innerText = `₱${total.toFixed(2)}`;
+            calculateChange();
         }
 
-        // CHECKOUT & SYNC TO GOOGLE SHEETS
+        // SAVE ACTIVE ORDER
+        function saveActiveOrder() {
+            if (cart.length === 0) {
+                alert("Please add items to cart first!");
+                return;
+            }
+            const tableName = document.getElementById('order-table').value || "Table " + (activeOrders.length + 1);
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            activeOrders.push({
+                id: Date.now(),
+                table: tableName,
+                cart: JSON.parse(JSON.stringify(cart)),
+                total: total,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            clearCart();
+            document.getElementById('cart-drawer').classList.add('translate-y-full');
+            alert(`Order saved for ${tableName}! View it in 'Active Orders'.`);
+        }
+
+        // RENDER ACTIVE ORDERS
+        function renderActiveOrders() {
+            const grid = document.getElementById('active-orders-grid');
+            if (activeOrders.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>`;
+                return;
+            }
+
+            grid.innerHTML = activeOrders.map(order => `
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2 pb-2 border-b">
+                            <h3 class="font-black text-brand-dark text-base">${order.table}</h3>
+                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span>
+                        </div>
+                        <ul class="space-y-2 text-xs text-gray-600 mb-4">
+                            ${order.cart.map(i => `
+                                <li class="flex justify-between items-center">
+                                    <div class="flex items-center gap-1.5">
+                                        <span>${i.name} (x${i.qty})</span>
+                                        ${getTypeBadgeHtml(i.orderType || 'Dine-In')}
+                                    </div>
+                                    <span class="font-bold">₱${(i.price * i.qty).toFixed(2)}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="pt-3 border-t space-y-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-gray-500">Total:</span>
+                            <span class="font-black text-brand-orange text-lg">₱${order.total.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs transition border flex items-center justify-center gap-1">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="checkoutActiveOrder(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center">
+                                Pay & Complete
+                            </button>
+                        </div>
+                        <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">
+                            Cancel Order
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editActiveOrder(orderId) {
+            const idx = activeOrders.findIndex(o => o.id === orderId);
+            if (idx !== -1) {
+                if (cart.length > 0) {
+                    if (!confirm("May laman pa ang kasalukuyang cart. Palitan ba ito?")) return;
+                }
+                const order = activeOrders[idx];
+                cart = JSON.parse(JSON.stringify(order.cart));
+                document.getElementById('order-table').value = order.table;
+                activeOrders.splice(idx, 1);
+                switchTab('pos');
+                updateCartUI();
+            }
+        }
+
+        function cancelActiveOrder(orderId) {
+            if (confirm("Sigurado ka bang gusto mong i-cancel ang order na ito?")) {
+                activeOrders = activeOrders.filter(o => o.id !== orderId);
+                renderActiveOrders();
+            }
+        }
+
+        async function checkoutActiveOrder(orderId) {
+            const idx = activeOrders.findIndex(o => o.id === orderId);
+            if (idx !== -1) {
+                const order = activeOrders[idx];
+                cart = JSON.parse(JSON.stringify(order.cart));
+                document.getElementById('order-table').value = order.table;
+                activeOrders.splice(idx, 1);
+                await checkout();
+                renderActiveOrders();
+            }
+        }
+
+        // CHECKOUT & GOOGLE SHEETS SYNC
         async function checkout() {
             if (cart.length === 0) {
                 alert("Please add items to cart first!");
@@ -314,26 +601,49 @@
 
             const payBtn = document.getElementById('pay-button');
             const syncStatus = document.getElementById('sync-status');
+            const tableCustomer = document.getElementById('order-table').value || "Dine-In";
+            const paymentMethod = document.getElementById('payment-method').value || "Cash";
             
+            const orderTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const amountPaid = parseFloat(document.getElementById('amount-paid').value) || orderTotal;
+            const change = amountPaid >= orderTotal ? amountPaid - orderTotal : 0;
+
             payBtn.disabled = true;
-            payBtn.innerText = "Processing Order...";
+            payBtn.innerText = "Processing...";
             syncStatus.innerText = "⏳ Syncing to Sheet...";
 
-            const orderTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const orderSummary = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+            // PLAIN TEXT FOR GOOGLE SHEETS SYNC
+            const plainSheetSummary = cart.map(i => `${i.name} x${i.qty} [${i.orderType || 'Dine-In'}]`).join(', ');
+
+            // VISUAL HTML BADGES FOR APP UI HISTORY
+            const htmlHistorySummary = cart.map(i => `
+                <span class="inline-flex items-center gap-1 my-0.5">
+                    <strong>${i.name}</strong> x${i.qty} ${getTypeBadgeHtml(i.orderType || 'Dine-In')}
+                </span>
+            `).join(', ');
+
+            const currentNum = "#" + orderCounter++;
 
             const orderData = {
-                orderId: "ORD-" + Date.now().toString().slice(-6),
                 dateTime: new Date().toLocaleString(),
-                items: orderSummary,
-                total: orderTotal
+                orderNumber: currentNum,
+                itemsOrdered: `${plainSheetSummary} (${tableCustomer})`,
+                paymentMethod: paymentMethod,
+                totalAmount: orderTotal,
+                amountPaid: amountPaid,
+                change: change,
+                status: "Paid"
             };
 
-            // Local history update
-            orderHistory.unshift(orderData);
+            orderHistory.unshift({
+                orderId: currentNum,
+                customer: tableCustomer,
+                dateTime: orderData.dateTime,
+                itemsHtml: htmlHistorySummary,
+                total: orderTotal
+            });
             renderOrdersTable();
 
-            // Sync with Google Sheets
             try {
                 await fetch(GOOGLE_SHEET_SCRIPT_URL, {
                     method: 'POST',
@@ -347,29 +657,90 @@
                 syncStatus.innerText = "❌ Sheet Sync: Failed";
             }
 
-            alert(`Order #${orderData.orderId} completed! Total: ₱${orderTotal.toFixed(2)}`);
+            alert(`Order ${currentNum} completed!\nTotal: ₱${orderTotal.toFixed(2)}\nAmount Paid: ₱${amountPaid.toFixed(2)}\nChange: ₱${change.toFixed(2)}`);
             clearCart();
+            document.getElementById('cart-drawer').classList.add('translate-y-full');
             payBtn.disabled = false;
-            payBtn.innerText = "Pay & Complete Order";
+            payBtn.innerText = "💳 Pay & Complete";
         }
 
-        // RENDER INVENTORY TOGGLES
-        function renderInventoryTab() {
-            const container = document.getElementById('inventory-list');
-            container.innerHTML = menu.map(item => `
-                <div class="flex items-center justify-between p-3 bg-brand-cream rounded-xl border border-gray-200">
-                    <div>
-                        <p class="font-bold text-xs text-brand-dark">${item.name}</p>
-                        <p class="text-[10px] text-gray-500">₱${item.price.toFixed(2)}</p>
-                    </div>
-                    <button 
-                        onclick="toggleAvailability(${item.id})"
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${item.available !== false ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}"
-                    >
-                        ${item.available !== false ? 'Available' : 'Out of Stock'}
-                    </button>
+        // CATEGORY MANAGEMENT
+        function renderCategoriesManager() {
+            const container = document.getElementById('category-badge-list');
+            container.innerHTML = categories.map(cat => `
+                <div class="flex items-center gap-1.5 bg-brand-cream border border-amber-900/20 px-3 py-1 rounded-xl shadow-sm text-xs font-bold text-brand-dark">
+                    <span>${cat}</span>
+                    <button onclick="deleteCategory('${cat}')" class="text-red-500 font-black hover:text-red-700 ml-1">×</button>
                 </div>
             `).join('');
+        }
+
+        function addCategory() {
+            const name = prompt("Enter new Category Name (e.g., DESSERTS, EXTRAS):");
+            if (name) {
+                const formatted = name.trim().toUpperCase();
+                if (!categories.includes(formatted)) {
+                    categories.push(formatted);
+                    renderCategoriesManager();
+                    renderPOSMenu();
+                    renderInventoryTab();
+                } else {
+                    alert("Category already exists!");
+                }
+            }
+        }
+
+        function deleteCategory(catName) {
+            if (confirm(`Sigurado ka bang i-delete ang kategoryang '${catName}'?`)) {
+                categories = categories.filter(c => c !== catName);
+                renderCategoriesManager();
+                renderPOSMenu();
+                renderInventoryTab();
+            }
+        }
+
+        // EDIT MENU & INVENTORY MANAGEMENT
+        function renderInventoryTab() {
+            renderCategoriesManager();
+            const container = document.getElementById('inventory-list');
+            
+            container.innerHTML = menu.map(item => `
+                <div class="p-3 bg-brand-cream rounded-xl border border-gray-200 flex flex-col justify-between space-y-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex-1">
+                            <input type="text" value="${item.name}" onchange="updateItemDetails(${item.id}, 'name', this.value)" class="font-bold text-xs text-brand-dark bg-transparent border-b border-transparent hover:border-gray-300 focus:outline-none focus:border-brand-orange w-full">
+                            
+                            <!-- Category Select Dropdown -->
+                            <select onchange="updateItemDetails(${item.id}, 'category', this.value)" class="mt-1 text-[10px] font-bold uppercase bg-white border border-gray-200 rounded px-1 py-0.5 text-gray-600 focus:outline-none">
+                                ${categories.map(c => `<option value="${c}" ${c === item.category ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <button 
+                            onclick="toggleAvailability(${item.id})"
+                            class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition flex-shrink-0 ${item.available !== false ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}"
+                        >
+                            ${item.available !== false ? 'Available' : 'Out of Stock'}
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-200/50">
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs font-bold text-gray-500">₱</span>
+                            <input type="number" step="0.01" value="${item.price}" onchange="updateItemDetails(${item.id}, 'price', parseFloat(this.value))" class="w-20 font-black text-xs text-brand-orange bg-transparent border-b border-transparent hover:border-gray-300 focus:outline-none focus:border-brand-orange">
+                        </div>
+                        <button onclick="deleteMenuItem(${item.id})" class="text-[10px] text-red-500 font-bold hover:underline">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateItemDetails(id, field, value) {
+            const item = menu.find(m => m.id === id);
+            if (item) {
+                item[field] = value;
+                renderPOSMenu();
+            }
         }
 
         function toggleAvailability(itemId) {
@@ -381,19 +752,52 @@
             }
         }
 
-        // RENDER ORDER HISTORY TABLE
+        function addNewMenuItem() {
+            const name = prompt("Enter item name:");
+            if (!name) return;
+            const price = parseFloat(prompt("Enter price (₱):") || "0");
+            
+            // Choose Category
+            let catPrompt = "Pumili ng Category number:\n" + categories.map((c, i) => `${i + 1}. ${c}`).join('\n');
+            let catChoice = prompt(catPrompt, "1");
+            let selectedCat = categories[parseInt(catChoice) - 1] || categories[0];
+
+            const newId = Date.now();
+            menu.push({ id: newId, name, price, category: selectedCat, available: true });
+            renderPOSMenu();
+            renderInventoryTab();
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm("Are you sure you want to delete this menu item?")) {
+                menu = menu.filter(m => m.id !== id);
+                renderPOSMenu();
+                renderInventoryTab();
+            }
+        }
+
+        // ORDER HISTORY & SUMMARY
         function renderOrdersTable() {
             const tbody = document.getElementById('orders-table-body');
-            if (orderHistory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>`;
+            const totalOrders = orderHistory.length;
+            const totalSales = orderHistory.reduce((sum, o) => sum + o.total, 0);
+            const avgSale = totalOrders > 0 ? totalSales / totalOrders : 0;
+
+            document.getElementById('stat-total-orders').innerText = totalOrders;
+            document.getElementById('stat-total-sales').innerText = `₱${totalSales.toFixed(2)}`;
+            document.getElementById('stat-avg-sale').innerText = `₱${avgSale.toFixed(2)}`;
+
+            if (totalOrders === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = orderHistory.map(o => `
                 <tr class="hover:bg-brand-cream/50 transition">
                     <td class="p-3 font-bold text-brand-orange">${o.orderId}</td>
+                    <td class="p-3 font-semibold text-gray-700">${o.customer || 'Dine-In'}</td>
                     <td class="p-3 text-gray-500 text-xs">${o.dateTime}</td>
-                    <td class="p-3 font-medium text-brand-dark">${o.items}</td>
+                    <td class="p-3 font-medium text-brand-dark leading-relaxed">${o.itemsHtml}</td>
                     <td class="p-3 text-right font-black text-brand-dark">₱${o.total.toFixed(2)}</td>
                 </tr>
             `).join('');
@@ -401,7 +805,7 @@
 
         // NAVIGATION LOGIC
         function switchTab(tab) {
-            ['pos', 'orders', 'inventory'].forEach(t => {
+            ['pos', 'active', 'orders', 'inventory'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition";
             });
@@ -409,9 +813,13 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
 
-            if (tab === 'inventory') {
-                renderInventoryTab();
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar-nav').classList.add('hidden');
             }
+
+            if (tab === 'inventory') renderInventoryTab();
+            if (tab === 'active') renderActiveOrders();
+            if (tab === 'orders') renderOrdersTable();
         }
 
         // INITIAL LOAD
