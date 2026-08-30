@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leonardo's Kambingan sa Chapel - POS</title>
     
+    <!-- PWA Manifest & Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2C1810">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LKC POS">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Firebase SDK (v9 Compat Version for easy integration) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -29,6 +36,23 @@
                 }
             }
         }
+
+        // ==========================================
+        // FIREBASE CONFIGURATION (PALITAN MO ITO!)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
     </script>
     <style>
         @media print {
@@ -40,17 +64,20 @@
 </head>
 <body class="bg-brand-cream text-brand-dark font-sans h-screen flex flex-col md:flex-row overflow-hidden select-none">
 
+    <!-- SIDEBAR NAVIGATION -->
     <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col justify-between shrink-0">
         <div>
+            <!-- BRANDING LOGO -->
             <div class="p-4 bg-brand-brown flex flex-col items-center text-center border-b border-brand-warm">
-            <div class="w-24 h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-1 mb-2 shadow-md overflow-hidden">
-                <img src="image.jpg" alt="Leonardo's Logo" class="w-full h-full object-cover rounded-full">
-            </div>
+                <div class="w-24 h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-1 mb-2 shadow-md overflow-hidden">
+                    <img src="image.jpg" alt="Leonardo's Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/100?text=LKC+Logo'">
+                </div>
                 <h1 class="font-black tracking-wider text-base uppercase text-brand-cream">LEONARDO’S KAMBINGAN</h1>
                 <p class="text-xs text-brand-accent font-semibold">SA CHAPEL</p>
                 <p class="text-[10px] italic mt-1 text-gray-300">“WARI KO’Y DI MO MAWARI.”</p>
             </div>
 
+            <!-- NAV LINKS -->
             <nav class="p-4 space-y-2">
                 <button onclick="switchView('pos')" id="nav-pos" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition bg-brand-accent text-white">
                     <span>🛒</span> New Order / POS
@@ -73,14 +100,17 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTAINER -->
     <main class="flex-1 flex flex-col overflow-y-auto">
 
-        <section id="view-pos" class="flex-1 flex flex-col lg:flex-row h-full overflow-hidden">
+        <!-- VIEW: MAIN POS SCREEN -->
+        <section id="view-pos" class="flex-1 flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden">
             <div class="flex-1 flex flex-col p-4 overflow-y-auto">
                 <div class="flex gap-2 overflow-x-auto pb-3 mb-3 border-b border-gray-300 shrink-0" id="category-tabs"></div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-1" id="product-grid"></div>
             </div>
 
+            <!-- RIGHT: CURRENT ORDER -->
             <div class="w-full lg:w-96 bg-white border-l border-gray-200 flex flex-col h-full shadow-lg shrink-0">
                 <div class="p-4 bg-brand-brown text-white flex justify-between items-center">
                     <h2 class="font-bold text-lg">Current Order</h2>
@@ -106,7 +136,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-3 space-y-2" id="cart-items">
+                <div class="flex-1 overflow-y-auto p-3 space-y-2 min-h-[150px]" id="cart-items">
                     <div class="text-center text-gray-400 mt-10 text-sm">No items added yet</div>
                 </div>
 
@@ -152,6 +182,7 @@
             </div>
         </section>
 
+        <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="hidden p-6 space-y-6">
             <h2 class="text-2xl font-bold text-brand-dark">Daily Summary Dashboard</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -180,6 +211,7 @@
             </div>
         </section>
 
+        <!-- ORDERS HISTORY VIEW -->
         <section id="view-orders" class="hidden p-6 space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h2 class="text-2xl font-bold text-brand-dark">Order History</h2>
@@ -204,6 +236,7 @@
             </div>
         </section>
 
+        <!-- MENU MANAGEMENT VIEW -->
         <section id="view-menu" class="hidden p-6 space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-brand-dark">Menu Management</h2>
@@ -229,6 +262,7 @@
 
     </main>
 
+    <!-- RECEIPT MODAL -->
     <div id="receipt-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full space-y-4 max-h-[90vh] overflow-y-auto">
             <div id="printable-receipt" class="font-mono text-xs space-y-2 p-2 text-black">
@@ -256,14 +290,16 @@
         </div>
     </div>
 
+    <!-- PWA & APPLICATION LOGIC WITH FIREBASE REALTIME SYNC -->
     <script>
+        // Register PWA Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
             });
         }
 
-        const fullMasterMenu = [
+        const defaultMasterMenu = [
             { id: 1, name: 'Lomi Regular', category: 'LOMI', price: 80, available: true, unconfirmed: false },
             { id: 2, name: 'Lomi Special', category: 'LOMI', price: 100, available: true, unconfirmed: false },
             { id: 3, name: 'Lomi Jumbo', category: 'LOMI', price: 120, available: true, unconfirmed: false },
@@ -294,20 +330,35 @@
             { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true, unconfirmed: false }
         ];
 
-        let menu = fullMasterMenu;
-        let orders = JSON.parse(localStorage.getItem('lkc_orders')) || [];
+        let menu = [];
+        let orders = [];
         let currentCart = [];
         let activeCategory = 'LOMI';
 
-        window.onload = () => {
+        // REAL-TIME DATABASE LISTENERS (AUTO-SYNC ACROSS ALL DEVICES)
+        db.ref('orders').on('value', (snapshot) => {
+            const data = snapshot.val();
+            orders = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+            updateOrderCounter();
+            renderDashboard();
+            renderOrderHistory();
+        });
+
+        db.ref('menu').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                menu = Array.isArray(data) ? data : Object.values(data);
+            } else {
+                menu = defaultMasterMenu;
+                saveMenu(); // Seed initial menu if database is empty
+            }
             renderCategoryTabs();
             renderProducts();
-            renderCart();
-            updateOrderCounter();
-        };
+            renderMenuManagement();
+        });
 
-        function saveMenu() { localStorage.setItem('lkc_menu_v3', JSON.stringify(menu)); }
-        function saveOrders() { localStorage.setItem('lkc_orders', JSON.stringify(orders)); }
+        function saveMenu() { db.ref('menu').set(menu); }
+        function saveOrders() { db.ref('orders').set(orders); }
 
         function switchView(viewName) {
             ['pos', 'dashboard', 'orders', 'menu'].forEach(v => {
@@ -461,7 +512,7 @@
             };
 
             orders.push(order);
-            saveOrders();
+            saveOrders(); // Automatic syncs to Firebase Realtime Database
             showReceiptModal(order);
 
             currentCart = [];
@@ -500,7 +551,7 @@
         }
 
         function renderOrderHistory() {
-            const query = document.getElementById('order-search').value.toLowerCase();
+            const query = (document.getElementById('order-search')?.value || '').toLowerCase();
             const filtered = orders.filter(o => o.orderNum.includes(query) || o.customer.toLowerCase().includes(query));
             
             document.getElementById('order-history-table').innerHTML = filtered.slice().reverse().map(o => `
@@ -557,7 +608,7 @@
 
         function toggleAvailability(id) {
             const item = menu.find(m => m.id === id);
-            if(item) { item.available = !item.available; saveMenu(); renderMenuManagement(); renderProducts(); }
+            if(item) { item.available = !item.available; saveMenu(); }
         }
 
         function editPrice(id) {
@@ -567,8 +618,6 @@
                 item.price = parseFloat(newPrice);
                 item.unconfirmed = false;
                 saveMenu();
-                renderMenuManagement();
-                renderProducts();
             }
         }
 
@@ -581,9 +630,6 @@
             const newItem = { id: Date.now(), name, category, price, available: true, unconfirmed: price === 0 };
             menu.push(newItem);
             saveMenu();
-            renderCategoryTabs();
-            renderMenuManagement();
-            renderProducts();
         }
     </script>
 </body>
