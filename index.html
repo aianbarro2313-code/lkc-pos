@@ -54,7 +54,7 @@
                     📋 <span>Order History</span>
                 </button>
                 <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-                    📦 <span>Inventory</span>
+                    📦 <span>Item Availability</span>
                 </button>
             </nav>
         </div>
@@ -138,11 +138,17 @@
             </div>
         </div>
 
-        <!-- INVENTORY TAB -->
+        <!-- INVENTORY / ITEM AVAILABILITY TAB -->
         <div id="tab-inventory" class="flex-1 p-6 overflow-y-auto hidden">
-            <h2 class="text-2xl font-black text-brand-dark mb-4">Inventory Management</h2>
+            <div class="mb-6">
+                <h2 class="text-2xl font-black text-brand-dark">Item Availability</h2>
+                <p class="text-xs text-gray-500">I-toggle ang switch para i-mark kung Available o Out of Stock ang pagkain.</p>
+            </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <p class="text-gray-500 text-sm">Inventory features are under maintenance.</p>
+                <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Dynamic rendering for item toggles -->
+                </div>
             </div>
         </div>
 
@@ -150,36 +156,36 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ⚠️ ILAGAY DITO ANG GOOGLE APPS SCRIPT WEB APP URL MO:
-        const GOOGLE_SHEET_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+        // GOOGLE APPS SCRIPT WEB APP URL (NAILAGAY NA ULIT):
+        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz52ppZkqfMjfp7ssXhaG8kUbctYQLdno7il5Y7ikJS8iqr0qvJKPiwEFpSBniar0JK/exec";
 
         // MENU DATA
         const menu = [
-            { id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00 },
-            { id: 2, name: "Lomi Special", category: "LOMI", price: 100.00 },
-            { id: 3, name: "Lomi Jumbo", category: "LOMI", price: 120.00 },
-            { id: 4, name: "Double Toppings", category: "LOMI", price: 80.00 },
+            { id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00, available: true },
+            { id: 2, name: "Lomi Special", category: "LOMI", price: 100.00, available: true },
+            { id: 3, name: "Lomi Jumbo", category: "LOMI", price: 120.00, available: true },
+            { id: 4, name: "Double Toppings", category: "LOMI", price: 80.00, available: true },
             
-            { id: 5, name: "Pancit Guisado", category: "PANCIT", price: 100.00 },
-            { id: 6, name: "Pancit Chami", category: "PANCIT", price: 100.00 },
-            { id: 7, name: "Pancit Chami Tamis Anghang", category: "PANCIT", price: 100.00 },
-            { id: 8, name: "Pancit Canton", category: "PANCIT", price: 100.00 },
-            { id: 9, name: "Pancit Bihon", category: "PANCIT", price: 100.00 },
-            { id: 10, name: "Pancit Canton Bihon", category: "PANCIT", price: 100.00 },
+            { id: 5, name: "Pancit Guisado", category: "PANCIT", price: 100.00, available: true },
+            { id: 6, name: "Pancit Chami", category: "PANCIT", price: 100.00, available: true },
+            { id: 7, name: "Pancit Chami Tamis Anghang", category: "PANCIT", price: 100.00, available: true },
+            { id: 8, name: "Pancit Canton", category: "PANCIT", price: 100.00, available: true },
+            { id: 9, name: "Pancit Bihon", category: "PANCIT", price: 100.00, available: true },
+            { id: 10, name: "Pancit Canton Bihon", category: "PANCIT", price: 100.00, available: true },
 
-            { id: 11, name: "Tapsilog", category: "SILOG", price: 95.00 },
-            { id: 12, name: "Tosilog", category: "SILOG", price: 85.00 },
-            { id: 13, name: "Porksilog", category: "SILOG", price: 90.00 },
-            { id: 14, name: "Hotsilog", category: "SILOG", price: 70.00 },
-            { id: 15, name: "Chicksilog", category: "SILOG", price: 95.00 },
-            { id: 16, name: "Bangsilog", category: "SILOG", price: 95.00 },
+            { id: 11, name: "Tapsilog", category: "SILOG", price: 95.00, available: true },
+            { id: 12, name: "Tosilog", category: "SILOG", price: 85.00, available: true },
+            { id: 13, name: "Porksilog", category: "SILOG", price: 90.00, available: true },
+            { id: 14, name: "Hotsilog", category: "SILOG", price: 70.00, available: true },
+            { id: 15, name: "Chicksilog", category: "SILOG", price: 95.00, available: true },
+            { id: 16, name: "Bangsilog", category: "SILOG", price: 95.00, available: true },
 
-            { id: 17, name: "Sisig", category: "SIZZLING", price: 150.00 },
-            { id: 18, name: "Porkchop with Gravy", category: "SIZZLING", price: 120.00 },
-            { id: 19, name: "Fried Chicken with Gravy", category: "SIZZLING", price: 120.00 },
-            { id: 20, name: "Hungarian with Gravy", category: "SIZZLING", price: 110.00 },
+            { id: 17, name: "Sisig", category: "SIZZLING", price: 150.00, available: true },
+            { id: 18, name: "Porkchop with Gravy", category: "SIZZLING", price: 120.00, available: true },
+            { id: 19, name: "Fried Chicken with Gravy", category: "SIZZLING", price: 120.00, available: true },
+            { id: 20, name: "Hungarian with Gravy", category: "SIZZLING", price: 110.00, available: true },
 
-            { id: 21, name: "Kalderetang Kambing", category: "OTHER", price: 150.00 }
+            { id: 21, name: "Kalderetang Kambing", category: "OTHER", price: 150.00, available: true }
         ];
 
         let cart = [];
@@ -188,8 +194,6 @@
         // RENDER MENU BY CATEGORY (VERTICAL SCROLL)
         function renderPOSMenu() {
             const grid = document.getElementById('pos-menu-grid');
-            
-            // Get unique categories
             const categories = [...new Set(menu.map(item => item.category))];
 
             grid.innerHTML = categories.map(cat => {
@@ -204,20 +208,33 @@
                             <span class="text-[10px] text-gray-400 font-bold">(${items.length})</span>
                         </div>
 
-                        <!-- Items Grid for this Category -->
+                        <!-- Items Grid -->
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                            ${items.map(item => `
-                                <div onclick="addToCart(${item.id})" class="bg-white p-3 rounded-xl shadow-sm hover:shadow-md cursor-pointer border border-gray-100 flex flex-col justify-between transition transform active:scale-95">
-                                    <div>
-                                        <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">${item.category}</span>
-                                        <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
+                            ${items.map(item => {
+                                const isAvail = item.available !== false;
+                                return `
+                                    <div 
+                                        ${isAvail ? `onclick="addToCart(${item.id})"` : ''} 
+                                        class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden
+                                        ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}"
+                                    >
+                                        ${!isAvail ? `
+                                            <div class="absolute inset-0 bg-gray-900/10 flex items-center justify-center z-10">
+                                                <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">OUT OF STOCK</span>
+                                            </div>
+                                        ` : ''}
+
+                                        <div>
+                                            <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">${item.category}</span>
+                                            <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
+                                        </div>
+                                        <div class="mt-3 flex justify-between items-center">
+                                            <span class="font-black text-xs ${isAvail ? 'text-brand-orange' : 'text-gray-400'}">₱${item.price.toFixed(2)}</span>
+                                            <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border border-gray-200">+</span>
+                                        </div>
                                     </div>
-                                    <div class="mt-3 flex justify-between items-center">
-                                        <span class="font-black text-xs text-brand-orange">₱${item.price.toFixed(2)}</span>
-                                        <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border border-gray-200">+</span>
-                                    </div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -227,6 +244,8 @@
         // CART LOGIC
         function addToCart(itemId) {
             const item = menu.find(m => m.id === itemId);
+            if (!item || item.available === false) return;
+
             const existing = cart.find(c => c.id === itemId);
 
             if (existing) {
@@ -316,17 +335,13 @@
 
             // Sync with Google Sheets
             try {
-                if (GOOGLE_SHEET_SCRIPT_URL && !GOOGLE_SHEET_SCRIPT_URL.includes("PASTE_YOUR")) {
-                    await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderData)
-                    });
-                    syncStatus.innerText = "📊 Sheet Sync: Updated ✅";
-                } else {
-                    syncStatus.innerText = "⚠️ Sheet Sync: URL Missing";
-                }
+                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                syncStatus.innerText = "📊 Sheet Sync: Updated ✅";
             } catch (err) {
                 console.error("Sync Error:", err);
                 syncStatus.innerText = "❌ Sheet Sync: Failed";
@@ -336,6 +351,34 @@
             clearCart();
             payBtn.disabled = false;
             payBtn.innerText = "Pay & Complete Order";
+        }
+
+        // RENDER INVENTORY TOGGLES
+        function renderInventoryTab() {
+            const container = document.getElementById('inventory-list');
+            container.innerHTML = menu.map(item => `
+                <div class="flex items-center justify-between p-3 bg-brand-cream rounded-xl border border-gray-200">
+                    <div>
+                        <p class="font-bold text-xs text-brand-dark">${item.name}</p>
+                        <p class="text-[10px] text-gray-500">₱${item.price.toFixed(2)}</p>
+                    </div>
+                    <button 
+                        onclick="toggleAvailability(${item.id})"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${item.available !== false ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}"
+                    >
+                        ${item.available !== false ? 'Available' : 'Out of Stock'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleAvailability(itemId) {
+            const item = menu.find(m => m.id === itemId);
+            if (item) {
+                item.available = item.available === false ? true : false;
+                renderPOSMenu();
+                renderInventoryTab();
+            }
         }
 
         // RENDER ORDER HISTORY TABLE
@@ -365,6 +408,10 @@
 
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
+
+            if (tab === 'inventory') {
+                renderInventoryTab();
+            }
         }
 
         // INITIAL LOAD
