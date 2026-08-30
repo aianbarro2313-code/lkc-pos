@@ -47,20 +47,20 @@
     <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col justify-between shrink-0">
         <div>
             <!-- BRANDING LOGO -->
-            <div class="p-3 md:p-4 bg-brand-brown flex items-center md:flex-col text-left md:text-center justify-between md:justify-center border-b border-brand-warm">
-                <div class="flex items-center gap-3 md:flex-col">
-                    <div class="w-10 h-10 md:w-24 md:h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-0.5 md:p-1 shadow-md overflow-hidden shrink-0">
+            <div class="p-2 md:p-4 bg-brand-brown flex items-center md:flex-col text-left md:text-center justify-between md:justify-center border-b border-brand-warm">
+                <div class="flex items-center gap-2 md:flex-col">
+                    <div class="w-8 h-8 md:w-24 md:h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-0.5 md:p-1 shadow-md overflow-hidden shrink-0">
                         <img src="logo.png" alt="Leonardo's Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/100?text=LKC+Logo'">
                     </div>
                     <div>
                         <h1 class="font-black tracking-wider text-xs md:text-base uppercase text-brand-cream">LEONARDO’S KAMBINGAN</h1>
-                        <p class="text-[10px] md:text-xs text-brand-accent font-semibold">SA CHAPEL</p>
+                        <p class="text-[9px] md:text-xs text-brand-accent font-semibold">SA CHAPEL</p>
                     </div>
                 </div>
             </div>
 
             <!-- NAV LINKS -->
-            <nav class="p-2 md:p-4 grid grid-cols-4 md:flex md:flex-col gap-1 md:gap-2 text-xs md:text-sm bg-brand-dark">
+            <nav class="p-1.5 md:p-4 grid grid-cols-4 md:flex md:flex-col gap-1 md:gap-2 text-xs md:text-sm bg-brand-dark">
                 <button onclick="switchView('pos')" id="nav-pos" class="px-2 py-2 md:px-4 md:py-3 rounded-lg font-medium flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 transition bg-brand-accent text-white text-center md:text-left">
                     <span>🛒</span> <span class="text-[10px] md:text-sm">POS</span>
                 </button>
@@ -76,33 +76,45 @@
             </nav>
         </div>
 
-        <div class="p-2 text-center border-t border-brand-brown">
+        <div class="hidden md:block p-2 text-center border-t border-brand-brown">
             <button onclick="forceResetData()" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded shadow">
-                ⚠️ FORCE RESET ALL MENU
+                ⚠️ RESET ALL MENU
             </button>
         </div>
     </aside>
 
     <!-- MAIN CONTAINER -->
-    <main class="flex-1 flex flex-col overflow-y-auto">
+    <main class="flex-1 flex flex-col overflow-hidden relative">
 
         <!-- VIEW: MAIN POS SCREEN -->
-        <section id="view-pos" class="flex-1 flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden">
+        <section id="view-pos" class="flex-1 flex flex-col lg:flex-row h-full overflow-hidden relative">
             
-            <!-- LEFT: PRODUCT SELECTION -->
-            <div class="flex-1 flex flex-col p-3 md:p-4 overflow-y-auto">
+            <!-- LEFT: PRODUCT SELECTION (Full Height on Mobile) -->
+            <div class="flex-1 flex flex-col p-3 md:p-4 overflow-y-auto pb-20 lg:pb-4">
                 <div class="flex gap-2 overflow-x-auto pb-2 mb-2 border-b border-gray-300 shrink-0" id="category-tabs"></div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4 overflow-y-auto pr-1" id="product-grid"></div>
             </div>
 
-            <!-- RIGHT: CURRENT ORDER CART -->
-            <div class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col shrink-0 shadow-lg">
-                <div class="p-3 bg-brand-brown text-white flex justify-between items-center">
-                    <h2 class="font-bold text-sm md:text-base">Current Order</h2>
+            <!-- FLOATING CART BUTTON FOR MOBILE -->
+            <div id="mobile-cart-bar" class="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-brand-dark border-t border-brand-warm z-20 flex justify-between items-center shadow-lg">
+                <button onclick="toggleMobileCart(true)" class="w-full py-3 bg-brand-accent text-white font-bold rounded-lg flex justify-between items-center px-4 shadow">
+                    <span id="mobile-cart-count" class="text-xs">🛒 View Order (0)</span>
+                    <span id="mobile-cart-total" class="text-sm font-black">₱0.00</span>
+                </button>
+            </div>
+
+            <!-- RIGHT: CURRENT ORDER CART (Responsive Drawer/Sidebar) -->
+            <div id="cart-container" class="fixed lg:relative inset-0 lg:inset-auto z-30 lg:z-10 transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col h-full shadow-2xl lg:shadow-lg">
+                
+                <div class="p-3 bg-brand-brown text-white flex justify-between items-center shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleMobileCart(false)" class="lg:hidden p-1 bg-brand-dark rounded text-xs px-2">✕ Close</button>
+                        <h2 class="font-bold text-sm md:text-base">Current Order</h2>
+                    </div>
                     <span id="pos-order-number" class="text-xs bg-brand-accent px-2 py-1 rounded font-mono">#000001</span>
                 </div>
 
-                <div class="p-2 md:p-3 bg-brand-cream border-b border-gray-200 grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2 md:p-3 bg-brand-cream border-b border-gray-200 grid grid-cols-2 gap-2 text-xs shrink-0">
                     <div>
                         <label class="block font-medium text-gray-600 mb-0.5">Customer Name</label>
                         <input type="text" id="cust-name" placeholder="Optional" class="w-full p-1.5 border rounded">
@@ -121,11 +133,12 @@
                     </div>
                 </div>
 
-                <div class="max-h-48 lg:max-h-none flex-1 overflow-y-auto p-2 space-y-2 min-h-[100px]" id="cart-items">
-                    <div class="text-center text-gray-400 my-4 text-xs">No items added yet</div>
+                <!-- CART ITEMS CONTAINER WITH AUTO-SCROLL -->
+                <div class="flex-1 overflow-y-auto p-2 space-y-2 min-h-0" id="cart-items">
+                    <div class="text-center text-gray-400 my-8 text-xs">No items added yet</div>
                 </div>
 
-                <div class="p-3 bg-brand-cream border-t border-gray-200 space-y-2">
+                <div class="p-3 bg-brand-cream border-t border-gray-200 space-y-2 shrink-0">
                     <div class="flex justify-between text-xs">
                         <span>Subtotal:</span>
                         <span id="summary-subtotal" class="font-semibold">₱0.00</span>
@@ -167,7 +180,7 @@
         </section>
 
         <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="hidden p-4 md:p-6 space-y-4">
+        <section id="view-dashboard" class="hidden p-4 md:p-6 space-y-4 overflow-y-auto">
             <h2 class="text-xl md:text-2xl font-bold text-brand-dark">Daily Summary Dashboard</h2>
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <div class="bg-white p-3 rounded-xl shadow border-l-4 border-brand-accent">
@@ -190,7 +203,7 @@
         </section>
 
         <!-- ORDERS HISTORY VIEW -->
-        <section id="view-orders" class="hidden p-4 md:p-6 space-y-4">
+        <section id="view-orders" class="hidden p-4 md:p-6 space-y-4 overflow-y-auto">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
                 <h2 class="text-xl font-bold text-brand-dark">Order History</h2>
             </div>
@@ -210,20 +223,19 @@
         </section>
 
         <!-- MENU MANAGEMENT VIEW -->
-        <section id="view-menu" class="hidden p-4 md:p-6 space-y-4">
+        <section id="view-menu" class="hidden p-4 md:p-6 space-y-4 overflow-y-auto">
             <div class="flex justify-between items-center flex-wrap gap-2">
                 <h2 class="text-xl font-bold text-brand-dark">Menu Management</h2>
                 <div class="flex gap-2">
                     <button onclick="addNewCategory()" class="px-3 py-1.5 bg-brand-brown text-white font-bold rounded-lg text-xs shadow hover:bg-brand-dark">
-                        📂 + Add Category
+                        📂 + Category
                     </button>
                     <button onclick="addNewProduct()" class="px-3 py-1.5 bg-brand-accent text-white font-bold rounded-lg text-xs shadow hover:bg-orange-600">
-                        ➕ + Add Item
+                        ➕ + Item
                     </button>
                 </div>
             </div>
 
-            <!-- CATEGORY FILTER TABS FOR MENU MANAGEMENT -->
             <div class="flex gap-2 overflow-x-auto pb-1" id="menu-mgmt-cat-tabs"></div>
 
             <div class="bg-white rounded-xl shadow overflow-x-auto">
@@ -322,7 +334,7 @@
         let orders = JSON.parse(localStorage.getItem('lkc_orders') || '[]');
         let currentCart = [];
         let activeCategory = 'SILOG';
-        let activeMgmtCategory = 'ALL'; // Filter para sa Menu Management View
+        let activeMgmtCategory = 'ALL';
 
         function forceResetData() {
             localStorage.removeItem('lkc_menu');
@@ -417,7 +429,7 @@
                         <h3 class="font-bold text-xs text-brand-dark line-clamp-2">${item.name}</h3>
                         <p class="text-brand-accent font-black text-xs mt-0.5">₱${itemPrice.toFixed(2)}</p>
                     </div>
-                    <button onclick="addToCart(${item.id})" class="mt-2 w-full py-1 rounded text-[10px] font-bold bg-brand-warm text-white hover:bg-brand-brown transition">
+                    <button onclick="addToCart(${item.id})" class="mt-2 w-full py-1.5 rounded text-xs font-bold bg-brand-warm text-white hover:bg-brand-brown transition">
                         + ADD
                     </button>
                 </div>
@@ -443,29 +455,42 @@
             renderCart();
         }
 
+        function toggleMobileCart(open) {
+            const cart = document.getElementById('cart-container');
+            if(open) {
+                cart.classList.remove('translate-y-full');
+            } else {
+                cart.classList.add('translate-y-full');
+            }
+        }
+
         function renderCart() {
             const container = document.getElementById('cart-items');
             if(currentCart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 my-4 text-xs">No items added yet</div>`;
+                container.innerHTML = `<div class="text-center text-gray-400 my-8 text-xs">No items added yet</div>`;
             } else {
                 container.innerHTML = currentCart.map(item => `
-                    <div class="flex justify-between items-center bg-brand-light p-1.5 rounded border text-xs">
+                    <div class="flex justify-between items-center bg-brand-light p-2 rounded border text-xs">
                         <div class="flex-1 pr-2">
-                            <p class="font-bold text-[11px]">${item.name}</p>
+                            <p class="font-bold text-xs">${item.name}</p>
                             <p class="text-gray-500 text-[10px]">₱${item.price.toFixed(2)} × ${item.qty}</p>
                         </div>
                         <div class="flex items-center gap-1">
-                            <button onclick="updateCartQty(${item.id}, -1)" class="w-5 h-5 bg-gray-200 rounded font-bold text-xs">-</button>
-                            <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
-                            <button onclick="updateCartQty(${item.id}, 1)" class="w-5 h-5 bg-gray-200 rounded font-bold text-xs">+</button>
+                            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 rounded font-bold text-xs">-</button>
+                            <span class="font-bold text-xs w-5 text-center">${item.qty}</span>
+                            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 rounded font-bold text-xs">+</button>
                         </div>
                     </div>
                 `).join('');
             }
 
+            const totalQty = currentCart.reduce((sum, item) => sum + item.qty, 0);
             const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const discount = parseFloat(document.getElementById('summary-discount').value) || 0;
             const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('mobile-cart-count').innerText = `🛒 View Order (${totalQty})`;
+            document.getElementById('mobile-cart-total').innerText = `₱${total.toFixed(2)}`;
 
             document.getElementById('summary-subtotal').innerText = `₱${subtotal.toFixed(2)}`;
             document.getElementById('summary-total').innerText = `₱${total.toFixed(2)}`;
@@ -513,6 +538,7 @@
             currentCart = [];
             document.getElementById('cust-name').value = '';
             document.getElementById('cash-received').value = '';
+            toggleMobileCart(false);
             renderCart();
             updateOrderCounter();
         }
@@ -526,7 +552,6 @@
 
         function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
 
-        // RENDER MENU MANAGEMENT BY CATEGORY
         function setMgmtCategory(cat) {
             activeMgmtCategory = cat;
             renderMenuManagement();
@@ -597,7 +622,7 @@
         }
 
         function addNewCategory() {
-            const catName = prompt("Ipasok ang pangalan ng BAGONG CATEGORY (Halimbawa: DESSERTS, BEVERAGES):");
+            const catName = prompt("Ipasok ang pangalan ng BAGONG CATEGORY:");
             if (!catName || catName.trim() === "") return;
             
             const upperCat = catName.trim().toUpperCase();
@@ -610,14 +635,13 @@
             renderCategoryTabs();
             setCategory(upperCat);
             setMgmtCategory(upperCat);
-            alert(`Na-add na ang kategoryang "${upperCat}"!`);
         }
 
         function addNewProduct() {
             const name = prompt("Pangalan ng pagkain/inumin:");
             if(!name || name.trim() === "") return;
             
-            const priceInput = prompt("Presyo (₱) [Pwedeng 0 muna]:", "0");
+            const priceInput = prompt("Presyo (₱):", "0");
             const price = parseFloat(priceInput) || 0;
             
             const catChoices = categoriesList.join(", ");
