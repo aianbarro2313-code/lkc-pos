@@ -68,8 +68,8 @@
             <!-- BRANDING LOGO -->
             <div class="p-3 md:p-4 bg-brand-brown flex items-center md:flex-col text-left md:text-center justify-between md:justify-center border-b border-brand-warm">
                 <div class="flex items-center gap-3 md:flex-col">
-                    <div class="w-12 h-12 md:w-24 md:h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-0.5 md:p-1 shadow-md overflow-hidden shrink-0">
-                        <img src="image.jpg" alt="Leonardo's Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/100?text=LKC+Logo'">
+                    <div class="w-10 h-10 md:w-24 md:h-24 rounded-full border-2 border-brand-accent bg-brand-cream flex items-center justify-center p-0.5 md:p-1 shadow-md overflow-hidden shrink-0">
+                        <img src="logo.png" alt="Leonardo's Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/100?text=LKC+Logo'">
                     </div>
                     <div>
                         <h1 class="font-black tracking-wider text-xs md:text-base uppercase text-brand-cream">LEONARDO’S KAMBINGAN</h1>
@@ -205,17 +205,12 @@
                     <p class="text-lg md:text-2xl font-black text-brand-dark" id="dash-aov">₱0.00</p>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow">
-                <h3 class="font-bold text-sm mb-2 text-brand-dark">Payment Breakdown</h3>
-                <div id="dash-payments" class="space-y-1 text-xs"></div>
-            </div>
         </section>
 
         <!-- ORDERS HISTORY VIEW -->
         <section id="view-orders" class="hidden p-4 md:p-6 space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
                 <h2 class="text-xl font-bold text-brand-dark">Order History</h2>
-                <input type="text" id="order-search" onkeyup="renderOrderHistory()" placeholder="Search Order # or Customer..." class="p-2 border rounded-lg w-full sm:w-64 text-xs">
             </div>
             <div class="bg-white rounded-xl shadow overflow-x-auto">
                 <table class="w-full text-left text-xs">
@@ -224,7 +219,7 @@
                             <th class="p-2">Order #</th>
                             <th class="p-2">Customer</th>
                             <th class="p-2">Total</th>
-                            <th class="p-2 text-right">Action</th>
+                            <th class="p-2 text-right">Time</th>
                         </tr>
                     </thead>
                     <tbody id="order-history-table" class="divide-y divide-gray-100"></tbody>
@@ -287,60 +282,79 @@
     <!-- APPLICATION LOGIC -->
     <script>
         const defaultMasterMenu = [
-            { id: 1, name: 'Lomi Regular', category: 'LOMI', price: 80, available: true, unconfirmed: false },
-            { id: 2, name: 'Lomi Special', category: 'LOMI', price: 100, available: true, unconfirmed: false },
-            { id: 3, name: 'Lomi Jumbo', category: 'LOMI', price: 120, available: true, unconfirmed: false },
-            { id: 4, name: 'Double Toppings', category: 'LOMI', price: 80, available: true, unconfirmed: false },
-            { id: 5, name: 'Pancit Guisado', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 6, name: 'Pancit Chami', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 7, name: 'Pancit Chami Tamis Anghang', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 8, name: 'Pancit Canton', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 9, name: 'Pancit Bihon', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 10, name: 'Pancit Canton Bihon', category: 'PANCIT', price: 100, available: true, unconfirmed: false },
-            { id: 11, name: 'Mismo', category: 'DRINKS', price: 22, available: true, unconfirmed: false },
-            { id: 12, name: '1.5L Soda', category: 'DRINKS', price: 80, available: true, unconfirmed: false },
-            { id: 13, name: 'Tapsilog', category: 'SILOG', price: 95, available: true, unconfirmed: false },
-            { id: 14, name: 'Tosilog', category: 'SILOG', price: 85, available: true, unconfirmed: false },
-            { id: 15, name: 'Porksilog', category: 'SILOG', price: 90, available: true, unconfirmed: false },
-            { id: 26, name: 'Kalderetang Kambing', category: 'OTHER', price: 150, available: true, unconfirmed: false },
-            { id: 27, name: 'Dinuguan', category: 'OTHER', price: 60, available: true, unconfirmed: false },
-            { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true, unconfirmed: false }
+            { id: 1, name: 'Lomi Regular', category: 'LOMI', price: 80, available: true },
+            { id: 2, name: 'Lomi Special', category: 'LOMI', price: 100, available: true },
+            { id: 3, name: 'Lomi Jumbo', category: 'LOMI', price: 120, available: true },
+            { id: 4, name: 'Double Toppings', category: 'LOMI', price: 80, available: true },
+            { id: 5, name: 'Pancit Guisado', category: 'PANCIT', price: 100, available: true },
+            { id: 6, name: 'Pancit Chami', category: 'PANCIT', price: 100, available: true },
+            { id: 7, name: 'Pancit Chami Tamis Anghang', category: 'PANCIT', price: 100, available: true },
+            { id: 8, name: 'Pancit Canton', category: 'PANCIT', price: 100, available: true },
+            { id: 9, name: 'Pancit Bihon', category: 'PANCIT', price: 100, available: true },
+            { id: 10, name: 'Pancit Canton Bihon', category: 'PANCIT', price: 100, available: true },
+            { id: 11, name: 'Mismo', category: 'DRINKS', price: 22, available: true },
+            { id: 12, name: '1.5L Soda', category: 'DRINKS', price: 80, available: true },
+            { id: 13, name: 'Tapsilog', category: 'SILOG', price: 95, available: true },
+            { id: 14, name: 'Tosilog', category: 'SILOG', price: 85, available: true },
+            { id: 15, name: 'Porksilog', category: 'SILOG', price: 90, available: true },
+            { id: 26, name: 'Kalderetang Kambing', category: 'OTHER', price: 150, available: true },
+            { id: 27, name: 'Dinuguan', category: 'OTHER', price: 60, available: true },
+            { id: 28, name: 'Goto', category: 'OTHER', price: 70, available: true }
         ];
 
-        let menu = defaultMasterMenu;
-        let orders = [];
+        let storedMenu = localStorage.getItem('lkc_menu');
+        let menu = storedMenu ? JSON.parse(storedMenu) : defaultMasterMenu;
+        let orders = JSON.parse(localStorage.getItem('lkc_orders') || '[]');
         let currentCart = [];
         let activeCategory = 'LOMI';
 
-        // Connect to Firebase if configured
         try {
-            const db = firebase.database();
-            db.ref('menu').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if(data) menu = Array.isArray(data) ? data : Object.values(data);
-                renderCategoryTabs(); renderProducts(); renderMenuManagement();
-            });
-            db.ref('orders').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if(data) orders = Array.isArray(data) ? data : Object.values(data);
-                updateOrderCounter(); renderDashboard(); renderOrderHistory();
-            });
+            if (typeof firebase !== 'undefined' && firebase.apps.length) {
+                const db = firebase.database();
+                db.ref('menu').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) {
+                        menu = Array.isArray(data) ? data : Object.values(data);
+                        saveLocalMenu();
+                        renderCategoryTabs(); renderProducts(); renderMenuManagement();
+                    }
+                });
+                db.ref('orders').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) {
+                        orders = Array.isArray(data) ? data : Object.values(data);
+                        updateOrderCounter(); renderDashboard(); renderOrderHistory();
+                    }
+                });
+            }
         } catch(e) {}
+
+        function saveLocalMenu() {
+            localStorage.setItem('lkc_menu', JSON.stringify(menu));
+        }
 
         function initApp() {
             renderCategoryTabs();
             renderProducts();
             renderCart();
+            renderMenuManagement();
+            updateOrderCounter();
         }
 
         function switchView(viewName) {
             ['pos', 'dashboard', 'orders', 'menu'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                document.getElementById(`nav-${v}`).classList.remove('bg-brand-accent');
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if(el) el.classList.add('hidden');
+                if(nav) nav.classList.remove('bg-brand-accent');
             });
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            document.getElementById(`nav-${viewName}`).classList.add('bg-brand-accent');
+            
+            const activeEl = document.getElementById(`view-${viewName}`);
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if(activeEl) activeEl.classList.remove('hidden');
+            if(activeNav) activeNav.classList.add('bg-brand-accent');
 
+            if(viewName === 'pos') renderProducts();
             if(viewName === 'dashboard') renderDashboard();
             if(viewName === 'orders') renderOrderHistory();
             if(viewName === 'menu') renderMenuManagement();
@@ -362,19 +376,19 @@
         }
 
         function renderProducts() {
-            const items = menu.filter(m => m.category === activeCategory);
+            const items = menu.filter(m => m.category === activeCategory && m.available !== false);
             const container = document.getElementById('product-grid');
             if(items.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400 text-xs">No items.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400 text-xs">No available items in this category.</div>`;
                 return;
             }
             container.innerHTML = items.map(item => `
                 <div class="bg-white rounded-lg p-2.5 border flex flex-col justify-between shadow-sm">
                     <div>
                         <h3 class="font-bold text-xs text-brand-dark line-clamp-1">${item.name}</h3>
-                        <p class="text-brand-accent font-black text-xs mt-0.5">₱${item.price.toFixed(2)}</p>
+                        <p class="text-brand-accent font-black text-xs mt-0.5">₱${parseFloat(item.price).toFixed(2)}</p>
                     </div>
-                    <button onclick="addToCart(${item.id})" class="mt-2 w-full py-1 rounded text-[10px] font-bold bg-brand-warm text-white hover:bg-brand-brown">
+                    <button onclick="addToCart(${item.id})" class="mt-2 w-full py-1 rounded text-[10px] font-bold bg-brand-warm text-white hover:bg-brand-brown transition">
                         + ADD
                     </button>
                 </div>
@@ -383,9 +397,10 @@
 
         function addToCart(productId) {
             const product = menu.find(p => p.id === productId);
+            if (!product) return;
             const existing = currentCart.find(c => c.id === productId);
             if(existing) { existing.qty++; } 
-            else { currentCart.push({ id: product.id, name: product.name, price: product.price, qty: 1 }); }
+            else { currentCart.push({ id: product.id, name: product.name, price: parseFloat(product.price), qty: 1 }); }
             renderCart();
         }
 
@@ -443,14 +458,14 @@
         }
 
         function completeOrder() {
-            if(currentCart.length === 0) return alert('Add items first!');
+            if(currentCart.length === 0) return alert('Maglagay muna ng order!');
             const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const discount = parseFloat(document.getElementById('summary-discount').value) || 0;
             const total = Math.max(0, subtotal - discount);
             const paymentMethod = document.getElementById('payment-method').value;
             const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
 
-            if(paymentMethod === 'Cash' && cashReceived < total) return alert('Insufficient cash!');
+            if(paymentMethod === 'Cash' && cashReceived < total) return alert('Kulang ang cash!');
 
             const order = {
                 orderNum: (orders.length + 1).toString().padStart(6, '0'),
@@ -463,6 +478,7 @@
             };
 
             orders.push(order);
+            localStorage.setItem('lkc_orders', JSON.stringify(orders));
             showReceiptModal(order);
             currentCart = [];
             document.getElementById('cust-name').value = '';
@@ -479,11 +495,77 @@
         }
 
         function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
-        function renderDashboard() {}
-        function renderOrderHistory() {}
-        function renderMenuManagement() {}
 
-        // Load App
+        function renderMenuManagement() {
+            const table = document.getElementById('menu-management-table');
+            if(!table) return;
+            
+            table.innerHTML = menu.map(item => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-2.5 font-bold">${item.name} <span class="text-[10px] text-gray-400 font-normal">(${item.category})</span></td>
+                    <td class="p-2.5 font-semibold text-brand-warm">₱${parseFloat(item.price).toFixed(2)}</td>
+                    <td class="p-2.5 text-right">
+                        <button onclick="toggleAvailability(${item.id})" class="px-2.5 py-1 rounded text-[10px] font-bold ${item.available !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                            ${item.available !== false ? 'AVAILABLE' : 'OUT OF STOCK'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleAvailability(id) {
+            const item = menu.find(m => m.id === id);
+            if(item) {
+                item.available = item.available === false ? true : false;
+                saveLocalMenu();
+                renderMenuManagement();
+                renderProducts();
+            }
+        }
+
+        function addNewProduct() {
+            const name = prompt("Pangalan ng pagkain/inumin:");
+            if(!name) return;
+            const price = parseFloat(prompt("Presyo (₱):"));
+            if(isNaN(price)) return alert("Maling presyo!");
+            const category = prompt("Category (LOMI, PANCIT, SILOG, DRINKS, OTHER):", "LOMI").toUpperCase();
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                price,
+                category,
+                available: true
+            };
+
+            menu.push(newItem);
+            saveLocalMenu();
+            renderMenuManagement();
+            renderProducts();
+            renderCategoryTabs();
+        }
+
+        function renderDashboard() {
+            const gross = orders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('dash-gross').innerText = `₱${gross.toFixed(2)}`;
+            document.getElementById('dash-net').innerText = `₱${gross.toFixed(2)}`;
+            document.getElementById('dash-orders').innerText = orders.length;
+            document.getElementById('dash-aov').innerText = orders.length ? `₱${(gross / orders.length).toFixed(2)}` : '₱0.00';
+        }
+
+        function renderOrderHistory() {
+            const table = document.getElementById('order-history-table');
+            if(!table) return;
+            table.innerHTML = orders.slice().reverse().map(o => `
+                <tr class="border-b">
+                    <td class="p-2 font-mono font-bold">#${o.orderNum}</td>
+                    <td class="p-2">${o.customer}</td>
+                    <td class="p-2 font-bold text-brand-accent">₱${o.total.toFixed(2)}</td>
+                    <td class="p-2 text-right text-[10px] text-gray-500">${o.time}</td>
+                </tr>
+            `).join('');
+        }
+
         initApp();
     </script>
 </body>
