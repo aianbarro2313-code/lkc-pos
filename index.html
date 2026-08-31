@@ -271,8 +271,8 @@ tailwind.config = {
 
 <!-- JAVASCRIPT LOGIC -->
 <script>
-// GOOGLE SHEET DEPLOYMENT URL
-const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhLrnqJ99ET5tnMGMwNB5hletOYmE-PkyKqqvahBj0IHsy5td-U6kYjHTCWCPST1PE/exec";
+// GOOGLE SHEET DEPLOYMENT URL (Siguraduhing palitan ito kung may bago kang URL)
+const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhLrnqJ99ET5tnMGMwNB5hletOYmE-PkyKqqvahBj0IHsy5td-U6kYjHTCWCPsT1PE/exec";
 
 let orderCounter = 1;
 let currentDefaultType = "Dine-In";
@@ -344,6 +344,12 @@ function startShift() {
     document.getElementById('btn-end-shift').disabled = false;
     document.getElementById('btn-end-shift').classList.remove('opacity-50', 'cursor-not-allowed');
 
+    // Magpadala ng "SHIFT STARTED" log sa Google Sheet
+    syncShiftStatusToGoogleSheet({
+        type: "SHIFT_START",
+        startShiftTime: currentShift.startDateTimeStr
+    });
+
     alert("Shift started successfully!");
 }
 
@@ -364,14 +370,15 @@ function endShift() {
     const durationStr = `${diffHrs} hrs ${diffMins} mins`;
 
     const shiftReport = {
-        type: "SHIFT_REPORT",
+        type: "SHIFT_END",
         startShift: currentShift.startDateTimeStr,
         endShift: endDateTimeStr,
         duration: durationStr,
         totalSales: currentShift.totalSalesDuringShift
     };
 
-    syncShiftToGoogleSheet(shiftReport);
+    // Magpadala ng "SHIFT ENDED" log sa Google Sheet
+    syncShiftStatusToGoogleSheet(shiftReport);
 
     currentShift.active = false;
 
@@ -388,17 +395,17 @@ function endShift() {
     alert(`Shift ended successfully! Total Sales recorded: ₱${currentShift.totalSalesDuringShift.toFixed(2)}`);
 }
 
-function syncShiftToGoogleSheet(report) {
+function syncShiftStatusToGoogleSheet(payload) {
     const statusEl = document.getElementById('sync-status');
-    statusEl.innerText = "📊 Sheet Sync: Sending Shift Report...";
+    statusEl.innerText = "📊 Sheet Sync: Updating Shift...";
     
     fetch(GOOGLE_SHEET_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-        body: JSON.stringify(report)
+        body: JSON.stringify(payload)
     }).then(() => {
-        statusEl.innerText = "📊 Sheet Sync: Shift Synced";
+        statusEl.innerText = "📊 Sheet Sync: Shift Logged";
         statusEl.className = "text-emerald-300 font-medium";
     }).catch(err => {
         console.error("Shift sync error:", err);
