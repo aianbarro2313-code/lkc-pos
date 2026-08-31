@@ -105,7 +105,7 @@ colors: {
 <!-- FLOATING BUTTON FOR MOBILE TO VIEW CART -->
 <button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
 <span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
-<span id="mobile-cart-total">0.00</span>
+<span id="mobile-cart-total">P0.00</span>
 </button>
 <!-- RIGHT: CART/ORDER SUMMARY -->
 <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
@@ -365,13 +365,15 @@ statusEl.innerText = "Updating Shift...";
 statusEl.className = "text-amber-300 font-medium animate-pulse";
 fetch(GOOGLE_SHEET_SCRIPT_URL, {
 method: 'POST',
-mode: 'no-cors',
 headers: { 'Content-Type': 'text/plain; charset=utf-8' },
 body: JSON.stringify(payload)
-}).then(() => {
+})
+.then(response => response.json())
+.then(data => {
 statusEl.innerText = "Shift Logged";
 statusEl.className = "text-emerald-300 font-medium";
-}).catch(err => {
+})
+.catch(err => {
 console.error("Shift sync error:", err);
 statusEl.innerText = "Failed ❌";
 statusEl.className = "text-red-300 font-medium";
@@ -692,13 +694,15 @@ change: changeVal
 };
 fetch(GOOGLE_SHEET_SCRIPT_URL, {
 method: 'POST',
-mode: 'no-cors',
 headers: { 'Content-Type': 'text/plain; charset=utf-8' },
 body: JSON.stringify(payload)
-}).then(() => {
+})
+.then(response => response.json())
+.then(data => {
 statusEl.innerText = "Synced";
 statusEl.className = "text-emerald-300 font-medium";
-}).catch(err => {
+})
+.catch(err => {
 console.error("Sync error:", err);
 statusEl.innerText = "Failed ❌";
 statusEl.className = "text-red-300 font-medium";
