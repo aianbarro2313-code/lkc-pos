@@ -625,36 +625,40 @@
             document.getElementById('cart-drawer').classList.add('translate-y-full');
         }
 
-        function syncOrderToGoogleSheet(order) {
-            const statusEl = document.getElementById('sync-status');
-            statusEl.innerText = "📊 Sheet Sync: Saving...";
-            statusEl.className = "text-amber-300 font-medium animate-pulse";
+function syncOrderToGoogleSheet(order) {
+    const statusEl = document.getElementById('sync-status');
+    statusEl.innerText = "📊 Sheet Sync: Saving...";
+    statusEl.className = "text-amber-300 font-medium animate-pulse";
 
-            const itemsDescription = order.items.map(i => `${i.qty}x ${i.name} (${i.orderType || 'Dine-In'})`).join(', ');
+    const itemsDescription = order.items.map(i => `${i.qty}x ${i.name} (${i.orderType || 'Dine-In'})`).join(', ');
+    const amountPaidVal = parseFloat(document.getElementById('amount-paid').value) || order.total;
+    const changeVal = amountPaidVal >= order.total ? amountPaidVal - order.total : 0;
 
-            const payload = {
-                orderNum: order.orderNum,
-                table: order.table,
-                date: order.date,
-                items: itemsDescription,
-                total: order.total,
-                paymentMethod: order.paymentMethod
-            };
+    const payload = {
+        orderNum: order.orderNum,
+        table: order.table,
+        date: order.date,
+        items: itemsDescription,
+        total: order.total,
+        paymentMethod: order.paymentMethod,
+        amountPaid: amountPaidVal,
+        change: changeVal
+    };
 
-            fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                statusEl.innerText = "📊 Sheet Sync: Synced ✔";
-                statusEl.className = "text-emerald-300 font-medium";
-            }).catch(err => {
-                console.error("Sync error:", err);
-                statusEl.innerText = "📊 Sheet Sync: Failed ❌";
-                statusEl.className = "text-red-300 font-medium";
-            });
-        }
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    }).then(() => {
+        statusEl.innerText = "📊 Sheet Sync: Synced ✔";
+        statusEl.className = "text-emerald-300 font-medium";
+    }).catch(err => {
+        console.error("Sync error:", err);
+        statusEl.innerText = "📊 Sheet Sync: Failed ❌";
+        statusEl.className = "text-red-300 font-medium";
+    });
+}
 
         function updateOrderHistoryUI() {
             const tbody = document.getElementById('orders-table-body');
