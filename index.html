@@ -630,15 +630,21 @@ function syncOrderToGoogleSheet(order) {
     statusEl.innerText = "📊 Sheet Sync: Saving...";
     statusEl.className = "text-amber-300 font-medium animate-pulse";
 
-    const itemsDescription = order.items.map(i => `${i.qty}x ${i.name} (${i.orderType || 'Dine-In'})`).join(', ');
     const amountPaidVal = parseFloat(document.getElementById('amount-paid').value) || order.total;
     const changeVal = amountPaidVal >= order.total ? amountPaidVal - order.total : 0;
+
+    // Ipasa ang buong array ng items para ma-loop ng Google Script per row
+    const formattedItems = order.items.map(i => ({
+        qty: i.qty,
+        name: i.name,
+        orderType: i.orderType || 'Dine-In'
+    }));
 
     const payload = {
         orderNum: order.orderNum,
         table: order.table,
         date: order.date,
-        items: itemsDescription,
+        items: formattedItems,
         total: order.total,
         paymentMethod: order.paymentMethod,
         amountPaid: amountPaidVal,
