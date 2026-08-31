@@ -4,20 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leonardo's Kambingan sa Chapel - POS System</title>
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
-theme: {
-extend: {
-colors: {
-'brand-dark': '#2C1810',
-'brand-orange': '#D9531E',
-'brand-cream': '#FDFBF7',
-'brand-bg': '#F4EFEB'
-}
-}
-}
+theme: { extend: { colors: { 'brand-dark': '#2C1810', 'brand-orange': '#D9531E', 'brand-cream': '#FDFBF7', 'brand-bg': '#F4EFEB' } } }
 }
 </script>
 <style>
@@ -27,47 +17,32 @@ colors: {
 </style>
 </head>
 <body class="bg-brand-bg font-sans antialiased min-h-screen flex flex-col md:flex-row">
-<!-- MOBILE TOP HEADER & NAVIGATION TOGGLE -->
 <header class="bg-brand-dark text-white p-3 flex justify-between items-center md:hidden border-b border-white/15 z-30 sticky top-0">
 <div class="flex items-center gap-3">
-<img src="logo.png" alt="Leonardo's Logo" class="w-10 h-10 object-contain rounded-full border border-brand-orange bg-white">
+<div class="w-10 h-10 rounded-full border border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-xs">LKC</div>
 <div>
 <h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
 <p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
 </div>
 </div>
-<button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg focus:outline-none">
-☰
-</button>
+<button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg">☰</button>
 </header>
 
-<!-- SIDEBAR (DESKTOP) & MOBILE DROPDOWN NAVIGATION -->
 <aside id="sidebar-nav" class="hidden md:flex w-full md:w-64 bg-brand-dark text-white flex-col justify-between p-4 flex-shrink-0 z-20 md:h-screen md:sticky md:top-0">
 <div>
-<!-- LOGO/HEADER (DESKTOP) -->
 <div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
-<img src="logo.png" alt="Leonardo's Logo" class="w-20 h-20 object-contain rounded-full border-2 border-brand-orange bg-white mb-2 shadow-md">
+<div class="w-16 h-16 rounded-full border-2 border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-lg mb-2 shadow-md">LKC</div>
 <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
 <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
 </div>
-<!-- NAVIGATION MENU -->
 <nav class="space-y-2">
-<button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">
-<span>POS & Take Order</span>
-</button>
-<button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-<span>Active Orders</span>
-</button>
-<button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-<span>Order History & Summary</span>
-</button>
-<button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">
-<span>Edit Menu & Categories</span>
-</button>
+<button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">POS & Take Order</button>
+<button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Active Orders</button>
+<button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Order History & Summary</button>
+<button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Edit Menu & Categories</button>
 </nav>
 </div>
 <div class="space-y-3 mt-4 md:mt-0">
-<!-- SHIFT MANAGEMENT WIDGET -->
 <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
 <div class="flex justify-between items-center">
 <span class="font-bold text-gray-300">Shift Status:</span>
@@ -75,39 +50,35 @@ colors: {
 </div>
 <div id="shift-info" class="text-[10px] text-gray-400">No active shift.</div>
 <div class="grid grid-cols-2 gap-1.5 pt-1">
-<button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] transition">Start Shift</button>
-<button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] transition opacity-50 cursor-not-allowed" disabled>End Shift</button>
+<button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px]">Start Shift</button>
+<button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] opacity-50 cursor-not-allowed" disabled>End Shift</button>
 </div>
 </div>
-<!-- SYNC STATUS INDICATOR -->
 <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs flex items-center justify-between">
-<span class="text-gray-400 font-bold">Sheet Sync:</span>
-<span id="sync-status" class="text-amber-300 font-medium">Ready</span>
+<span class="text-gray-400 font-bold">Cloud Sync:</span>
+<span id="sync-status" class="text-emerald-300 font-medium">Connected</span>
+<button onclick="fetchAllDataFromCloud()" class="ml-2 bg-white/10 px-2 py-1 rounded text-[10px] hover:bg-white/20">🔄 Refresh</button>
 </div>
 </div>
 </aside>
 
-<!-- MAIN CONTENT AREA -->
 <main class="flex-1 flex flex-col md:flex-row relative overflow-y-auto">
-<!-- POS TAB -->
 <div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6">
-<!-- LEFT: MENU ITEMS (BY CATEGORY) -->
 <div class="flex-1 flex flex-col min-w-0">
 <div class="mb-3 md:mb-4 flex justify-between items-center">
 <div>
 <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
-<p class="text-[11px] md:text-xs text-gray-500">Pumili ng pagkain para idagdag sa order summary</p>
+<p class="text-[11px] md:text-xs text-gray-500">Live menu galing sa Google Sheet database</p>
 </div>
 </div>
-<!-- CATEGORIES CONTAINER -->
 <div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
 </div>
-<!-- FLOATING BUTTON FOR MOBILE TO VIEW CART -->
+
 <button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
 <span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
 <span id="mobile-cart-total">P0.00</span>
 </button>
-<!-- RIGHT: CART/ORDER SUMMARY -->
+
 <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
 <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
 <h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
@@ -116,52 +87,41 @@ colors: {
 <button onclick="toggleMobileCart()" class="md:hidden text-gray-500 font-bold text-lg">X</button>
 </div>
 </div>
-<!-- TABLE/CUSTOMER INFO & SET ALL TYPE OPTION -->
 <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
 <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
 <div class="flex items-center justify-between text-xs pt-1">
 <span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
 <div class="flex gap-2">
 <label class="inline-flex items-center gap-1 cursor-pointer">
-<input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')" class="text-emerald-600 focus:ring-emerald-500">
+<input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')">
 <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
 </label>
 <label class="inline-flex items-center gap-1 cursor-pointer">
-<input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')" class="text-red-600 focus:ring-red-500">
+<input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')">
 <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
 </label>
 </div>
 </div>
 </div>
-<!-- CART ITEMS LIST -->
 <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
 <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
 </div>
-<!-- ORDER TOTAL, PAYMENT & INPUTS AT THE BOTTOM -->
 <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
-<!-- FOOD & DRINKS SUBTOTALS -->
 <div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
-<div class="flex justify-between items-center text-gray-600">
-<span>Food Subtotal</span>
-<span id="cart-food-subtotal" class="font-bold text-brand-dark">P0.00</span>
+<div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">P0.00</span></div>
+<div class="flex justify-between items-center text-gray-600"><span>Drinks Subtotal</span><span id="cart-drinks-subtotal" class="font-bold text-brand-dark">P0.00</span></div>
 </div>
-<div class="flex justify-between items-center text-gray-600">
-<span>Drinks Subtotal</span>
-<span id="cart-drinks-subtotal" class="font-bold text-brand-dark">P0.00</span>
-</div>
-</div>
-<!-- PAYMENT METHOD & AMOUNT PAID -->
 <div class="grid grid-cols-2 gap-2 pt-1">
 <div>
 <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
-<select id="payment-method" class="w-full p-2 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white font-bold text-gray-700">
+<select id="payment-method" class="w-full p-2 text-xs border rounded-lg bg-white font-bold text-gray-700">
 <option value="Cash">Cash</option>
 <option value="GCash">GCash</option>
 </select>
 </div>
 <div>
 <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
-<input type="number" id="amount-paid" oninput="calculateChange()" placeholder="P0.00" class="w-full p-2 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white font-bold">
+<input type="number" id="amount-paid" oninput="calculateChange()" placeholder="P0.00" class="w-full p-2 text-xs border rounded-lg bg-white font-bold">
 </div>
 </div>
 <div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
@@ -173,719 +133,510 @@ colors: {
 <span id="cart-total" class="text-brand-orange">P0.00</span>
 </div>
 <div class="grid grid-cols-2 gap-2 mt-2">
-<button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow transition">
-Save Active Order
-</button>
-<button id="pay-button" onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow transition">
-Pay & Complete
-</button>
+<button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow">Save Active Order</button>
+<button onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Pay & Complete</button>
 </div>
 </div>
 </div>
 </div>
 
-<!-- ACTIVE ORDERS TAB -->
 <div id="tab-active" class="flex-1 p-4 md:p-6 hidden">
-<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables</h2>
+<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables (Cloud Synced)</h2>
 <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 </div>
 
-<!-- ORDER HISTORY & SUMMARY TAB -->
 <div id="tab-orders" class="flex-1 p-4 md:p-6 hidden">
 <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-<p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p>
-<p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p>
-</div>
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-<p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p>
-<p id="stat-total-sales" class="text-2xl font-black text-brand-orange">P0.00</p>
-</div>
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-<p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p>
-<p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">P0.00</p>
-</div>
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p><p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p></div>
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p><p id="stat-total-sales" class="text-2xl font-black text-brand-orange">P0.00</p></div>
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p><p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">P0.00</p></div>
 </div>
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
 <table class="w-full text-left border-collapse min-w-[600px]">
 <thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
-<tr>
-<th class="p-3">Order #</th>
-<th class="p-3">Table/Customer</th>
-<th class="p-3">Date/Time</th>
-<th class="p-3">Items & Order Type</th>
-<th class="p-3 text-right">Total Amount</th>
-</tr>
+<tr><th class="p-3">Order #</th><th class="p-3">Table/Customer</th><th class="p-3">Date/Time</th><th class="p-3">Items & Order Type</th><th class="p-3 text-right">Total Amount</th></tr>
 </thead>
 <tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
-<tr>
-<td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td>
-</tr>
+<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 
-<!-- EDIT MENU & CATEGORIES TAB -->
 <div id="tab-inventory" class="flex-1 p-4 md:p-6 hidden space-y-6">
 <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-<div>
-<h3 class="text-lg font-black text-brand-dark">Manage Categories</h3>
-<p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya sa POS</p>
-</div>
-<button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-black transition">
-+ Add Category
-</button>
+<div><h3 class="text-lg font-black text-brand-dark">Manage Categories</h3><p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya</p></div>
+<button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold">+ Add Category</button>
 </div>
 <div id="category-badge-list" class="flex flex-wrap gap-2"></div>
 </div>
 <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-<div>
-<h3 class="text-lg font-black text-brand-dark">Menu Items & Prices</h3>
-<p class="text-xs text-gray-500">I-edit ang presyo, pangalan, o stock availability ng bawat item direkta rito.</p>
-</div>
-<button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:bg-orange-600 transition">
-+ Add New Menu Item
-</button>
+<div><h3 class="text-lg font-black text-brand-dark">Menu Items & Prices (Cloud Sync)</h3><p class="text-xs text-gray-500">Ang pag-edit dito ay mag-aappear sa lahat ng device pagka-save.</p></div>
+<button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow">+ Add New Menu Item</button>
 </div>
 <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
 </div>
 </main>
 
-<!-- JAVASCRIPT LOGIC -->
 <script>
-const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUI2xV7EVRKM5sJXPBRpKFZcXnI-Fd0HQCnkvOG4tje4Z32sj6Rx2fEhKwbGza5tEc/exec";
+const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyivvBhH301w-lw9i1hKIUq1tNKVsAJLAu4N_d-wKTdva4Q-u-Zq6V6R9JO47S9Z_AdAA/exec"; // Palitan nito ang URL mo
 let orderCounter = 1;
 let currentDefaultType = "Dine-In";
 let categories = ["LOMI", "PANCIT", "SILOG", "SIZZLING", "DRINKS", "OTHER"];
-let menu = [
-{ id: 1, name: "Lomi Regular", category: "LOMI", price: 80.00, available: true },
-{ id: 2, name: "Lomi Special", category: "LOMI", price: 100.00, available: true },
-{ id: 3, name: "Lomi Jumbo", category: "LOMI", price: 120.00, available: true },
-{ id: 4, name: "Double Toppings", category: "LOMI", price: 80.00, available: true },
-{ id: 5, name: "Pancit Guisado", category: "PANCIT", price: 100.00, available: true },
-{ id: 6, name: "Pancit Chami", category: "PANCIT", price: 100.00, available: true },
-{ id: 7, name: "Pancit Chami Tamis Anghang", category: "PANCIT", price: 100.00, available: true },
-{ id: 8, name: "Pancit Canton", category: "PANCIT", price: 100.00, available: true },
-{ id: 9, name: "Pancit Bihon", category: "PANCIT", price: 100.00, available: true },
-{ id: 10, name: "Pancit Canton Bihon", category: "PANCIT", price: 100.00, available: true },
-{ id: 11, name: "Tapsilog", category: "SILOG", price: 130.00, available: true },
-{ id: 12, name: "Tosilog", category: "SILOG", price: 130.00, available: true },
-{ id: 13, name: "Porksilog", category: "SILOG", price: 130.00, available: true },
-{ id: 14, name: "Hotsilog", category: "SILOG", price: 130.00, available: true },
-{ id: 15, name: "Chicksilog", category: "SILOG", price: 130.00, available: true },
-{ id: 16, name: "Bangsilog", category: "SILOG", price: 130.00, available: true },
-{ id: 17, name: "Sisig", category: "SIZZLING", price: 150.00, available: true },
-{ id: 18, name: "Porkchop with Gravy", category: "SIZZLING", price: 150.00, available: true },
-{ id: 19, name: "Fried Chicken with Gravy", category: "SIZZLING", price: 150.00, available: true },
-{ id: 20, name: "Hungarian with Gravy", category: "SIZZLING", price: 150.00, available: true },
-{ id: 21, name: "Softdrinks 8oz", category: "DRINKS", price: 20.00, available: true },
-{ id: 22, name: "Softdrinks 1.5L", category: "DRINKS", price: 75.00, available: true },
-{ id: 23, name: "Iced Tea Pitcher", category: "DRINKS", price: 60.00, available: true },
-{ id: 24, name: "Bottled Water", category: "DRINKS", price: 15.00, available: true },
-{ id: 25, name: "Kalderetang Kambing", category: "OTHER", price: 150.00, available: true },
-{ id: 26, name: "Champeni", category: "OTHER", price: 80.00, available: true },
-{ id: 27, name: "Dinuguan", category: "OTHER", price: 60.00, available: true },
-{ id: 28, name: "Extra Rice", category: "OTHER", price: 15.00, available: true }
-];
+let menu = [];
 let cart = [];
 let activeOrders = [];
 let orderHistory = [];
-let currentShift = {
-active: false,
-startTime: null,
-startDateTimeStr: null,
-totalSalesDuringShift: 0
+let currentShift = { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
+
+// Auto-fetch data galing sa Google Sheet tuwing bubuksan o i-rerefresh ang page
+window.onload = function() {
+    fetchAllDataFromCloud();
+    setInterval(fetchAllDataFromCloud, 10000); // Automatic sync bawat 10 segundo sa iba't ibang device
 };
 
-function startShift() {
-if (currentShift.active) {
-alert("May kasalukuyan nang naka-start na shift!");
-return;
+function fetchAllDataFromCloud() {
+    fetch(GOOGLE_SHEET_SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+        if(data.menu && data.menu.length > 0) {
+            menu = data.menu;
+            // Kunin din ang mga unique categories mula sa menu
+            let cats = [...new Set(menu.map(m => m.category))];
+            if(cats.length > 0) categories = cats;
+        }
+        if(data.activeOrders) {
+            activeOrders = data.activeOrders;
+        }
+        renderPOSMenu();
+        if(!document.getElementById('tab-inventory').classList.contains('hidden')) renderInventory();
+        if(!document.getElementById('tab-active').classList.contains('hidden')) renderActiveOrders();
+        document.getElementById('sync-status').innerText = "Synced";
+        document.getElementById('sync-status').className = "text-emerald-300 font-medium";
+    })
+    .catch(err => {
+        console.log("Fetch error:", err);
+        document.getElementById('sync-status').innerText = "Offline/Error";
+        document.getElementById('sync-status').className = "text-red-300 font-medium";
+    });
 }
-const now = new Date();
-currentShift = {
-active: true,
-startTime: now,
-startDateTimeStr: now.toLocaleString(),
-totalSalesDuringShift: 0
-};
-document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
-document.getElementById('shift-status-badge').innerText = "OPEN";
-document.getElementById('shift-info').innerText = `Started: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-document.getElementById('btn-start-shift').disabled = true;
-document.getElementById('btn-start-shift').classList.add('opacity-50', 'cursor-not-allowed');
-document.getElementById('btn-end-shift').disabled = false;
-document.getElementById('btn-end-shift').classList.remove('opacity-50', 'cursor-not-allowed');
-syncShiftStatusToGoogleSheet({
-type: "SHIFT_START",
-startShiftTime: currentShift.startDateTimeStr
-});
-alert("Shift started successfully!");
+
+function syncMenuToCloud() {
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: JSON.stringify({ type: "UPDATE_MENU", menu: menu })
+    }).then(() => fetchAllDataFromCloud());
+}
+
+function syncActiveOrdersToCloud() {
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: JSON.stringify({ type: "SYNC_ACTIVE", activeOrders: activeOrders })
+    });
+}
+
+function startShift() {
+    if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
+    const now = new Date();
+    currentShift = { active: true, startTime: now, startDateTimeStr: now.toLocaleString(), totalSalesDuringShift: 0 };
+    document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
+    document.getElementById('shift-status-badge').innerText = "OPEN";
+    document.getElementById('shift-info').innerText = `Started: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    document.getElementById('btn-start-shift').disabled = true;
+    document.getElementById('btn-end-shift').disabled = false;
+    document.getElementById('btn-end-shift').classList.remove('opacity-50', 'cursor-not-allowed');
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: JSON.stringify({ type: "SHIFT_START", startShiftTime: currentShift.startDateTimeStr })
+    });
+    alert("Shift started successfully!");
 }
 
 function endShift() {
-if (!currentShift.active) {
-alert("Walang aktibong shift na naka-open!");
-return;
-}
-if (!confirm("Sigurado ka bang nais mong tapusin ang shift na ito?")) return;
-const endTime = new Date();
-const endDateTimeStr = endTime.toLocaleString();
-const diffMs = endTime - currentShift.startTime;
-const diffHrs = Math.floor(diffMs / 3600000);
-const diffMins = Math.floor((diffMs % 3600000) / 60000);
-const durationStr = `${diffHrs} hrs ${diffMins} mins`;
-const shiftReport = {
-type: "SHIFT_END",
-startShift: currentShift.startDateTimeStr,
-endShift: endDateTimeStr,
-duration: durationStr,
-totalSales: currentShift.totalSalesDuringShift
-};
-syncShiftStatusToGoogleSheet(shiftReport);
-currentShift.active = false;
-document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300";
-document.getElementById('shift-status-badge').innerText = "CLOSED";
-document.getElementById('shift-info').innerText = 'Last shift ended.';
-document.getElementById('btn-start-shift').disabled = false;
-document.getElementById('btn-start-shift').classList.remove('opacity-50', 'cursor-not-allowed');
-document.getElementById('btn-end-shift').disabled = true;
-document.getElementById('btn-end-shift').classList.add('opacity-50', 'cursor-not-allowed');
-alert(`Shift ended successfully! Total Sales recorded: P${currentShift.totalSalesDuringShift.toFixed(2)}`);
-}
-
-function syncShiftStatusToGoogleSheet(payload) {
-const statusEl = document.getElementById('sync-status');
-statusEl.innerText = "Updating Shift...";
-statusEl.className = "text-amber-300 font-medium animate-pulse";
-fetch(GOOGLE_SHEET_SCRIPT_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-body: JSON.stringify(payload)
-})
-.then(response => response.json())
-.then(data => {
-statusEl.innerText = "Shift Logged";
-statusEl.className = "text-emerald-300 font-medium";
-})
-.catch(err => {
-console.error("Shift sync error:", err);
-statusEl.innerText = "Failed ❌";
-statusEl.className = "text-red-300 font-medium";
-});
+    if (!currentShift.active) return alert("Walang aktibong shift!");
+    if (!confirm("Tapusin na ang shift na ito?")) return;
+    const endTime = new Date();
+    const endDateTimeStr = endTime.toLocaleString();
+    const diffMs = endTime - currentShift.startTime;
+    const durationStr = `${Math.floor(diffMs / 3600000)} hrs ${Math.floor((diffMs % 3600000) / 60000)} mins`;
+    
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: JSON.stringify({ type: "SHIFT_END", startShift: currentShift.startDateTimeStr, endShift: endDateTimeStr, duration: durationStr, totalSales: currentShift.totalSalesDuringShift })
+    });
+    currentShift.active = false;
+    document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300";
+    document.getElementById('shift-status-badge').innerText = "CLOSED";
+    document.getElementById('btn-start-shift').disabled = false;
+    document.getElementById('btn-end-shift').disabled = true;
+    alert(`Shift ended! Total Sales: P${currentShift.totalSalesDuringShift.toFixed(2)}`);
 }
 
 function getTypeBadgeHtml(type) {
-if (type === 'Take-Out') {
-return '<span class="inline-block bg-red-100 text-red-700 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Take-Out</span>';
-}
-return '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Dine-In</span>';
-}
-
-function toggleMobileMenu() {
-const sidebar = document.getElementById('sidebar-nav');
-sidebar.classList.toggle('hidden');
+    return type === 'Take-Out' 
+        ? '<span class="inline-block bg-red-100 text-red-700 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Take-Out</span>'
+        : '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Dine-In</span>';
 }
 
-function toggleMobileCart() {
-const drawer = document.getElementById('cart-drawer');
-drawer.classList.toggle('translate-y-full');
-}
-
-function setDefaultType(type) {
-currentDefaultType = type;
-cart.forEach(item => item.orderType = type);
-updateCartUI();
-}
+function toggleMobileMenu() { document.getElementById('sidebar-nav').classList.toggle('hidden'); }
+function toggleMobileCart() { document.getElementById('cart-drawer').classList.toggle('translate-y-full'); }
+function setDefaultType(type) { currentDefaultType = type; cart.forEach(i => i.orderType = type); updateCartUI(); }
 
 function renderPOSMenu() {
-const grid = document.getElementById('pos-menu-grid');
-grid.innerHTML = categories.map(cat => {
-const items = menu.filter(m => m.category === cat);
-if (items.length === 0) return '';
-return `
-<div class="space-y-2">
-<div class="sticky top-16 md:top-0 bg-brand-bg/95 backdrop-blur py-2 z-10 border-b border-amber-900/10 flex items-center gap-2">
-<span class="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
-<h3 class="font-black text-xs uppercase tracking-widest text-brand-dark">${cat}</h3>
-<span class="text-[10px] text-gray-400 font-bold">(${items.length})</span>
-</div>
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-3">
-${items.map(item => {
-const isAvail = item.available !== false;
-return `
-<div ${isAvail ? `onclick="addToCart(${item.id})"` : ''} class="bg-white p-2.5 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}">
-${!isAvail ? '<div class="absolute inset-0 bg-gray-900/20 flex items-center justify-center z-10"><span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow uppercase">OUT OF STOCK</span></div>' : ''}
-<div>
-<span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">${item.category}</span>
-<h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
-</div>
-<div class="mt-2.5 flex justify-between items-center">
-<span class="font-black text-xs ${isAvail ? 'text-brand-orange' : 'text-gray-400'}">P${item.price.toFixed(2)}</span>
-<span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border border-gray-200">+</span>
-</div>
-</div>
-`;
-}).join('')}
-</div>
-</div>
-`;
-}).join('');
+    const grid = document.getElementById('pos-menu-grid');
+    grid.innerHTML = categories.map(cat => {
+        const items = menu.filter(m => m.category === cat);
+        if (items.length === 0) return '';
+        return `
+        <div class="space-y-2">
+            <div class="sticky top-16 md:top-0 bg-brand-bg/95 py-2 z-10 border-b border-amber-900/10 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
+                <h3 class="font-black text-xs uppercase tracking-widest text-brand-dark">${cat}</h3>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-3">
+                ${items.map(item => {
+                    const isAvail = item.available !== false;
+                    return `
+                    <div ${isAvail ? `onclick="addToCart(${item.id})"` : ''} class="bg-white p-2.5 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}">
+                        ${!isAvail ? '<div class="absolute inset-0 bg-gray-900/20 flex items-center justify-center z-10"><span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">OUT OF STOCK</span></div>' : ''}
+                        <div>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase">${item.category}</span>
+                            <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
+                        </div>
+                        <div class="mt-2.5 flex justify-between items-center">
+                            <span class="font-black text-xs ${isAvail ? 'text-brand-orange' : 'text-gray-400'}">P${Number(item.price).toFixed(2)}</span>
+                            <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border">+</span>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }).join('');
 }
 
 function addToCart(itemId) {
-const item = menu.find(m => m.id === itemId);
-if (!item || item.available === false) return;
-const existing = cart.find(c => c.id === itemId && c.orderType === currentDefaultType);
-if (existing) {
-existing.qty += 1;
-} else {
-cart.push({...item, qty: 1, orderType: currentDefaultType });
-}
-updateCartUI();
+    const item = menu.find(m => m.id === itemId);
+    if (!item || item.available === false) return;
+    const existing = cart.find(c => c.id === itemId && c.orderType === currentDefaultType);
+    if (existing) existing.qty += 1;
+    else cart.push({...item, qty: 1, orderType: currentDefaultType });
+    updateCartUI();
 }
 
 function updateCartQty(index, delta) {
-if (cart[index]) {
-cart[index].qty += delta;
-if (cart[index].qty <= 0) cart.splice(index, 1);
-updateCartUI();
-}
+    if (cart[index]) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) cart.splice(index, 1);
+        updateCartUI();
+    }
 }
 
 function updateItemOrderType(index, type) {
-if (cart[index]) {
-cart[index].orderType = type;
-updateCartUI();
-}
+    if (cart[index]) { cart[index].orderType = type; updateCartUI(); }
 }
 
 function clearCart() {
-cart = [];
-document.getElementById('order-table').value = '';
-document.getElementById('amount-paid').value = '';
-document.getElementById('cart-change').innerText = 'P0.00';
-updateCartUI();
+    cart = [];
+    document.getElementById('order-table').value = '';
+    document.getElementById('amount-paid').value = '';
+    document.getElementById('cart-change').innerText = 'P0.00';
+    updateCartUI();
 }
 
 function calculateChange() {
-const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
-const change = amountPaid >= total ? amountPaid - total : 0;
-document.getElementById('cart-change').innerText = `P${change.toFixed(2)}`;
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+    const change = amountPaid >= total ? amountPaid - total : 0;
+    document.getElementById('cart-change').innerText = `P${change.toFixed(2)}`;
 }
 
 function updateCartUI() {
-const container = document.getElementById('cart-items');
-const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-let foodSubtotal = 0;
-let drinksSubtotal = 0;
-cart.forEach(item => {
-const itemTotal = item.price * item.qty;
-if (item.category === 'DRINKS') {
-drinksSubtotal += itemTotal;
-} else {
-foodSubtotal += itemTotal;
-}
-});
-const total = foodSubtotal + drinksSubtotal;
-document.getElementById('mobile-cart-count').innerText = totalQty;
-document.getElementById('mobile-cart-total').innerText = `P${total.toFixed(2)}`;
-if (cart.length === 0) {
-container.innerHTML = '<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>';
-document.getElementById('cart-food-subtotal').innerText = 'P0.00';
-document.getElementById('cart-drinks-subtotal').innerText = 'P0.00';
-document.getElementById('cart-total').innerText = 'P0.00';
-document.getElementById('cart-change').innerText = 'P0.00';
-return;
-}
-container.innerHTML = cart.map((item, idx) => {
-const isTakeout = item.orderType === 'Take-Out';
-return `
-<div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
-<div class="flex items-center justify-between">
-<div class="flex-1 pr-2">
-<h5 class="font-bold text-xs text-brand-dark leading-tight">${item.name}</h5>
-<p class="text-[10px] text-gray-500">P${item.price.toFixed(2)}</p>
-</div>
-<div class="flex items-center gap-2">
-<button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 rounded-lg bg-white border flex items-center justify-center font-bold text-xs hover:bg-gray-100">-</button>
-<span class="font-bold text-xs w-4 text-center">${item.qty}</span>
-<button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 rounded-lg bg-white border flex items-center justify-center font-bold text-xs hover:bg-gray-100">+</button>
-</div>
-</div>
-<div class="flex items-center justify-between pt-1.5 border-t border-gray-200/60 text-[10px]">
-<span class="text-gray-400 font-bold uppercase">Type:</span>
-<div class="flex items-center gap-2">
-${getTypeBadgeHtml(item.orderType)}
-<select onchange="updateItemOrderType(${idx}, this.value)" class="bg-white border rounded px-1.5 py-0.5 text-xs font-bold text-brand-dark focus:outline-none focus:border-brand-orange">
-<option value="Dine-In" ${!isTakeout ? 'selected' : ''}>Dine-In</option>
-<option value="Take-Out" ${isTakeout ? 'selected' : ''}>Take-Out</option>
-</select>
-</div>
-</div>
-</div>
-`;
-}).join('');
-document.getElementById('cart-food-subtotal').innerText = `P${foodSubtotal.toFixed(2)}`;
-document.getElementById('cart-drinks-subtotal').innerText = `P${drinksSubtotal.toFixed(2)}`;
-document.getElementById('cart-total').innerText = `P${total.toFixed(2)}`;
-calculateChange();
+    const container = document.getElementById('cart-items');
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    let foodSubtotal = 0, drinksSubtotal = 0;
+    cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        if (item.category === 'DRINKS') drinksSubtotal += itemTotal;
+        else foodSubtotal += itemTotal;
+    });
+    const total = foodSubtotal + drinksSubtotal;
+    document.getElementById('mobile-cart-count').innerText = totalQty;
+    document.getElementById('mobile-cart-total').innerText = `P${total.toFixed(2)}`;
+    
+    if (cart.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>';
+        document.getElementById('cart-food-subtotal').innerText = 'P0.00';
+        document.getElementById('cart-drinks-subtotal').innerText = 'P0.00';
+        document.getElementById('cart-total').innerText = 'P0.00';
+        document.getElementById('cart-change').innerText = 'P0.00';
+        return;
+    }
+    container.innerHTML = cart.map((item, idx) => `
+        <div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 pr-2"><h5 class="font-bold text-xs text-brand-dark leading-tight">${item.name}</h5><p class="text-[10px] text-gray-500">P${Number(item.price).toFixed(2)}</p></div>
+                <div class="flex items-center gap-2">
+                    <button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 rounded-lg bg-white border font-bold text-xs">-</button>
+                    <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
+                    <button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 rounded-lg bg-white border font-bold text-xs">+</button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 border-t border-gray-200/60 text-[10px]">
+                <span class="text-gray-400 font-bold uppercase">Type:</span>
+                <div class="flex items-center gap-2">
+                    ${getTypeBadgeHtml(item.orderType)}
+                    <select onchange="updateItemOrderType(${idx}, this.value)" class="bg-white border rounded px-1.5 py-0.5 text-xs font-bold">
+                        <option value="Dine-In" ${item.orderType !== 'Take-Out' ? 'selected' : ''}>Dine-In</option>
+                        <option value="Take-Out" ${item.orderType === 'Take-Out' ? 'selected' : ''}>Take-Out</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('cart-food-subtotal').innerText = `P${foodSubtotal.toFixed(2)}`;
+    document.getElementById('cart-drinks-subtotal').innerText = `P${drinksSubtotal.toFixed(2)}`;
+    document.getElementById('cart-total').innerText = `P${total.toFixed(2)}`;
+    calculateChange();
 }
 
 function saveActiveOrder() {
-if (cart.length === 0) {
-alert("Please add items to cart first!");
-return;
-}
-const tableName = document.getElementById('order-table').value || "Table " + (activeOrders.length + 1);
-const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-activeOrders.push({
-id: Date.now(),
-table: tableName,
-cart: JSON.parse(JSON.stringify(cart)),
-total: total,
-time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-});
-clearCart();
-document.getElementById('cart-drawer').classList.add('translate-y-full');
-alert(`Order saved for ${tableName}! View it in 'Active Orders'.`);
+    if (cart.length === 0) return alert("Please add items to cart first!");
+    const tableName = document.getElementById('order-table').value || "Table " + (activeOrders.length + 1);
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    activeOrders.push({ id: Date.now(), table: tableName, cart: JSON.parse(JSON.stringify(cart)), total: total, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+    syncActiveOrdersToCloud();
+    clearCart();
+    document.getElementById('cart-drawer').classList.add('translate-y-full');
+    alert(`Order saved for ${tableName} and synced to cloud!`);
 }
 
 function renderActiveOrders() {
-const grid = document.getElementById('active-orders-grid');
-if (activeOrders.length === 0) {
-grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
-return;
-}
-grid.innerHTML = activeOrders.map(order => `
-<div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-<div>
-<div class="flex justify-between items-center mb-2 pb-2 border-b">
-<h3 class="font-black text-brand-dark text-base">${order.table}</h3>
-<span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span>
-</div>
-<ul class="space-y-2 text-xs text-gray-600 mb-4">
-${order.cart.map(i => `
-<li class="flex justify-between items-center">
-<div class="flex items-center gap-1.5">
-<span>${i.name} (x${i.qty})</span>
-${getTypeBadgeHtml(i.orderType || 'Dine-In')}
-</div>
-<span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span>
-</li>
-`).join('')}
-</ul>
-</div>
-<div class="pt-3 border-t space-y-2">
-<div class="flex justify-between items-center mb-1">
-<span class="text-xs font-bold text-gray-500">Total:</span>
-<span class="font-black text-brand-orange text-lg">P${order.total.toFixed(2)}</span>
-</div>
-<div class="grid grid-cols-2 gap-2">
-<button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs transition border flex items-center justify-center gap-1">Edit</button>
-<button onclick="checkoutActiveOrder(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center">Pay & Complete</button>
-</div>
-<button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
-</div>
-</div>
-`).join('');
+    const grid = document.getElementById('active-orders-grid');
+    if (activeOrders.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
+        return;
+    }
+    grid.innerHTML = activeOrders.map(order => `
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-2 pb-2 border-b"><h3 class="font-black text-brand-dark text-base">${order.table}</h3><span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span></div>
+                <ul class="space-y-2 text-xs text-gray-600 mb-4">
+                    ${order.cart.map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join('')}
+                </ul>
+            </div>
+            <div class="pt-3 border-t space-y-2">
+                <div class="flex justify-between items-center mb-1"><span class="text-xs font-bold text-gray-500">Total:</span><span class="font-black text-brand-orange text-lg">P${order.total.toFixed(2)}</span></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs border">Edit</button>
+                    <button onclick="checkoutActiveOrder(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs">Pay & Complete</button>
+                </div>
+                <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function editActiveOrder(orderId) {
-const idx = activeOrders.findIndex(o => o.id === orderId);
-if (idx !== -1) {
-if (cart.length > 0) {
-if (!confirm("May laman pa ang kasalukuyang cart. Palitan ba ito?")) return;
-}
-const order = activeOrders[idx];
-cart = JSON.parse(JSON.stringify(order.cart));
-document.getElementById('order-table').value = order.table;
-activeOrders.splice(idx, 1);
-switchTab('pos');
-updateCartUI();
-renderActiveOrders();
-alert(`Loaded order for ${order.table} back to cart.`);
-}
+    const idx = activeOrders.findIndex(o => o.id === orderId);
+    if (idx !== -1) {
+        const order = activeOrders[idx];
+        cart = JSON.parse(JSON.stringify(order.cart));
+        document.getElementById('order-table').value = order.table;
+        activeOrders.splice(idx, 1);
+        syncActiveOrdersToCloud();
+        switchTab('pos');
+        updateCartUI();
+        renderActiveOrders();
+    }
 }
 
 function cancelActiveOrder(orderId) {
-if (confirm("Sigurado ka bang gusto mong i-cancel ang order na ito?")) {
-activeOrders = activeOrders.filter(o => o.id !== orderId);
-renderActiveOrders();
-}
+    if (confirm("I-cancel ang order na ito?")) {
+        activeOrders = activeOrders.filter(o => o.id !== orderId);
+        syncActiveOrdersToCloud();
+        renderActiveOrders();
+    }
 }
 
 function checkoutActiveOrder(orderId) {
-const idx = activeOrders.findIndex(o => o.id === orderId);
-if (idx === -1) return;
-const order = activeOrders[idx];
-cart = JSON.parse(JSON.stringify(order.cart));
-document.getElementById('order-table').value = order.table;
-activeOrders.splice(idx, 1);
-updateCartUI();
-switchTab('pos');
-const drawer = document.getElementById('cart-drawer');
-drawer.classList.remove('translate-y-full');
-alert(`Ready to checkout ${order.table}. Please enter payment amount.`);
+    const idx = activeOrders.findIndex(o => o.id === orderId);
+    if (idx === -1) return;
+    const order = activeOrders[idx];
+    cart = JSON.parse(JSON.stringify(order.cart));
+    document.getElementById('order-table').value = order.table;
+    activeOrders.splice(idx, 1);
+    syncActiveOrdersToCloud();
+    updateCartUI();
+    switchTab('pos');
+    document.getElementById('cart-drawer').classList.remove('translate-y-full');
 }
 
 function checkout() {
-if (cart.length === 0) {
-alert("Walang laman ang cart para i-checkout!");
-return;
-}
-const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
-const paymentMethod = document.getElementById('payment-method').value;
-if (paymentMethod === 'Cash' && amountPaid < total) {
-alert("Kulang ang bayad! Pakisuri ang Amount Paid.");
-return;
-}
-const tableCustomer = document.getElementById('order-table').value || "Walk-in";
-const now = new Date();
-const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-const newOrderRecord = {
-orderNum: orderCounter++,
-table: tableCustomer,
-date: dateStr,
-items: JSON.parse(JSON.stringify(cart)),
-total: total,
-paymentMethod: paymentMethod
-};
-orderHistory.unshift(newOrderRecord);
-if (currentShift.active) {
-currentShift.totalSalesDuringShift += total;
-}
-updateOrderHistoryUI();
-syncOrderToGoogleSheet(newOrderRecord);
-alert(`Order #${newOrderRecord.orderNum} completed successfully!`);
-clearCart();
-document.getElementById('cart-drawer').classList.add('translate-y-full');
-}
-
-function syncOrderToGoogleSheet(order) {
-const statusEl = document.getElementById('sync-status');
-statusEl.innerText = "Saving...";
-statusEl.className = "text-amber-300 font-medium animate-pulse";
-const amountPaidVal = parseFloat(document.getElementById('amount-paid').value) || order.total;
-const changeVal = amountPaidVal >= order.total ? amountPaidVal - order.total : 0;
-const formattedItems = order.items.map(i => ({
-qty: i.qty,
-name: i.name,
-price: i.price,
-total: i.price * i.qty,
-orderType: i.orderType || 'Dine-In'
-}));
-const payload = {
-orderNum: order.orderNum,
-table: order.table,
-date: order.date,
-items: formattedItems,
-grandTotal: order.total,
-paymentMethod: order.paymentMethod,
-amountPaid: amountPaidVal,
-change: changeVal
-};
-fetch(GOOGLE_SHEET_SCRIPT_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-body: JSON.stringify(payload)
-})
-.then(response => response.json())
-.then(data => {
-statusEl.innerText = "Synced";
-statusEl.className = "text-emerald-300 font-medium";
-})
-.catch(err => {
-console.error("Sync error:", err);
-statusEl.innerText = "Failed ❌";
-statusEl.className = "text-red-300 font-medium";
-});
+    if (cart.length === 0) return alert("Walang laman ang cart!");
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+    const paymentMethod = document.getElementById('payment-method').value;
+    if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
+    
+    const tableCustomer = document.getElementById('order-table').value || "Walk-in";
+    const now = new Date();
+    const newOrderRecord = {
+        orderNum: orderCounter++,
+        table: tableCustomer,
+        date: now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        items: JSON.parse(JSON.stringify(cart)),
+        total: total,
+        paymentMethod: paymentMethod,
+        amountPaid: amountPaid,
+        change: amountPaid >= total ? amountPaid - total : 0
+    };
+    
+    orderHistory.unshift(newOrderRecord);
+    if (currentShift.active) currentShift.totalSalesDuringShift += total;
+    updateOrderHistoryUI();
+    
+    // Sync to Google Sheet sales history
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: JSON.stringify(newOrderRecord)
+    });
+    
+    alert(`Order #${newOrderRecord.orderNum} completed!`);
+    clearCart();
+    document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
 
 function updateOrderHistoryUI() {
-const tbody = document.getElementById('orders-table-body');
-const totalOrdersEl = document.getElementById('stat-total-orders');
-const totalSalesEl = document.getElementById('stat-total-sales');
-const avgSaleEl = document.getElementById('stat-avg-sale');
-totalOrdersEl.innerText = orderHistory.length;
-const totalRevenue = orderHistory.reduce((sum, o) => sum + o.total, 0);
-totalSalesEl.innerText = `P${totalRevenue.toFixed(2)}`;
-avgSaleEl.innerText = orderHistory.length > 0 ? `P${(totalRevenue / orderHistory.length).toFixed(2)}` : 'P0.00';
-if (orderHistory.length === 0) {
-tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
-return;
-}
-tbody.innerHTML = orderHistory.map(o => `
-<tr class="hover:bg-gray-50/50">
-<td class="p-3 font-bold text-brand-dark">#${o.orderNum}</td>
-<td class="p-3 font-medium text-gray-700">${o.table}</td>
-<td class="p-3 text-xs text-gray-500">${o.date}</td>
-<td class="p-3 text-xs text-gray-600">
-<div class="space-y-1">
-${o.items.map(i => `<div class="flex items-center gap-1.5"><span>${i.qty}x ${i.name}</span> ${getTypeBadgeHtml(i.orderType)}</div>`).join('')}
-</div>
-</td>
-<td class="p-3 text-right font-black text-brand-orange">P${o.total.toFixed(2)}</td>
-</tr>
-`).join('');
+    const tbody = document.getElementById('orders-table-body');
+    document.getElementById('stat-total-orders').innerText = orderHistory.length;
+    const totalRev = orderHistory.reduce((s, o) => s + o.total, 0);
+    document.getElementById('stat-total-sales').innerText = `P${totalRev.toFixed(2)}`;
+    document.getElementById('stat-avg-sale').innerText = orderHistory.length > 0 ? `P${(totalRev / orderHistory.length).toFixed(2)}` : 'P0.00';
+    if (orderHistory.length === 0) return tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
+    
+    tbody.innerHTML = orderHistory.map(o => `
+        <tr class="hover:bg-gray-50/50">
+            <td class="p-3 font-bold text-brand-dark">#${o.orderNum}</td>
+            <td class="p-3 font-medium text-gray-700">${o.table}</td>
+            <td class="p-3 text-xs text-gray-500">${o.date}</td>
+            <td class="p-3 text-xs text-gray-600">${o.items.map(i => `<div>${i.qty}x ${i.name} ${getTypeBadgeHtml(i.orderType)}</div>`).join('')}</td>
+            <td class="p-3 text-right font-black text-brand-orange">P${o.total.toFixed(2)}</td>
+        </tr>
+    `).join('');
 }
 
 function renderInventory() {
-const badgeList = document.getElementById('category-badge-list');
-badgeList.innerHTML = categories.map(cat => `
-<span class="inline-flex items-center gap-2 bg-brand-cream border border-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-dark">
-${cat}
-<button onclick="removeCategory('${cat}')" class="text-red-500 hover:text-red-700 font-black">×</button>
-</span>
-`).join('');
+    document.getElementById('category-badge-list').innerHTML = categories.map(cat => `
+        <span class="inline-flex items-center gap-2 bg-brand-cream border px-3 py-1.5 rounded-xl text-xs font-bold">
+            ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
+        </span>
+    `).join('');
 
-const invList = document.getElementById('inventory-list');
-invList.innerHTML = menu.map(item => `
-<div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
-<div class="flex justify-between items-start">
-<div class="flex-1 pr-2">
-<span class="text-[9px] font-bold text-gray-400 uppercase">${item.category}</span>
-<!-- KATABI NA ANG EDIT NAME BUTTON SA PANGALAN NG MENU -->
-<div class="flex items-center justify-between gap-2 mt-0.5">
-<h4 class="font-bold text-xs text-brand-dark">${item.name}</h4>
-<button onclick="editMenuItemName(${item.id})" class="text-brand-orange font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded border border-orange-200 text-[10px]">
-Edit Name
-</button>
-</div>
-</div>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.available !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
-${item.available !== false ? 'Available' : 'Out of Stock'}
-</span>
-</div>
-
-<!-- DIRECT PRICE EDIT INPUT -->
-<div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-<span class="text-xs font-bold text-gray-500">P</span>
-<input type="number" id="price-input-${item.id}" value="${item.price}" class="w-24 p-1.5 text-xs font-bold border rounded-lg focus:outline-none focus:border-brand-orange bg-gray-50">
-<button onclick="saveItemPrice(${item.id})" class="bg-brand-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 transition shadow-sm">
-Save Price
-</button>
-</div>
-
-<!-- MARK OUT OF STOCK BUTTON SA BABA -->
-<div class="flex justify-between items-center pt-1 text-xs">
-<button onclick="toggleAvailability(${item.id})" class="text-brand-dark font-bold hover:underline">
-${item.available !== false ? 'Mark Out of Stock' : 'Mark Available'}
-</button>
-</div>
-</div>
-`).join('');
+    document.getElementById('inventory-list').innerHTML = menu.map(item => `
+        <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
+            <div class="flex justify-between items-start">
+                <div class="flex-1 pr-2">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase">${item.category}</span>
+                    <div class="flex items-center justify-between gap-2 mt-0.5">
+                        <h4 class="font-bold text-xs text-brand-dark">${item.name}</h4>
+                        <button onclick="editMenuItemName(${item.id})" class="text-brand-orange font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded border text-[10px]">Edit Name</button>
+                    </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.available !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                    ${item.available !== false ? 'Available' : 'Out of Stock'}
+                </span>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t">
+                <span class="text-xs font-bold text-gray-500">P</span>
+                <input type="number" id="price-input-${item.id}" value="${item.price}" class="w-24 p-1.5 text-xs font-bold border rounded-lg bg-gray-50">
+                <button onclick="saveItemPrice(${item.id})" class="bg-brand-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Save Price</button>
+            </div>
+            <button onclick="toggleAvailability(${item.id})" class="text-brand-dark font-bold text-xs hover:underline text-left">
+                ${item.available !== false ? 'Mark Out of Stock' : 'Mark Available'}
+            </button>
+        </div>
+    `).join('');
 }
 
 function saveItemPrice(id) {
-const item = menu.find(m => m.id === id);
-if (!item) return;
-const inputEl = document.getElementById(`price-input-${id}`);
-const newPrice = parseFloat(inputEl.value);
-if (isNaN(newPrice) || newPrice < 0) {
-alert("Mangyaring maglagay ng wastong halaga ng presyo.");
-return;
-}
-item.price = newPrice;
-renderPOSMenu();
-renderInventory();
-alert(`Na-update na ang presyo ng "${item.name}" sa P${newPrice.toFixed(2)}!`);
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+    const newPrice = parseFloat(document.getElementById(`price-input-${id}`).value);
+    if (isNaN(newPrice) || newPrice < 0) return alert("Maglagay ng wastong presyo.");
+    item.price = newPrice;
+    syncMenuToCloud();
+    alert(`Na-update ang presyo at nai-sync sa cloud!`);
 }
 
 function toggleAvailability(id) {
-const item = menu.find(m => m.id === id);
-if (item) {
-item.available = item.available !== false ? false : true;
-renderPOSMenu();
-renderInventory();
-}
+    const item = menu.find(m => m.id === id);
+    if (item) {
+        item.available = item.available !== false ? false : true;
+        syncMenuToCloud();
+    }
 }
 
 function addCategory() {
-const newCat = prompt("Enter new category name:");
-if (newCat && newCat.trim() !== '') {
-const upper = newCat.trim().toUpperCase();
-if (!categories.includes(upper)) {
-categories.push(upper);
-renderPOSMenu();
-renderInventory();
-} else {
-alert("Category already exists!");
-}
-}
+    const newCat = prompt("Enter new category name:");
+    if (newCat && newCat.trim() !== '') {
+        const upper = newCat.trim().toUpperCase();
+        if (!categories.includes(upper)) {
+            categories.push(upper);
+            renderInventory();
+        }
+    }
 }
 
 function removeCategory(cat) {
-if (confirm(`Remove category ${cat}? Items under it might need recategorization.`)) {
-categories = categories.filter(c => c !== cat);
-}
-renderPOSMenu();
-renderInventory();
+    if (confirm(`Remove category ${cat}?`)) {
+        categories = categories.filter(c => c !== cat);
+        renderInventory();
+    }
 }
 
 function addNewMenuItem() {
-const name = prompt("Enter menu item name:");
-if (!name) return;
-const price = parseFloat(prompt("Enter price (P):", "100")) || 0;
-const cat = prompt(`Enter category (${categories.join(', ')}):`, categories[0] || "OTHER").toUpperCase();
-if (!categories.includes(cat)) categories.push(cat);
-menu.push({
-id: Date.now(),
-name: name,
-category: cat,
-price: price,
-available: true
-});
-renderPOSMenu();
-renderInventory();
+    const name = prompt("Enter menu item name:");
+    if (!name) return;
+    const price = parseFloat(prompt("Enter price (P):", "100")) || 0;
+    const cat = prompt(`Enter category (${categories.join(', ')}):`, categories[0] || "OTHER").toUpperCase();
+    if (!categories.includes(cat)) categories.push(cat);
+    
+    menu.push({ id: Date.now(), name: name, category: cat, price: price, available: true });
+    syncMenuToCloud();
+    alert("Bagong menu item idinagdag at nai-sync sa cloud!");
 }
 
 function editMenuItemName(id) {
-const item = menu.find(m => m.id === id);
-if (!item) return;
-const newName = prompt("Edit item name:", item.name);
-if (newName && newName.trim() !== '') {
-item.name = newName.trim();
-renderPOSMenu();
-renderInventory();
-}
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+    const newName = prompt("Edit item name:", item.name);
+    if (newName && newName.trim() !== '') {
+        item.name = newName.trim();
+        syncMenuToCloud();
+    }
 }
 
 function switchTab(tabId) {
-['pos', 'active', 'orders', 'inventory'].forEach(t => {
-const tabEl = document.getElementById(`tab-${t}`);
-if (tabEl) tabEl.classList.add('hidden');
-const navBtn = document.getElementById(`nav-${t}`);
-if (navBtn) {
-navBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition";
+    ['pos', 'active', 'orders', 'inventory'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition";
+    });
+    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    document.getElementById(`nav-${tabId}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
+    
+    if (tabId === 'active') renderActiveOrders();
+    if (tabId === 'inventory') renderInventory();
+    if (window.innerWidth < 768) document.getElementById('sidebar-nav').classList.add('hidden');
 }
-});
-const targetTab = document.getElementById(`tab-${tabId}`);
-if (targetTab) targetTab.classList.remove('hidden');
-const activeNav = document.getElementById(`nav-${tabId}`);
-if (activeNav) {
-activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
-}
-if (tabId === 'active') renderActiveOrders();
-if (tabId === 'inventory') renderInventory();
-const sidebar = document.getElementById('sidebar-nav');
-if (window.innerWidth < 768) {
-sidebar.classList.add('hidden');
-window.scrollTo(0, 0);
-}
-}
-
-window.onload = function() {
-renderPOSMenu();
-renderInventory();
-};
 </script>
 </body>
 </html>
