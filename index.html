@@ -633,10 +633,12 @@ function syncOrderToGoogleSheet(order) {
     const amountPaidVal = parseFloat(document.getElementById('amount-paid').value) || order.total;
     const changeVal = amountPaidVal >= order.total ? amountPaidVal - order.total : 0;
 
-    // Ipasa ang buong array ng items para ma-loop ng Google Script per row
+    // Ipasa ang bawat item kasama ang presyo at total niya
     const formattedItems = order.items.map(i => ({
         qty: i.qty,
         name: i.name,
+        price: i.price, // Presyo bawat isa
+        total: i.price * i.qty, // Total para sa item na ito
         orderType: i.orderType || 'Dine-In'
     }));
 
@@ -645,7 +647,7 @@ function syncOrderToGoogleSheet(order) {
         table: order.table,
         date: order.date,
         items: formattedItems,
-        total: order.total,
+        grandTotal: order.total, // Buong bayad ng order
         paymentMethod: order.paymentMethod,
         amountPaid: amountPaidVal,
         change: changeVal
