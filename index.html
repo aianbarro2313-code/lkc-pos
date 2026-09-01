@@ -18,164 +18,177 @@ tailwind.config = {
 </head>
 <body class="bg-brand-bg font-sans antialiased min-h-screen flex flex-col md:flex-row">
 <header class="bg-brand-dark text-white p-3 flex justify-between items-center md:hidden border-b border-white/15 z-30 sticky top-0">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full border border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-xs">LKC</div>
-<div>
-<h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
-<p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
-</div>
-</div>
-<button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg">☰</button>
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full border border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-xs">LKC</div>
+    <div>
+      <h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+      <p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
+    </div>
+  </div>
+  <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg">☰</button>
 </header>
 <aside id="sidebar-nav" class="hidden md:flex w-full md:w-64 bg-brand-dark text-white flex-col justify-between p-4 flex-shrink-0 z-20 md:h-screen md:sticky md:top-0">
-<div>
-<div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
-<div class="w-16 h-16 rounded-full border-2 border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-lg mb-2 shadow-md">LKC</div>
-<h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
-<p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
-</div>
-<nav class="space-y-2">
-<button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">POS & Take Order</button>
-<button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Active Orders</button>
-<button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Order History & Summary</button>
-<button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Edit Menu & Categories</button>
-</nav>
-</div>
-<div class="space-y-3 mt-4 md:mt-0">
-<div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
-<div class="flex justify-between items-center">
-<span class="font-bold text-gray-300">Shift Status:</span>
-<span id="shift-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300">CLOSED</span>
-</div>
-<div id="shift-info" class="text-[10px] text-gray-400">No active shift.</div>
-<div class="grid grid-cols-2 gap-1.5 pt-1">
-<button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px]">Start Shift</button>
-<button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] opacity-50 cursor-not-allowed" disabled>End Shift</button>
-</div>
-</div>
-<div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs flex items-center justify-between">
-<span class="text-gray-400 font-bold">Cloud Sync:</span>
-<span id="sync-status" class="text-emerald-300 font-medium">Connected</span>
-<button onclick="fetchAllDataFromCloud()" class="ml-2 bg-white/10 px-2 py-1 rounded text-[10px] hover:bg-white/20">Refresh</button>
-</div>
-</div>
+  <div>
+    <div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
+      <div class="w-16 h-16 rounded-full border-2 border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-lg mb-2 shadow-md">LKC</div>
+      <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+      <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
+    </div>
+    <nav class="space-y-2">
+      <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">POS & Take Order</button>
+      <button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Active Orders</button>
+      <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Order History & Summary</button>
+      <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Edit Menu & Categories</button>
+    </nav>
+  </div>
+  <div class="space-y-3 mt-4 md:mt-0">
+    <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
+      <div class="flex justify-between items-center">
+        <span class="font-bold text-gray-300">Shift Status:</span>
+        <span id="shift-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300">CLOSED</span>
+      </div>
+      <div id="shift-info" class="text-[10px] text-gray-400">No active shift.</div>
+      <div class="grid grid-cols-2 gap-1.5 pt-1">
+        <button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px]">Start Shift</button>
+        <button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] opacity-50 cursor-not-allowed" disabled>End Shift</button>
+      </div>
+    </div>
+    <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs flex items-center justify-between">
+      <span class="text-gray-400 font-bold">Cloud Sync:</span>
+      <span id="sync-status" class="text-emerald-300 font-medium">Connected</span>
+      <button onclick="fetchAllDataFromCloud()" class="ml-2 bg-white/10 px-2 py-1 rounded text-[10px] hover:bg-white/20">Refresh</button>
+    </div>
+  </div>
 </aside>
 <main class="flex-1 flex flex-col md:flex-row relative overflow-y-auto">
-<div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6">
-<div class="flex-1 flex flex-col min-w-0">
-<div class="mb-3 md:mb-4 flex justify-between items-center">
-<div>
-<h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
-<p class="text-[11px] md:text-xs text-gray-500">Live menu galing sa Google Sheet database</p>
-</div>
-</div>
-<div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
-</div>
-<button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
-<span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
-<span id="mobile-cart-total">₱0.00</span>
-</button>
-<div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
-<div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
-<h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
-<div class="flex items-center gap-3">
-<button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
-<button onclick="toggleMobileCart()" class="md:hidden text-gray-500 font-bold text-lg">✕</button>
-</div>
-</div>
-<div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
-<input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
-<div class="flex items-center justify-between text-xs pt-1">
-<span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
-<div class="flex gap-2">
-<label class="inline-flex items-center gap-1 cursor-pointer">
-<input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')">
-<span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
-</label>
-<label class="inline-flex items-center gap-1 cursor-pointer">
-<input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')">
-<span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
-</label>
-</div>
-</div>
-</div>
-<div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
-<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
-</div>
-<div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
-<div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
-<div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">₱0.00</span></div>
-<div class="flex justify-between items-center text-gray-600"><span>Drinks Subtotal</span><span id="cart-drinks-subtotal" class="font-bold text-brand-dark">₱0.00</span></div>
-</div>
-<div class="grid grid-cols-2 gap-2 pt-1">
-<div>
-<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
-<select id="payment-method" class="w-full p-2 text-xs border rounded-lg bg-white font-bold text-gray-700">
-<option value="Cash">Cash</option>
-<option value="GCash">GCash</option>
-</select>
-</div>
-<div>
-<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
-<input type="number" id="amount-paid" oninput="calculateChange()" placeholder="₱0.00" class="w-full p-2 text-xs border rounded-lg bg-white font-bold">
-</div>
-</div>
-<div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
-<span class="font-bold">Sukli / Change</span>
-<span id="cart-change" class="font-black text-sm">₱0.00</span>
-</div>
-<div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
-<span>Total</span>
-<span id="cart-total" class="text-brand-orange">₱0.00</span>
-</div>
-<div class="grid grid-cols-2 gap-2 mt-2">
-<button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow">Save Active Order</button>
-<button onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Pay & Complete</button>
-</div>
-</div>
-</div>
-</div>
-<div id="tab-active" class="flex-1 p-4 md:p-6 hidden">
-<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables (Cloud Synced)</h2>
-<div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-</div>
-<div id="tab-orders" class="flex-1 p-4 md:p-6 hidden">
-<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p><p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p></div>
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p><p id="stat-total-sales" class="text-2xl font-black text-brand-orange">₱0.00</p></div>
-<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p><p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">₱0.00</p></div>
-</div>
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-<table class="w-full text-left border-collapse min-w-[600px]">
-<thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
-<tr><th class="p-3">Order #</th><th class="p-3">Table/Customer</th><th class="p-3">Date/Time</th><th class="p-3">Items & Order Type</th><th class="p-3 text-right">Total Amount</th></tr>
-</thead>
-<tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
-<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="tab-inventory" class="flex-1 p-4 md:p-6 hidden space-y-6">
-<div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-<div><h3 class="text-lg font-black text-brand-dark">Manage Categories</h3><p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya</p></div>
-<button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold">+ Add Category</button>
-</div>
-<div id="category-badge-list" class="flex flex-wrap gap-2"></div>
-</div>
-<div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-<div><h3 class="text-lg font-black text-brand-dark">Menu Items & Prices (Cloud Sync)</h3><p class="text-xs text-gray-500">Ang pag-edit dito ay mag-aappear sa lahat ng device pagka-save.</p></div>
-<button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow">+ Add New Menu Item</button>
-</div>
-<div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-</div>
-</div>
+  <div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6">
+    <div class="flex-1 flex flex-col min-w-0">
+      <div class="mb-3 md:mb-4 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
+          <p class="text-[11px] md:text-xs text-gray-500">Live menu galing sa Google Sheet database</p>
+        </div>
+      </div>
+      <div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
+    </div>
+    <button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
+      <span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
+      <span id="mobile-cart-total">0.00</span>
+    </button>
+    <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
+      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
+        <h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
+        <div class="flex items-center gap-3">
+          <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
+          <button onclick="toggleMobileCart()" class="md:hidden text-gray-500 font-bold text-lg">X</button>
+        </div>
+      </div>
+      <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
+        <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
+        <div class="flex items-center justify-between text-xs pt-1">
+          <span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
+          <div class="flex gap-2">
+            <label class="inline-flex items-center gap-1 cursor-pointer">
+              <input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')">
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
+            </label>
+            <label class="inline-flex items-center gap-1 cursor-pointer">
+              <input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')">
+              <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+        <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
+      </div>
+      <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
+        <div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
+          <div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">0.00</span></div>
+          <div class="flex justify-between items-center text-gray-600"><span>Drinks Subtotal</span><span id="cart-drinks-subtotal" class="font-bold text-brand-dark">0.00</span></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
+            <select id="payment-method" class="w-full p-2 text-xs border rounded-lg bg-white font-bold text-gray-700">
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
+            <input type="number" id="amount-paid" oninput="calculateChange()" placeholder="₱0.00" class="w-full p-2 text-xs border rounded-lg bg-white font-bold">
+          </div>
+        </div>
+        <div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
+          <span class="font-bold">Sukli / Change</span>
+          <span id="cart-change" class="font-black text-sm">0.00</span>
+        </div>
+        <div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
+          <span>Total</span>
+          <span id="cart-total" class="text-brand-orange">0.00</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow">Save Active Order</button>
+          <button onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Pay & Complete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-active" class="flex-1 p-4 md:p-6 hidden">
+    <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables (Cloud Synced)</h2>
+    <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </div>
+  <div id="tab-orders" class="flex-1 p-4 md:p-6 hidden">
+    <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p><p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p></div>
+      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p><p id="stat-total-sales" class="text-2xl font-black text-brand-orange">0.00</p></div>
+      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p><p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">0.00</p></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+      <table class="w-full text-left border-collapse min-w-[600px]">
+        <thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
+          <tr><th class="p-3">Order #</th><th class="p-3">Table/Customer</th><th class="p-3">Date/Time</th><th class="p-3">Items & Order Type</th><th class="p-3 text-right">Total Amount</th></tr>
+        </thead>
+        <tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
+          <tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="tab-inventory" class="flex-1 p-4 md:p-6 hidden space-y-6">
+    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div><h3 class="text-lg font-black text-brand-dark">Manage Categories</h3><p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya</p></div>
+        <button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold">+ Add Category</button>
+      </div>
+      <div id="category-badge-list" class="flex flex-wrap gap-2"></div>
+    </div>
+    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div><h3 class="text-lg font-black text-brand-dark">Menu Items & Prices (Cloud Sync)</h3><p class="text-xs text-gray-500">Ang pag-edit dito ay mag-aappear sa lahat ng device pagka-save.</p></div>
+        <button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow">+ Add New Menu Item</button>
+      </div>
+      <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </div>
+  </div>
 </main>
 <script>
-const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyivvBhH301w-lw9i1hKIUq1tNKVsAJLAu4N_d-wKTdva4Q-u-Zq6V6R9JO47S9Z_AdAA/exec";
+const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyivvBhH301w-lw9i1hKIUq1tNKVSAJLAu4N_d-wKTdva4Q-u-Zq6V6R9JO47S9Z_AdAA/exec";
+
+// Default fallback menu kung sakaling offline o hindi ma-reach ang Google Sheet
+const DEFAULT_MENU = [
+  { id: 1, name: "Special Lomi", category: "LOMI", price: 120, available: true },
+  { id: 2, name: "Ordinary Lomi", category: "LOMI", price: 90, available: true },
+  { id: 3, name: "Pancit Bihon", category: "PANCIT", price: 130, available: true },
+  { id: 4, name: "Pancit Canton", category: "PANCIT", price: 130, available: true },
+  { id: 5, name: "Tapsilog", category: "SILOG", price: 100, available: true },
+  { id: 6, name: "Pork Sisig", category: "SIZZLING", price: 150, available: true },
+  { id: 7, name: "Iced Tea", category: "DRINKS", price: 35, available: true },
+  { id: 8, name: "Softdrinks (Mismo)", category: "DRINKS", price: 25, available: true }
+];
+
 let orderCounter = 1;
 let currentDefaultType = "Dine-In";
 let categories = ["LOMI", "PANCIT", "SILOG", "SIZZLING", "DRINKS", "OTHER"];
@@ -183,14 +196,11 @@ let menu = [];
 let cart = [];
 let activeOrders = [];
 let orderHistory = [];
-
-// Gamitin ang localStorage para hindi mawala ang shift status kapag nag-refresh
 let currentShift = JSON.parse(localStorage.getItem('lc_current_shift')) || { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
 
 window.onload = function() {
   fetchAllDataFromCloud();
-  setInterval(fetchAllDataFromCloud, 10000); // Sync bawat 10 segundo
-  
+  setInterval(fetchAllDataFromCloud, 10000); 
   if (currentShift.active) {
     document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
     document.getElementById('shift-status-badge').innerText = "OPEN";
@@ -209,6 +219,8 @@ function fetchAllDataFromCloud() {
         menu = data.menu;
         let cats = [...new Set(menu.map(m => m.category))];
         if(cats.length > 0) categories = cats;
+      } else {
+        if(menu.length === 0) menu = DEFAULT_MENU;
       }
       if(data.activeOrders) {
         activeOrders = data.activeOrders;
@@ -216,7 +228,6 @@ function fetchAllDataFromCloud() {
       renderPOSMenu();
       if(!document.getElementById('tab-inventory').classList.contains('hidden')) renderInventory();
       if(!document.getElementById('tab-active').classList.contains('hidden')) renderActiveOrders();
-      
       document.getElementById('sync-status').innerText = "Synced";
       document.getElementById('sync-status').className = "text-emerald-300 font-medium";
     })
@@ -224,6 +235,13 @@ function fetchAllDataFromCloud() {
       console.log("Fetch error:", err);
       document.getElementById('sync-status').innerText = "Offline/Error";
       document.getElementById('sync-status').className = "text-red-300 font-medium";
+      
+      // Fallback para gumana pa rin ang POS kahit may error sa network/sheet
+      if(menu.length === 0) {
+        menu = DEFAULT_MENU;
+      }
+      renderPOSMenu();
+      if(!document.getElementById('tab-inventory').classList.contains('hidden')) renderInventory();
     });
 }
 
@@ -232,7 +250,7 @@ function syncMenuToCloud() {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     body: JSON.stringify({ type: "UPDATE_MENU", menu: menu })
-  }).then(() => fetchAllDataFromCloud());
+  }).catch(err => console.log("Background sync error:", err));
 }
 
 function syncActiveOrdersToCloud() {
@@ -240,28 +258,25 @@ function syncActiveOrdersToCloud() {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     body: JSON.stringify({ type: "SYNC_ACTIVE", activeOrders: activeOrders })
-  });
+  }).catch(err => console.log("Active orders sync error:", err));
 }
 
 function startShift() {
   if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
   const now = new Date();
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: now.toLocaleString(), totalSalesDuringShift: 0 };
-  
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
-
   document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
   document.getElementById('shift-status-badge').innerText = "OPEN";
   document.getElementById('shift-info').innerText = 'Started: ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   document.getElementById('btn-start-shift').disabled = true;
   document.getElementById('btn-end-shift').disabled = false;
   document.getElementById('btn-end-shift').classList.remove('opacity-50', 'cursor-not-allowed');
-
   fetch(GOOGLE_SHEET_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     body: JSON.stringify({ type: "SHIFT_START", startShiftTime: currentShift.startDateTimeStr })
-  });
+  }).catch(err => console.log("Shift start error:", err));
   alert("Shift started successfully!");
 }
 
@@ -273,28 +288,24 @@ function endShift() {
   const startTimeObj = new Date(currentShift.startTime);
   const diffMs = endTime - startTimeObj;
   const durationStr = `${Math.floor(diffMs / 3600000)} hrs ${Math.floor((diffMs % 3600000) / 60000)} mins`;
-
   fetch(GOOGLE_SHEET_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     body: JSON.stringify({ type: "SHIFT_END", startShift: currentShift.startDateTimeStr, endShift: endDateTimeStr, duration: durationStr, totalSales: currentShift.totalSalesDuringShift })
-  });
-
+  }).catch(err => console.log("Shift end error:", err));
   currentShift.active = false;
   localStorage.removeItem('lc_current_shift');
-
   document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300";
   document.getElementById('shift-status-badge').innerText = "CLOSED";
   document.getElementById('shift-info').innerText = "No active shift.";
   document.getElementById('btn-start-shift').disabled = false;
   document.getElementById('btn-end-shift').disabled = true;
   document.getElementById('btn-end-shift').classList.add('opacity-50', 'cursor-not-allowed');
-  
   alert(`Shift ended! Total Sales: ₱${currentShift.totalSalesDuringShift.toFixed(2)}`);
 }
 
 function getTypeBadgeHtml(type) {
-  return type === 'Take-Out'
+  return type === 'Take-Out' 
     ? '<span class="inline-block bg-red-100 text-red-700 border border-red-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Take-Out</span>'
     : '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Dine-In</span>';
 }
@@ -375,13 +386,11 @@ function updateCartUI() {
   const container = document.getElementById('cart-items');
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
   let foodSubtotal = 0, drinksSubtotal = 0;
-  
   cart.forEach(item => {
     const itemTotal = item.price * item.qty;
     if (item.category === 'DRINKS') drinksSubtotal += itemTotal;
     else foodSubtotal += itemTotal;
   });
-  
   const total = foodSubtotal + drinksSubtotal;
   document.getElementById('mobile-cart-count').innerText = totalQty;
   document.getElementById('mobile-cart-total').innerText = `₱${total.toFixed(2)}`;
@@ -415,9 +424,8 @@ function updateCartUI() {
           </select>
         </div>
       </div>
-    </div>
-  `).join('');
-  
+    </div>`).join('');
+    
   document.getElementById('cart-food-subtotal').innerText = `₱${foodSubtotal.toFixed(2)}`;
   document.getElementById('cart-drinks-subtotal').innerText = `₱${drinksSubtotal.toFixed(2)}`;
   document.getElementById('cart-total').innerText = `₱${total.toFixed(2)}`;
@@ -428,15 +436,13 @@ function saveActiveOrder() {
   if (cart.length === 0) return alert("Please add items to cart first!");
   const tableName = document.getElementById('order-table').value || "Table " + (activeOrders.length + 1);
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  
-  activeOrders.push({ 
-    id: Date.now(), 
-    table: tableName, 
-    cart: JSON.parse(JSON.stringify(cart)), 
-    total: total, 
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+  activeOrders.push({
+    id: Date.now(),
+    table: tableName,
+    cart: JSON.parse(JSON.stringify(cart)),
+    total: total,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   });
-  
   syncActiveOrdersToCloud();
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
@@ -449,7 +455,6 @@ function renderActiveOrders() {
     grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
     return;
   }
-  
   grid.innerHTML = activeOrders.map(order => `
     <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
       <div>
@@ -466,8 +471,7 @@ function renderActiveOrders() {
         </div>
         <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function editActiveOrder(orderId) {
@@ -509,11 +513,9 @@ function checkout() {
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
   const paymentMethod = document.getElementById('payment-method').value;
-  
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
   const now = new Date();
-  
   const newOrderRecord = {
     orderNum: orderCounter++,
     table: tableCustomer,
@@ -524,20 +526,17 @@ function checkout() {
     amountPaid: amountPaid,
     change: amountPaid >= total ? amountPaid - total : 0
   };
-  
   orderHistory.unshift(newOrderRecord);
   if (currentShift.active) {
     currentShift.totalSalesDuringShift += total;
     localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
   }
   updateOrderHistoryUI();
-
   fetch(GOOGLE_SHEET_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     body: JSON.stringify(newOrderRecord)
-  });
-
+  }).catch(err => console.log("Checkout sync error:", err));
   alert(`Order #${newOrderRecord.orderNum} completed!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
@@ -549,9 +548,7 @@ function updateOrderHistoryUI() {
   const totalRev = orderHistory.reduce((s, o) => s + o.total, 0);
   document.getElementById('stat-total-sales').innerText = `₱${totalRev.toFixed(2)}`;
   document.getElementById('stat-avg-sale').innerText = orderHistory.length > 0 ? `₱${(totalRev / orderHistory.length).toFixed(2)}` : '₱0.00';
-  
   if (orderHistory.length === 0) return tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
-  
   tbody.innerHTML = orderHistory.map(o => `
     <tr class="hover:bg-gray-50/50">
       <td class="p-3 font-bold text-brand-dark">#${o.orderNum}</td>
@@ -559,17 +556,15 @@ function updateOrderHistoryUI() {
       <td class="p-3 text-xs text-gray-500">${o.date}</td>
       <td class="p-3 text-xs text-gray-600">${o.items.map(i => `<div>${i.qty}x ${i.name} ${getTypeBadgeHtml(i.orderType)}</div>`).join('')}</td>
       <td class="p-3 text-right font-black text-brand-orange">₱${o.total.toFixed(2)}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 function renderInventory() {
   document.getElementById('category-badge-list').innerHTML = categories.map(cat => `
     <span class="inline-flex items-center gap-2 bg-brand-cream border px-3 py-1.5 rounded-xl text-xs font-bold">
       ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
-    </span>
-  `).join('');
-  
+    </span>`).join('');
+    
   document.getElementById('inventory-list').innerHTML = menu.map(item => `
     <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
       <div class="flex justify-between items-start">
@@ -592,8 +587,7 @@ function renderInventory() {
       <button onclick="toggleAvailability(${item.id})" class="text-brand-dark font-bold text-xs hover:underline text-left">
         ${item.available !== false ? 'Mark Out of Stock' : 'Mark Available'}
       </button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function saveItemPrice(id) {
@@ -610,6 +604,10 @@ function toggleAvailability(id) {
   const item = menu.find(m => m.id === id);
   if (item) {
     item.available = item.available !== false ? false : true;
+    renderPOSMenu();
+    if(!document.getElementById('tab-inventory').classList.contains('hidden')) {
+      renderInventory();
+    }
     syncMenuToCloud();
   }
 }
@@ -638,9 +636,10 @@ function addNewMenuItem() {
   const price = parseFloat(prompt("Enter price (₱):", "100")) || 0;
   const cat = prompt(`Enter category (${categories.join(', ')}):`, categories[0] || "OTHER").toUpperCase();
   if (!categories.includes(cat)) categories.push(cat);
-  
   menu.push({ id: Date.now(), name: name, category: cat, price: price, available: true });
   syncMenuToCloud();
+  renderInventory();
+  renderPOSMenu();
   alert("Bagong menu item idinagdag at nai-sync sa cloud!");
 }
 
@@ -651,6 +650,8 @@ function editMenuItemName(id) {
   if (newName && newName.trim() !== '') {
     item.name = newName.trim();
     syncMenuToCloud();
+    renderInventory();
+    renderPOSMenu();
   }
 }
 
@@ -661,7 +662,6 @@ function switchTab(tabId) {
   });
   document.getElementById(`tab-${tabId}`).classList.remove('hidden');
   document.getElementById(`nav-${tabId}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
-  
   if (tabId === 'active') renderActiveOrders();
   if (tabId === 'inventory') renderInventory();
   if (window.innerWidth < 768) document.getElementById('sidebar-nav').classList.add('hidden');
