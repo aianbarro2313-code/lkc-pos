@@ -175,7 +175,7 @@ tailwind.config = {
   </div>
 </main>
 <script>
-const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWwSMoQfc65kf8WvAGcGaUAqWnicQ-vWQ6SJS9iAz3wOMO8m-OxKcu-eFHGR7LrOJ0UQ/exec";
+const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyivvBhH301w-lw9i1hKIUq1tNKVSAJLAu4N_d-wKTdva4Q-u-Zq6V6R9JO47S9Z_AdAA/exec";
 
 const DEFAULT_MENU = [
   { id: 1, name: "Special Lomi", category: "LOMI", price: 120, available: true },
@@ -499,6 +499,7 @@ function checkout() {
   const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
   const paymentMethod = document.getElementById('payment-method').value;
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
+  
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
   const now = new Date();
   const newOrderRecord = {
@@ -511,13 +512,23 @@ function checkout() {
     amountPaid: amountPaid,
     change: amountPaid >= total ? amountPaid - total : 0
   };
+  
   orderHistory.unshift(newOrderRecord);
+
+  // I-send sa Google Sheet ang bagong order papunta sa "Orders" sheet tab
+  fetch(GOOGLE_SHEET_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    body: JSON.stringify({ type: "SAVE_ORDER", order: newOrderRecord })
+  }).catch(err => console.log("Order sync error:", err));
+
   if (currentShift.active) {
     currentShift.totalSalesDuringShift += total;
     localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
   }
+  
   updateOrderHistoryUI();
-  alert(`Order #${newOrderRecord.orderNum} completed!`);
+  alert(`Order #${newOrderRecord.orderNum} completed and saved to Sheet!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
@@ -637,7 +648,7 @@ function editMenuItemName(id) {
   if (newName && newName.trim() !== '') {
     menu[idx].name = newName.trim();
     saveLocalMenu();
-    syncMenuToCloud(); // Agad na mag-papadala sa cloud para ma-update ang Google Sheet
+    syncMenuToCloud();
     renderInventory();
     renderPOSMenu();
     alert("Na-update na ang pangalan at nai-sync sa cloud!");
