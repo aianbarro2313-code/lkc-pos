@@ -250,6 +250,7 @@ let orderHistory = JSON.parse(localStorage.getItem('lc_order_history')) || [];
 let currentShift = JSON.parse(localStorage.getItem('lc_current_shift')) || { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
 
 window.onload = function() {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   renderPOSMenu();
   renderInventory();
   updateOrderHistoryUI();
@@ -301,6 +302,11 @@ function fetchAllDataFromCloud(isBackground = false) {
           }
         }
         
+        // Strict guard to ensure menu is always an array
+        if (!Array.isArray(menu)) {
+          menu = DEFAULT_MENU;
+        }
+        
         if (resData.orders && Array.isArray(resData.orders) && resData.orders.length > 0) {
           orderHistory = resData.orders;
         }
@@ -339,6 +345,7 @@ function fetchAllDataFromCloud(isBackground = false) {
     })
     .catch(err => {
       console.warn("Cloud connection error, using local data.", err);
+      if (!Array.isArray(menu)) menu = DEFAULT_MENU;
       statusEl.innerText = "Offline/Local";
       statusEl.className = "text-red-300 font-medium";
     });
@@ -355,7 +362,9 @@ function sendDataToCloud(actionType, payloadData, extraParams = {}) {
 }
 
 function saveLocalStorageData() {
-  localStorage.setItem('lc_menu', JSON.stringify(menu));
+  if (Array.isArray(menu)) {
+    localStorage.setItem('lc_menu', JSON.stringify(menu));
+  }
   localStorage.setItem('lc_categories', JSON.stringify(categories));
   localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
   localStorage.setItem('lc_order_history', JSON.stringify(orderHistory));
@@ -437,6 +446,7 @@ function setDefaultType(type) {
 }
 
 function renderPOSMenu() {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   const grid = document.getElementById('pos-menu-grid');
   grid.innerHTML = categories.map(cat => {
     const items = menu.filter(m => m.category === cat);
@@ -708,6 +718,7 @@ function updateOrderHistoryUI() {
 }
 
 function renderInventory() {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   document.getElementById('category-badge-list').innerHTML = categories.map(cat => `
     <span class="inline-flex items-center gap-2 bg-brand-cream border px-3 py-1.5 rounded-xl text-xs font-bold">
       ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
@@ -739,6 +750,7 @@ function renderInventory() {
 }
 
 function saveItemPrice(id) {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   const item = menu.find(m => m.id == id);
   if (!item) return;
   const newPrice = parseFloat(document.getElementById(`price-input-${id}`).value);
@@ -752,6 +764,7 @@ function saveItemPrice(id) {
 }
 
 function toggleAvailability(id) {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   const item = menu.find(m => m.id == id);
   if (item) {
     item.available = item.available === false ? true : false;
@@ -785,6 +798,7 @@ function removeCategory(cat) {
 }
 
 function addNewMenuItem() {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   const name = prompt("Enter menu item name:");
   if (!name) return;
   const price = parseFloat(prompt("Enter price (P):", "100")) || 0;
@@ -799,6 +813,7 @@ function addNewMenuItem() {
 }
 
 function editMenuItemName(id) {
+  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
   const idx = menu.findIndex(m => m.id == id);
   if (idx === -1) return alert("Hindi mahanap ang item!");
   const currentName = menu[idx].name;
