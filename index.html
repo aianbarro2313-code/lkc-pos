@@ -271,7 +271,15 @@ function fetchAllDataFromCloud() {
                 if (data.menu && data.menu.length > 0) {
                     menu = data.menu;
                 }
-                // 2. Sync Cloud State (Order Counter & Shift Status)
+
+                // 2. Sync Order History galing sa Google Sheet (Para lumabas sa phone)
+                if (data.orders && Array.isArray(data.orders)) {
+                    orderHistory = data.orders;
+                } else if (data.orderHistory && Array.isArray(data.orderHistory)) {
+                    orderHistory = data.orderHistory;
+                }
+
+                // 3. Sync Cloud State (Order Counter & Shift Status)
                 if (data.cloudState) {
                     orderCounter = data.cloudState.orderCounter || orderCounter;
                     const cloudShiftActive = data.cloudState.shiftActive;
