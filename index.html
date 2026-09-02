@@ -282,31 +282,21 @@ function fetchAllDataFromCloud() {
       if (data.menu && data.menu.length > 0) {
         menu = data.menu;
         saveLocalMenu();
-        let cats = [...new Set(menu.map(m => m.category))];
-        if (cats.length > 0) categories = cats;
+      }
+      // I-sync ang Orders mula sa Cloud patungo sa lahat ng device
+      if (data.orders) {
+        orderHistory = data.orders;
+        updateOrderHistoryUI();
       }
       if (data.activeOrders) {
         activeOrders = data.activeOrders;
       }
-      if (data.shift) {
-        if (data.shift.active && !currentShift.active) {
-          currentShift.active = true;
-          currentShift.startDateTimeStr = data.shift.startTime;
-          updateShiftUIState(true, data.shift.startTime);
-        } else if (!data.shift.active && currentShift.active) {
-          currentShift.active = false;
-          updateShiftUIState(false, "");
-        }
-      }
-      renderPOSMenu();
-      if (!document.getElementById('tab-inventory').classList.contains('hidden')) renderInventory();
-      if (!document.getElementById('tab-active').classList.contains('hidden')) renderActiveOrders();
       
       document.getElementById('sync-status').innerText = "Synced";
       document.getElementById('sync-status').className = "text-emerald-300 font-medium";
     })
     .catch(err => {
-      console.log("Fetch error (Offline mode active):", err);
+      console.log("Offline mode active:", err);
       document.getElementById('sync-status').innerText = "Offline/Error";
       document.getElementById('sync-status').className = "text-red-300 font-medium";
     });
