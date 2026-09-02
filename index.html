@@ -503,7 +503,6 @@ function saveActiveOrder() {
 
   activeOrders.push(newActive);
   saveLocalStorageData();
-  sendDataToCloud('saveActiveOrder', newActive);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
   alert(`Order saved for ${tableName}!`);
@@ -583,16 +582,21 @@ function checkout() {
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
   
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
+  
+  // Tamang format para hindi maging 1900 sa Google Sheet
   const now = new Date();
+  const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
   const newOrderRecord = {
     orderNum: orderCounter++,
     table: tableCustomer,
-    date: now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: dateStr,
     items: JSON.parse(JSON.stringify(cart)),
     total: total,
     paymentMethod: paymentMethod,
     amountPaid: amountPaid,
-    change: amountPaid >= total ? amountPaid - total : 0
+    change: amountPaid >= total ? amountPaid - total : 0,
+    shiftTime: currentShift.active ? currentShift.startDateTimeStr : "No Active Shift"
   };
   
   orderHistory.unshift(newOrderRecord);
@@ -605,7 +609,7 @@ function checkout() {
   }
   
   updateOrderHistoryUI();
-  alert(`Order #${newOrderRecord.orderNum} completed successfully and saved to Google Sheet!`);
+  alert(`Order #${newOrderRecord.orderNum} completed successfully and saved per item!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
