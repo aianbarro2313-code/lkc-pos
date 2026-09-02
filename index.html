@@ -272,7 +272,7 @@ function fetchAllDataFromCloud() {
                     menu = data.menu;
                 }
 
-                // 2. Sync Order History galing sa Google Sheet (Para lumabas sa phone)
+                // 2. Sync Order History from Google Sheet
                 if (data.orders && Array.isArray(data.orders)) {
                     orderHistory = data.orders;
                 } else if (data.orderHistory && Array.isArray(data.orderHistory)) {
