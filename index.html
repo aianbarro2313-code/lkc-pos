@@ -256,6 +256,26 @@ window.onload = function() {
     fetchAllDataFromCloud();
 };
 
+// Helper function para sa Custom Date Format: mm/dd/yyyy | 00:00 am/pm
+function formatCustomDateTime(dateInput) {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return dateInput; // kung hindi mapasa-date, ibalik ang original string
+    
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 ay magiging 12
+    const strHours = String(hours).padStart(2, '0');
+    
+    return `${month}/${day}/${year} | ${strHours}:${minutes} ${ampm}`;
+}
+
 function fetchAllDataFromCloud() {
     const statusEl = document.getElementById('cloud-status');
     statusEl.innerText = "Syncing...";
@@ -283,7 +303,13 @@ function fetchAllDataFromCloud() {
                 if (data.cloudState) {
                     orderCounter = data.cloudState.orderCounter || orderCounter;
                     const cloudShiftActive = data.cloudState.shiftActive;
-                    const cloudShiftStart = data.cloudState.shiftStartTime;
+                    let cloudShiftStart = data.cloudState.shiftStartTime;
+                    
+                    // I-format sa mm/dd/yyyy | 00:00 am/pm kung may nakuha galing cloud
+                    if (cloudShiftStart) {
+                        cloudShiftStart = formatCustomDateTime(cloudShiftStart);
+                    }
+
                     const cloudShiftSales = data.cloudState.shiftTotalSales;
 
                     currentShift.active = cloudShiftActive;
@@ -327,7 +353,7 @@ function saveLocalStorageData() {
 function startShift() {
     if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
     const now = new Date();
-    const timeStr = now.toLocaleString();
+    const timeStr = formatCustomDateTime(now);
     currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
     localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
     sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 });
@@ -340,7 +366,7 @@ function endShift() {
     if (!confirm("Tapusin na ang shift na ito?")) return;
     const finalSales = currentShift.totalSalesDuringShift || 0;
     const now = new Date();
-    const timeStr = now.toLocaleString();
+    const timeStr = formatCustomDateTime(now);
     sendDataToCloud('logShift', { type: 'END', time: timeStr, totalIncome: finalSales });
     currentShift.active = false;
     localStorage.removeItem('lc_current_shift');
@@ -525,7 +551,7 @@ function saveActiveOrder() {
         table: tableName,
         cart: JSON.parse(JSON.stringify(cart)),
         total: total,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: formatCustomDateTime(new Date()).split(' | ')[1]
     };
     activeOrders.push(newActive);
     saveLocalStorageData();
@@ -607,8 +633,7 @@ function checkout() {
     if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
     const tableCustomer = document.getElementById('order-table').value || "Walk-in";
     
-    const now = new Date();
-    const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const dateStr = formatCustomDateTime(new Date());
     
     const newOrderRecord = {
         orderNum: orderCounter++,
