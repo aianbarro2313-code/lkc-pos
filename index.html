@@ -257,7 +257,6 @@ window.onload = function() {
   fetchAllDataFromCloud();
 };
 
-// AUTO-SYNC: Kusa itong hihila ng data mula sa Google Sheet tuwing 10 segundo (para sa lahat ng devices)
 setInterval(() => {
   fetchAllDataFromCloud(true);
 }, 10000);
@@ -289,15 +288,23 @@ function fetchAllDataFromCloud(isBackground = false) {
     .then(resData => {
       statusEl.innerText = "Online (Sheet Data)";
       statusEl.className = "text-emerald-300 font-medium";
-      if (resData) {
-        if (resData.menu && resData.menu.length > 0) {
-          menu = resData.menu;
+      
+      if (resData && resData.status === "success") {
+        if (resData.menu) {
+          try {
+            let parsedMenu = typeof resData.menu === 'string' ? JSON.parse(resData.menu) : resData.menu;
+            if (Array.isArray(parsedMenu) && parsedMenu.length > 0) {
+              menu = parsedMenu;
+            }
+          } catch(e) {
+            console.error("Menu parse error:", e);
+          }
         }
-        if (resData.orders && Array.isArray(resData.orders)) {
+        
+        if (resData.orders && Array.isArray(resData.orders) && resData.orders.length > 0) {
           orderHistory = resData.orders;
         }
         
-        // --- REAL-TIME ACTIVE ORDERS SYNC ---
         if (resData.activeOrders) {
           try {
             let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
@@ -307,11 +314,10 @@ function fetchAllDataFromCloud(isBackground = false) {
               if (typeof renderActiveOrders === 'function') renderActiveOrders();
             }
           } catch(e) {
-            console.error("Error parsing activeOrders:", e);
+            console.error("ActiveOrders parse error:", e);
           }
         }
 
-        // --- REAL-TIME SHIFT STATUS SYNC ---
         if (resData.shiftStatus) {
           try {
             let remoteShift = typeof resData.shiftStatus === 'string' ? JSON.parse(resData.shiftStatus) : resData.shiftStatus;
@@ -321,10 +327,11 @@ function fetchAllDataFromCloud(isBackground = false) {
               updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
             }
           } catch(e) {
-            console.error("Error parsing shiftStatus:", e);
+            console.error("ShiftStatus parse error:", e);
           }
         }
       }
+      
       saveLocalStorageData();
       renderPOSMenu();
       renderInventory();
@@ -362,8 +369,6 @@ function startShift() {
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
   
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
-  
-  // I-save agad sa cloud (ActiveOrdersJSON tapos isasama ang currentShift at active orders)
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 }, { shiftStatus: currentShift });
   
@@ -570,10 +575,7 @@ function saveActiveOrder() {
   };
   activeOrders.push(newActive);
   saveLocalStorageData();
-  
-  // I-sync agad sa Google Sheet para makita ng ibang device
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
-  
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
   alert(`Order saved for ${tableName} and synced!`);
