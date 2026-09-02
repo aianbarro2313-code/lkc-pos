@@ -698,7 +698,7 @@ function checkout() {
 function updateOrderHistoryUI() {
   const tbody = document.getElementById('orders-table-body');
   document.getElementById('stat-total-orders').innerText = orderHistory.length;
-  const totalRev = orderHistory.reduce((s, o) => s + o.total, 0);
+  const totalRev = orderHistory.reduce((s, o) => s + (o.total || 0), 0);
   document.getElementById('stat-total-sales').innerText = `P${totalRev.toFixed(2)}`;
   document.getElementById('stat-avg-sale').innerText = orderHistory.length > 0 ? `P${(totalRev / orderHistory.length).toFixed(2)}` : 'P0.00';
   
@@ -707,14 +707,18 @@ function updateOrderHistoryUI() {
     return;
   }
   
-  tbody.innerHTML = orderHistory.map(o => `
-    <tr class="hover:bg-gray-50/50">
-      <td class="p-3 font-bold text-brand-dark">#${o.orderNum}</td>
-      <td class="p-3 font-medium text-gray-700">${o.table}</td>
-      <td class="p-3 text-xs text-gray-500">${o.date}</td>
-      <td class="p-3 text-xs text-gray-600">${o.items.map(i => `<div>${i.qty}x ${i.name} ${getTypeBadgeHtml(i.orderType)}</div>`).join('')}</td>
-      <td class="p-3 text-right font-black text-brand-orange">P${o.total.toFixed(2)}</td>
-    </tr>`).join('');
+  tbody.innerHTML = orderHistory.map(o => {
+    // Proteksyon sakaling maging undefined o hindi array ang items
+    const itemsList = Array.isArray(o.items) ? o.items : [];
+    return `
+      <tr class="hover:bg-gray-50/50">
+        <td class="p-3 font-bold text-brand-dark">#${o.orderNum || '---'}</td>
+        <td class="p-3 font-medium text-gray-700">${o.table || 'Walk-in'}</td>
+        <td class="p-3 text-xs text-gray-500">${o.date || ''}</td>
+        <td class="p-3 text-xs text-gray-600">${itemsList.map(i => `<div>${i.qty || 1}x ${i.name || ''} ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div>`).join('')}</td>
+        <td class="p-3 text-right font-black text-brand-orange">P${Number(o.total || 0).toFixed(2)}</td>
+      </tr>`;
+  }).join('');
 }
 
 function renderInventory() {
