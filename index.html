@@ -262,27 +262,50 @@ window.onload = function() {
 };
 
 function fetchAllDataFromCloud() {
-  const statusEl = document.getElementById('cloud-status');
-  statusEl.innerText = "Syncing...";
-  statusEl.className = "text-amber-300 font-medium";
+    const statusEl = document.getElementById('cloud-status');
+    statusEl.innerText = "Syncing...";
+    statusEl.className = "text-amber-300 font-medium";
 
-  fetch(WEB_APP_URL)
-    .then(res => res.json())
-    .then(data => {
-      statusEl.innerText = "Online (Sheet Data)";
-      statusEl.className = "text-emerald-300 font-medium";
-      if (data && data.menu && data.menu.length > 0) {
-        menu = data.menu;
-        saveLocalStorageData();
-        renderPOSMenu();
-        renderInventory();
-      }
-    })
-    .catch(err => {
-      console.warn("Cloud connection error, using local data.", err);
-      statusEl.innerText = "Offline/Local";
-      statusEl.className = "text-red-300 font-medium";
-    });
+    fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+            statusEl.innerText = "Online (Sheet Data)";
+            statusEl.className = "text-emerald-300 font-medium";
+
+            if (data) {
+                // 1. Sync Menu
+                if (data.menu && data.menu.length > 0) {
+                    menu = data.menu;
+                }
+
+                // 2. Sync Cloud State (Order Counter & Shift Status)
+                if (data.cloudState) {
+                    orderCounter = data.cloudState.orderCounter || orderCounter;
+                    
+                    const cloudShiftActive = data.cloudState.shiftActive;
+                    const cloudShiftStart = data.cloudState.shiftStartTime;
+                    const cloudShiftSales = data.cloudState.shiftTotalSales;
+
+                    currentShift.active = cloudShiftActive;
+                    currentShift.startDateTimeStr = cloudShiftStart;
+                    currentShift.totalSalesDuringShift = cloudShiftSales;
+
+                    localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
+                    updateShiftUIState(cloudShiftActive, cloudShiftStart);
+                }
+
+                saveLocalStorageData();
+                renderPOSMenu();
+                renderInventory();
+                if (typeof renderActiveOrders === 'function') renderActiveOrders();
+                if (typeof updateOrderHistoryUI === 'function') updateOrderHistoryUI();
+            }
+        })
+        .catch(err => {
+            console.warn("Cloud connection error, using local data.", err);
+            statusEl.innerText = "Offline/Local";
+            statusEl.className = "text-red-300 font-medium";
+        });
 }
 
 function sendDataToCloud(actionType, payloadData) {
