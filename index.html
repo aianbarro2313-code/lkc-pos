@@ -58,7 +58,6 @@ tailwind.config = {
 </nav>
 </div>
 <div class="space-y-3 mt-4 md:mt-0">
-<!-- SHIFT SECTION -->
 <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
 <div class="flex justify-between items-center">
 <span class="font-bold text-gray-300">Shift Status:</span>
@@ -256,11 +255,8 @@ window.onload = function() {
   updateOrderHistoryUI();
   updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
   fetchAllDataFromCloud();
+  setInterval(() => { fetchAllDataFromCloud(true); }, 10000);
 };
-
-setInterval(() => {
-  fetchAllDataFromCloud(true);
-}, 10000);
 
 function formatCustomDateTime(dateInput) {
   const d = new Date(dateInput);
@@ -283,13 +279,11 @@ function fetchAllDataFromCloud(isBackground = false) {
     statusEl.innerText = "Syncing...";
     statusEl.className = "text-amber-300 font-medium";
   }
-
   fetch(WEB_APP_URL)
     .then(res => res.json())
     .then(resData => {
       statusEl.innerText = "Online (Sheet Data)";
       statusEl.className = "text-emerald-300 font-medium";
-      
       if (resData && resData.status === "success") {
         if (resData.menu) {
           try {
@@ -297,20 +291,18 @@ function fetchAllDataFromCloud(isBackground = false) {
             if (Array.isArray(parsedMenu) && parsedMenu.length > 0) {
               menu = parsedMenu;
             }
-          } catch(e) {
-            console.error("Menu parse error:", e);
-          }
+          } catch(e) { console.error("Menu parse error:", e); }
         }
-        
-        // Strict guard to ensure menu is always an array
-        if (!Array.isArray(menu)) {
-          menu = DEFAULT_MENU;
-        }
-        
+        if (!Array.isArray(menu)) menu = DEFAULT_MENU;
+
         if (resData.orders && Array.isArray(resData.orders) && resData.orders.length > 0) {
-          orderHistory = resData.orders;
+          // Salain para huwag isali ang shift rows sa order history
+          orderHistory = resData.orders.filter(o => {
+            let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
+            return ordNum.indexOf("SHIFT") === -1 && ordNum !== "#---" && ordNum !== "";
+          });
         }
-        
+
         if (resData.activeOrders) {
           try {
             let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
@@ -319,9 +311,7 @@ function fetchAllDataFromCloud(isBackground = false) {
               localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
               if (typeof renderActiveOrders === 'function') renderActiveOrders();
             }
-          } catch(e) {
-            console.error("ActiveOrders parse error:", e);
-          }
+          } catch(e) { console.error("ActiveOrders parse error:", e); }
         }
 
         if (resData.shiftStatus) {
@@ -332,16 +322,13 @@ function fetchAllDataFromCloud(isBackground = false) {
               localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
               updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
             }
-          } catch(e) {
-            console.error("ShiftStatus parse error:", e);
-          }
+          } catch(e) { console.error("ShiftStatus parse error:", e); }
         }
       }
-      
       saveLocalStorageData();
       renderPOSMenu();
       renderInventory();
-      if (typeof updateOrderHistoryUI === 'function') updateOrderHistoryUI();
+      updateOrderHistoryUI();
     })
     .catch(err => {
       console.warn("Cloud connection error, using local data.", err);
@@ -362,9 +349,7 @@ function sendDataToCloud(actionType, payloadData, extraParams = {}) {
 }
 
 function saveLocalStorageData() {
-  if (Array.isArray(menu)) {
-    localStorage.setItem('lc_menu', JSON.stringify(menu));
-  }
+  if (Array.isArray(menu)) localStorage.setItem('lc_menu', JSON.stringify(menu));
   localStorage.setItem('lc_categories', JSON.stringify(categories));
   localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
   localStorage.setItem('lc_order_history', JSON.stringify(orderHistory));
@@ -376,11 +361,9 @@ function startShift() {
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
-  
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 }, { shiftStatus: currentShift });
-  
   updateShiftUIState(true, timeStr);
   alert("Shift started successfully and synced to Google Sheet!");
 }
@@ -391,13 +374,10 @@ function endShift() {
   const finalSales = currentShift.totalSalesDuringShift || 0;
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
-  
   currentShift.active = false;
   let closedShiftPayload = JSON.parse(JSON.stringify(currentShift));
-  
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: closedShiftPayload });
   sendDataToCloud('logShift', { type: 'END', time: timeStr, totalIncome: finalSales }, { shiftStatus: closedShiftPayload });
-  
   localStorage.removeItem('lc_current_shift');
   updateShiftUIState(false, "");
   alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)} recorded.`);
@@ -411,7 +391,7 @@ function updateShiftUIState(isActive, timeStr) {
   if (isActive) {
     badge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
     badge.innerText = "OPEN";
-    info.innerText = 'Started: ' + (timeStr || '');
+    info.innerText = 'Started: ' + (timeStr || "");
     btnStart.disabled = true;
     btnEnd.disabled = false;
     btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -431,13 +411,8 @@ function getTypeBadgeHtml(type) {
     : '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Dine-In</span>';
 }
 
-function toggleMobileMenu() {
-  document.getElementById('sidebar-nav').classList.toggle('hidden');
-}
-
-function toggleMobileCart() {
-  document.getElementById('cart-drawer').classList.toggle('translate-y-full');
-}
+function toggleMobileMenu() { document.getElementById('sidebar-nav').classList.toggle('hidden'); }
+function toggleMobileCart() { document.getElementById('cart-drawer').classList.toggle('translate-y-full'); }
 
 function setDefaultType(type) {
   currentDefaultType = type;
@@ -450,7 +425,7 @@ function renderPOSMenu() {
   const grid = document.getElementById('pos-menu-grid');
   grid.innerHTML = categories.map(cat => {
     const items = menu.filter(m => m.category === cat);
-    if (items.length === 0) return '';
+    if (items.length === 0) return "";
     return `
       <div class="space-y-2">
         <div class="sticky top-16 md:top-0 bg-brand-bg/95 py-2 z-10 border-b border-amber-900/10 flex items-center gap-2">
@@ -461,8 +436,8 @@ function renderPOSMenu() {
           ${items.map(item => {
             const isAvail = item.available !== false;
             return `
-              <div ${isAvail ? `onclick="addToCart(${item.id})"` : ''} class="bg-white p-2.5 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}">
-                ${!isAvail ? '<div class="absolute inset-0 bg-gray-900/20 flex items-center justify-center z-10"><span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">OUT OF STOCK</span></div>' : ''}
+              <div ${isAvail ? `onclick="addToCart(${item.id})"` : ""} class="bg-white p-2.5 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition relative overflow-hidden ${isAvail ? 'hover:shadow-md cursor-pointer active:scale-95' : 'opacity-50 cursor-not-allowed bg-gray-50'}">
+                ${!isAvail ? '<div class="absolute inset-0 bg-gray-900/20 flex items-center justify-center z-10"><span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">OUT OF STOCK</span></div>' : ""}
                 <div>
                   <span class="text-[9px] font-bold text-gray-400 uppercase">${item.category}</span>
                   <h4 class="font-bold text-xs text-brand-dark leading-tight mt-0.5">${item.name}</h4>
@@ -472,10 +447,10 @@ function renderPOSMenu() {
                   <span class="text-[10px] bg-brand-bg text-brand-dark font-bold px-2 py-0.5 rounded-full border">+</span>
                 </div>
               </div>`;
-          }).join('')}
+          }).join("")}
         </div>
       </div>`;
-  }).join('');
+  }).join("");
 }
 
 function addToCart(itemId) {
@@ -504,8 +479,8 @@ function updateItemOrderType(index, type) {
 
 function clearCart() {
   cart = [];
-  document.getElementById('order-table').value = '';
-  document.getElementById('amount-paid').value = '';
+  document.getElementById('order-table').value = "";
+  document.getElementById('amount-paid').value = "";
   document.getElementById('cart-change').innerText = 'P0.00';
   updateCartUI();
 }
@@ -521,13 +496,11 @@ function updateCartUI() {
   const container = document.getElementById('cart-items');
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
   let foodSubtotal = 0, drinksSubtotal = 0;
-  
   cart.forEach(item => {
     const itemTotal = item.price * item.qty;
     if (item.category === 'DRINKS') drinksSubtotal += itemTotal;
     else foodSubtotal += itemTotal;
   });
-  
   const total = foodSubtotal + drinksSubtotal;
   document.getElementById('mobile-cart-count').innerText = totalQty;
   document.getElementById('mobile-cart-total').innerText = `P${total.toFixed(2)}`;
@@ -540,7 +513,7 @@ function updateCartUI() {
     document.getElementById('cart-change').innerText = 'P0.00';
     return;
   }
-  
+
   container.innerHTML = cart.map((item, idx) => `
     <div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
       <div class="flex items-center justify-between">
@@ -564,8 +537,8 @@ function updateCartUI() {
           </select>
         </div>
       </div>
-    </div>`).join('');
-    
+    </div>`).join("");
+
   document.getElementById('cart-food-subtotal').innerText = foodSubtotal.toFixed(2);
   document.getElementById('cart-drinks-subtotal').innerText = drinksSubtotal.toFixed(2);
   document.getElementById('cart-total').innerText = total.toFixed(2);
@@ -605,7 +578,7 @@ function renderActiveOrders() {
           <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span>
         </div>
         <ul class="space-y-2 text-xs text-gray-600 mb-4">
-          ${order.cart.map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join('')}
+          ${order.cart.map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
         </ul>
       </div>
       <div class="pt-3 border-t space-y-2">
@@ -619,7 +592,7 @@ function renderActiveOrders() {
         </div>
         <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
       </div>
-    </div>`).join('');
+    </div>`).join("");
 }
 
 function editActiveOrder(orderId) {
@@ -665,9 +638,9 @@ function checkout() {
   const amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
   const paymentMethod = document.getElementById('payment-method').value;
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
-  
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
   const dateStr = formatCustomDateTime(new Date());
+  
   const newOrderRecord = {
     orderNum: orderCounter++,
     table: tableCustomer,
@@ -697,28 +670,58 @@ function checkout() {
 
 function updateOrderHistoryUI() {
   const tbody = document.getElementById('orders-table-body');
-  document.getElementById('stat-total-orders').innerText = orderHistory.length;
-  const totalRev = orderHistory.reduce((s, o) => s + (o.total || 0), 0);
-  document.getElementById('stat-total-sales').innerText = `P${totalRev.toFixed(2)}`;
-  document.getElementById('stat-avg-sale').innerText = orderHistory.length > 0 ? `P${(totalRev / orderHistory.length).toFixed(2)}` : 'P0.00';
   
-  if (orderHistory.length === 0) {
+  // Salain para puro tunay na benta lang ang masama sa stats at listahan
+  const validOrders = orderHistory.filter(o => {
+    let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
+    return ordNum.indexOf("SHIFT") === -1 && ordNum !== "#---" && ordNum !== "";
+  });
+
+  document.getElementById('stat-total-orders').innerText = validOrders.length;
+  const totalRev = validOrders.reduce((s, o) => s + (parseFloat(o["total amount"] || o["total"] || 0)), 0);
+  document.getElementById('stat-total-sales').innerText = 'P' + totalRev.toFixed(2);
+  document.getElementById('stat-avg-sale').innerText = validOrders.length > 0 ? 'P' + (totalRev / validOrders.length).toFixed(2) : 'P0.00';
+
+  if (validOrders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
     return;
   }
-  
-  tbody.innerHTML = orderHistory.map(o => {
-    // Proteksyon sakaling maging undefined o hindi array ang items
-    const itemsList = Array.isArray(o.items) ? o.items : [];
+
+  tbody.innerHTML = validOrders.map(o => {
+    const orderNum = o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || '---';
+    const tableCust = o["table/customer"] || o["table"] || o["type of order"] || 'Walk-in';
+    const dateTime = o["date & time"] || o["date"] || '';
+    const totalAmt = parseFloat(o["total amount"] || o["total"] || 0);
+    
+    let rawItems = o["items & order type"] || o["items"] || [];
+    if (typeof rawItems === 'string') {
+      try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
+    }
+    const itemsList = Array.isArray(rawItems) ? rawItems : [];
+
+    let itemsHtml = itemsList.map(i => {
+      let iName = i.name || i["item ordered"] || i.title || "Item";
+      let iQty = i.quantity || i.qty || 1;
+      let iType = i.orderType || i["type of order"] || "Dine-In";
+      return `<div>${iQty}x ${iName} ${getTypeBadgeHtml(iType)}</div>`;
+    }).join("");
+
+    if (!itemsHtml) {
+      let fallbackItem = o["item ordered"] || "Item";
+      let fallbackQty = o["quantity"] || 1;
+      let fallbackType = o["type of order"] || "Dine-In";
+      itemsHtml = `<div>${fallbackQty}x ${fallbackItem} ${getTypeBadgeHtml(fallbackType)}</div>`;
+    }
+
     return `
       <tr class="hover:bg-gray-50/50">
-        <td class="p-3 font-bold text-brand-dark">#${o.orderNum || '---'}</td>
-        <td class="p-3 font-medium text-gray-700">${o.table || 'Walk-in'}</td>
-        <td class="p-3 text-xs text-gray-500">${o.date || ''}</td>
-        <td class="p-3 text-xs text-gray-600">${itemsList.map(i => `<div>${i.qty || 1}x ${i.name || ''} ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div>`).join('')}</td>
-        <td class="p-3 text-right font-black text-brand-orange">P${Number(o.total || 0).toFixed(2)}</td>
+        <td class="p-3 font-bold text-brand-dark">#${orderNum}</td>
+        <td class="p-3 font-medium text-gray-700">${tableCust}</td>
+        <td class="p-3 text-xs text-gray-500">${dateTime}</td>
+        <td class="p-3 text-xs text-gray-600">${itemsHtml}</td>
+        <td class="p-3 text-right font-black text-brand-orange">P${totalAmt.toFixed(2)}</td>
       </tr>`;
-  }).join('');
+  }).join("");
 }
 
 function renderInventory() {
@@ -726,8 +729,8 @@ function renderInventory() {
   document.getElementById('category-badge-list').innerHTML = categories.map(cat => `
     <span class="inline-flex items-center gap-2 bg-brand-cream border px-3 py-1.5 rounded-xl text-xs font-bold">
       ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
-    </span>`).join('');
-    
+    </span>`).join("");
+
   document.getElementById('inventory-list').innerHTML = menu.map(item => `
     <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
       <div class="flex justify-between items-start">
@@ -750,7 +753,7 @@ function renderInventory() {
       <button onclick="toggleAvailability(${item.id})" class="text-brand-dark font-bold text-xs hover:underline text-left">
         ${item.available !== false ? 'Mark Out of Stock' : 'Mark Available'}
       </button>
-    </div>`).join('');
+    </div>`).join("");
 }
 
 function saveItemPrice(id) {
@@ -843,7 +846,7 @@ function switchTab(tabId) {
   const activeNav = document.getElementById(`nav-${tabId}`);
   if (activeTab) activeTab.classList.remove('hidden');
   if (activeNav) activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
-  
+
   if (tabId === 'active') renderActiveOrders();
   if (tabId === 'inventory') renderInventory();
   if (window.innerWidth < 768) document.getElementById('sidebar-nav').classList.add('hidden');
