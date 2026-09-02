@@ -308,20 +308,31 @@ function startShift() {
   const timeStr = now.toLocaleString();
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
+  
+  // Ipadala sa Google Sheet ang Shift Start
+  sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 });
+
   updateShiftUIState(true, timeStr);
-  alert("Shift started successfully!");
+  alert("Shift started successfully and logged to Google Sheet!");
 }
 
 function endShift() {
   if (!currentShift.active) return alert("Walang aktibong shift!");
   if (!confirm("Tapusin na ang shift na ito?")) return;
+  
   const finalSales = currentShift.totalSalesDuringShift || 0;
+  const now = new Date();
+  const timeStr = now.toLocaleString();
+  
+  // Ipadala sa Google Sheet ang Shift End at Total Income
+  sendDataToCloud('logShift', { type: 'END', time: timeStr, totalIncome: finalSales });
+
   currentShift.active = false;
   localStorage.removeItem('lc_current_shift');
   updateShiftUIState(false, "");
-  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)}`);
+  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)} recorded in Google Sheet.`);
 }
-
+  
 function updateShiftUIState(isActive, timeStr) {
   const badge = document.getElementById('shift-status-badge');
   const info = document.getElementById('shift-info');
