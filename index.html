@@ -85,9 +85,9 @@ tailwind.config = {
 <div class="mb-3 md:mb-4 flex justify-between items-center">
 <div>
 <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
-<p class="text-[11px] md:text-xs text-gray-500">Google Sheet Database Connected</p>
+<p class="text-[11px] md:text-xs text-gray-500">Google Sheet Database Connected (Auto-Sync)</p>
 </div>
-<button onclick="fetchAllDataFromCloud()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Sync Cloud</button>
+<button onclick="fetchAllDataFromCloud()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Sync Cloud Now</button>
 </div>
 <div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
 </div>
@@ -254,12 +254,17 @@ window.onload = function() {
     renderInventory();
     updateOrderHistoryUI();
     fetchAllDataFromCloud();
+
+    // AUTO-SYNC: Kusa itong hihila ng data mula sa Google Sheet tuwing 10 segundo
+    setInterval(() => {
+        fetchAllDataFromCloud(true); // background sync para hindi maabala ang user
+    }, 10000);
 };
 
 // Helper function para sa Custom Date Format: mm/dd/yyyy | 00:00 am/pm
 function formatCustomDateTime(dateInput) {
     const d = new Date(dateInput);
-    if (isNaN(d.getTime())) return dateInput; // kung hindi mapasa-date, ibalik ang original string
+    if (isNaN(d.getTime())) return dateInput;
     
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -270,16 +275,18 @@ function formatCustomDateTime(dateInput) {
     const ampm = hours >= 12 ? 'pm' : 'am';
     
     hours = hours % 12;
-    hours = hours ? hours : 12; // 0 ay magiging 12
+    hours = hours ? hours : 12;
     const strHours = String(hours).padStart(2, '0');
     
     return `${month}/${day}/${year} | ${strHours}:${minutes} ${ampm}`;
 }
 
-function fetchAllDataFromCloud() {
+function fetchAllDataFromCloud(isBackground = false) {
     const statusEl = document.getElementById('cloud-status');
-    statusEl.innerText = "Syncing...";
-    statusEl.className = "text-amber-300 font-medium";
+    if (!isBackground) {
+        statusEl.innerText = "Syncing...";
+        statusEl.className = "text-amber-300 font-medium";
+    }
 
     fetch(WEB_APP_URL)
         .then(res => res.json())
@@ -287,25 +294,17 @@ function fetchAllDataFromCloud() {
             statusEl.innerText = "Online (Sheet Data)";
             statusEl.className = "text-emerald-300 font-medium";
             if (data) {
-                // 1. Sync Menu
                 if (data.menu && data.menu.length > 0) {
                     menu = data.menu;
                 }
-
-                // 2. Sync Order History from Google Sheet
                 if (data.orders && Array.isArray(data.orders)) {
                     orderHistory = data.orders;
-                } else if (data.orderHistory && Array.isArray(data.orderHistory)) {
-                    orderHistory = data.orderHistory;
                 }
-
-                // 3. Sync Cloud State (Order Counter & Shift Status)
                 if (data.cloudState) {
                     orderCounter = data.cloudState.orderCounter || orderCounter;
                     const cloudShiftActive = data.cloudState.shiftActive;
                     let cloudShiftStart = data.cloudState.shiftStartTime;
                     
-                    // I-format sa mm/dd/yyyy | 00:00 am/pm kung may nakuha galing cloud
                     if (cloudShiftStart) {
                         cloudShiftStart = formatCustomDateTime(cloudShiftStart);
                     }
