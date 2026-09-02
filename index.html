@@ -257,7 +257,7 @@ window.onload = function() {
   fetchAllDataFromCloud();
 };
 
-// AUTO-SYNC: Kusa itong hihila ng data mula sa Google Sheet tuwing 10 segundo
+// AUTO-SYNC: Kusa itong hihila ng data mula sa Google Sheet tuwing 10 segundo (para sa lahat ng devices)
 setInterval(() => {
   fetchAllDataFromCloud(true);
 }, 10000);
@@ -286,21 +286,35 @@ function fetchAllDataFromCloud(isBackground = false) {
 
   fetch(WEB_APP_URL)
     .then(res => res.json())
-    .then(data => {
+    .then(resData => {
       statusEl.innerText = "Online (Sheet Data)";
       statusEl.className = "text-emerald-300 font-medium";
-      if (data) {
-        if (data.menu && data.menu.length > 0) {
-          menu = data.menu;
+      if (resData) {
+        if (resData.menu && resData.menu.length > 0) {
+          menu = resData.menu;
         }
-        if (data.orders && Array.isArray(data.orders)) {
-          orderHistory = data.orders;
+        if (resData.orders && Array.isArray(resData.orders)) {
+          orderHistory = resData.orders;
         }
         
-        // --- REAL-TIME SHIFT STATUS SYNC ---
-        if (data.shiftStatus) {
+        // --- REAL-TIME ACTIVE ORDERS SYNC ---
+        if (resData.activeOrders) {
           try {
-            let remoteShift = typeof data.shiftStatus === 'string' ? JSON.parse(data.shiftStatus) : data.shiftStatus;
+            let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
+            if (Array.isArray(remoteActiveOrders)) {
+              activeOrders = remoteActiveOrders;
+              localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
+              if (typeof renderActiveOrders === 'function') renderActiveOrders();
+            }
+          } catch(e) {
+            console.error("Error parsing activeOrders:", e);
+          }
+        }
+
+        // --- REAL-TIME SHIFT STATUS SYNC ---
+        if (resData.shiftStatus) {
+          try {
+            let remoteShift = typeof resData.shiftStatus === 'string' ? JSON.parse(resData.shiftStatus) : resData.shiftStatus;
             if (remoteShift && typeof remoteShift.active !== 'undefined') {
               currentShift = remoteShift;
               localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
@@ -310,15 +324,10 @@ function fetchAllDataFromCloud(isBackground = false) {
             console.error("Error parsing shiftStatus:", e);
           }
         }
-        
-        if (data.cloudState) {
-          orderCounter = data.cloudState.orderCounter || orderCounter;
-        }
       }
       saveLocalStorageData();
       renderPOSMenu();
       renderInventory();
-      if (typeof renderActiveOrders === 'function') renderActiveOrders();
       if (typeof updateOrderHistoryUI === 'function') updateOrderHistoryUI();
     })
     .catch(err => {
@@ -353,10 +362,13 @@ function startShift() {
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
   
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
-  // I-save din ang shiftStatus sa Cloud kasama ang action
+  
+  // I-save agad sa cloud (ActiveOrdersJSON tapos isasama ang currentShift at active orders)
+  sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 }, { shiftStatus: currentShift });
+  
   updateShiftUIState(true, timeStr);
-  alert("Shift started successfully and logged to Google Sheet!");
+  alert("Shift started successfully and synced to Google Sheet!");
 }
 
 function endShift() {
@@ -369,10 +381,12 @@ function endShift() {
   currentShift.active = false;
   let closedShiftPayload = JSON.parse(JSON.stringify(currentShift));
   
+  sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: closedShiftPayload });
   sendDataToCloud('logShift', { type: 'END', time: timeStr, totalIncome: finalSales }, { shiftStatus: closedShiftPayload });
+  
   localStorage.removeItem('lc_current_shift');
   updateShiftUIState(false, "");
-  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)} recorded in Google Sheet.`);
+  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)} recorded.`);
 }
 
 function updateShiftUIState(isActive, timeStr) {
@@ -556,9 +570,13 @@ function saveActiveOrder() {
   };
   activeOrders.push(newActive);
   saveLocalStorageData();
+  
+  // I-sync agad sa Google Sheet para makita ng ibang device
+  sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
+  
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
-  alert(`Order saved for ${tableName}!`);
+  alert(`Order saved for ${tableName} and synced!`);
 }
 
 function renderActiveOrders() {
@@ -600,6 +618,7 @@ function editActiveOrder(orderId) {
     document.getElementById('order-table').value = order.table;
     activeOrders.splice(idx, 1);
     saveLocalStorageData();
+    sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
     switchTab('pos');
     updateCartUI();
   }
@@ -609,6 +628,7 @@ function cancelActiveOrder(orderId) {
   if (confirm("I-cancel ang order na ito?")) {
     activeOrders = activeOrders.filter(o => o.id != orderId);
     saveLocalStorageData();
+    sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
     renderActiveOrders();
   }
 }
@@ -621,6 +641,7 @@ function checkoutActiveOrder(orderId) {
   document.getElementById('order-table').value = order.table;
   activeOrders.splice(idx, 1);
   saveLocalStorageData();
+  sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   updateCartUI();
   switchTab('pos');
   document.getElementById('cart-drawer').classList.remove('translate-y-full');
@@ -657,7 +678,7 @@ function checkout() {
   }
   
   updateOrderHistoryUI();
-  alert(`Order #${newOrderRecord.orderNum} completed successfully and saved!`);
+  alert(`Order #${newOrderRecord.orderNum} completed successfully!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
