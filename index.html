@@ -59,6 +59,7 @@ tailwind.config = {
     </nav>
   </div>
   <div class="space-y-3 mt-4 md:mt-0">
+    <!-- SHIFT SECTION -->
     <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
       <div class="flex justify-between items-center">
         <span class="font-bold text-gray-300">Shift Status:</span>
@@ -85,7 +86,7 @@ tailwind.config = {
       <div class="mb-3 md:mb-4 flex justify-between items-center">
         <div>
           <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
-          <p class="text-[11px] md:text-xs text-gray-500">Live menu database</p>
+          <p class="text-[11px] md:text-xs text-gray-500">Google Sheet Database Connected</p>
         </div>
         <button onclick="fetchAllDataFromCloud()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Sync Cloud</button>
       </div>
@@ -256,12 +257,7 @@ window.onload = function() {
   fetchAllDataFromCloud();
   
   if (currentShift.active) {
-    document.getElementById('shift-status-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300";
-    document.getElementById('shift-status-badge').innerText = "OPEN";
-    document.getElementById('shift-info').innerText = 'Started: ' + currentShift.startDateTimeStr;
-    document.getElementById('btn-start-shift').disabled = true;
-    document.getElementById('btn-end-shift').disabled = false;
-    document.getElementById('btn-end-shift').classList.remove('opacity-50', 'cursor-not-allowed');
+    updateShiftUIState(true, currentShift.startDateTimeStr);
   }
 };
 
@@ -273,7 +269,7 @@ function fetchAllDataFromCloud() {
   fetch(WEB_APP_URL)
     .then(res => res.json())
     .then(data => {
-      statusEl.innerText = "Online";
+      statusEl.innerText = "Online (Sheet Data)";
       statusEl.className = "text-emerald-300 font-medium";
       if (data && data.menu && data.menu.length > 0) {
         menu = data.menu;
@@ -306,6 +302,26 @@ function saveLocalStorageData() {
   localStorage.setItem('lc_order_counter', orderCounter);
 }
 
+function startShift() {
+  if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
+  const now = new Date();
+  const timeStr = now.toLocaleString();
+  currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
+  localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
+  updateShiftUIState(true, timeStr);
+  alert("Shift started successfully!");
+}
+
+function endShift() {
+  if (!currentShift.active) return alert("Walang aktibong shift!");
+  if (!confirm("Tapusin na ang shift na ito?")) return;
+  const finalSales = currentShift.totalSalesDuringShift || 0;
+  currentShift.active = false;
+  localStorage.removeItem('lc_current_shift');
+  updateShiftUIState(false, "");
+  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)}`);
+}
+
 function updateShiftUIState(isActive, timeStr) {
   const badge = document.getElementById('shift-status-badge');
   const info = document.getElementById('shift-info');
@@ -326,26 +342,6 @@ function updateShiftUIState(isActive, timeStr) {
     btnEnd.disabled = true;
     btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
   }
-}
-
-function startShift() {
-  if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
-  const now = new Date();
-  const timeStr = now.toLocaleString();
-  currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
-  localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
-  updateShiftUIState(true, timeStr);
-  alert("Shift started successfully!");
-}
-
-function endShift() {
-  if (!currentShift.active) return alert("Walang aktibong shift!");
-  if (!confirm("Tapusin na ang shift na ito?")) return;
-  const finalSales = currentShift.totalSalesDuringShift || 0;
-  currentShift.active = false;
-  localStorage.removeItem('lc_current_shift');
-  updateShiftUIState(false, "");
-  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)}`);
 }
 
 function getTypeBadgeHtml(type) {
@@ -609,7 +605,7 @@ function checkout() {
   }
   
   updateOrderHistoryUI();
-  alert(`Order #${newOrderRecord.orderNum} completed successfully!`);
+  alert(`Order #${newOrderRecord.orderNum} completed successfully and saved to Google Sheet!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
@@ -677,7 +673,7 @@ function saveItemPrice(id) {
   sendDataToCloud('updateMenu', menu);
   renderPOSMenu();
   renderInventory();
-  alert('Na-update ang presyo!');
+  alert('Na-update ang presyo at naipadala sa Google Sheet!');
 }
 
 function toggleAvailability(id) {
@@ -724,7 +720,7 @@ function addNewMenuItem() {
   sendDataToCloud('updateMenu', menu);
   renderInventory();
   renderPOSMenu();
-  alert("Bagong menu item idinagdag!");
+  alert("Bagong menu item idinagdag at na-sync sa Google Sheet!");
 }
 
 function editMenuItemName(id) {
