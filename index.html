@@ -565,15 +565,15 @@ function saveActiveOrder() {
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   
   const now = new Date();
-  const formattedTimeStr = formatCustomDateTime(now).split('|')[1].trim();
+  const formattedDateTime = formatCustomDateTime(now); // Buong Date & Time na (e.g. 09/03/2026 | 08:24 pm)
 
   const newActive = {
     id: Date.now(),
     table: tableName,
     cart: JSON.parse(JSON.stringify(cart)),
     total: total,
-    time: formattedTimeStr,
-    fullDateTime: formatCustomDateTime(now)
+    time: formattedDateTime,
+    fullDateTime: formattedDateTime
   };
   activeOrders.push(newActive);
   saveLocalStorageData();
@@ -598,14 +598,10 @@ function renderActiveOrders() {
   }
   
   grid.innerHTML = activeOrders.map(order => {
-    let rawTime = order.time || order.fullDateTime || "";
-    let displayTime = rawTime;
-    
-    if (rawTime.includes("T") || rawTime.includes("Z")) {
-      displayTime = formatCustomDateTime(rawTime);
-      if (displayTime.includes('|')) {
-        displayTime = displayTime.split('|')[1].trim();
-      }
+    // Siguraduhing buong Date & Time ang ipapakita sa active orders
+    let displayDateTime = order.fullDateTime || order.time || "";
+    if (!displayDateTime.includes("/")) {
+      displayDateTime = formatCustomDateTime(order.id);
     }
 
     return `
@@ -613,7 +609,7 @@ function renderActiveOrders() {
         <div>
           <div class="flex justify-between items-center mb-2 pb-2 border-b">
             <h3 class="font-black text-brand-dark text-base">${order.table || 'Table'}</h3>
-            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${displayTime}</span>
+            <span class="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full">${displayDateTime}</span>
           </div>
           <ul class="space-y-2 text-xs text-gray-600 mb-4">
             ${(order.cart || []).map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
@@ -720,7 +716,6 @@ function checkout() {
 function updateOrderHistoryUI() {
   const tbody = document.getElementById('orders-table-body');
   const validOrders = orderHistory.filter(o => {
-    // Naka-wrap na sa String() para hindi mag-error kung number o undefined man ito
     let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
     return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
   });
@@ -764,7 +759,6 @@ function updateOrderHistoryUI() {
   }
 
   tbody.innerHTML = validOrders.map(o => {
-    // Dito rin ay ginamitan ng String() para safe sa `.startsWith()`
     const rawOrderNum = o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || '---';
     const orderNumStr = String(rawOrderNum);
     const tableCust = o["table/customer"] || o["table"] || o["type of order"] || 'Walk-in';
@@ -789,9 +783,11 @@ function updateOrderHistoryUI() {
       itemsHtml = `<div>${fallbackQty}x ${fallbackItem} ${getTypeBadgeHtml(fallbackType)}</div>`;
     }
 
+    const displayOrderNum = orderNumStr.startsWith('#') ? orderNumStr : '#' + orderNumStr;
+
     return `
       <tr class="hover:bg-gray-50/50">
-        <td class="p-3 font-bold text-brand-dark">${orderNumStr.startsWith('#') ? orderNumStr : '#' + orderNumStr}</td>
+        <td class="p-3 font-bold text-brand-dark">${displayOrderNum}</td>
         <td class="p-3 font-medium text-gray-700">${tableCust}</td>
         <td class="p-3 text-xs text-gray-500">${dateTime}</td>
         <td class="p-3 text-xs text-gray-600">${itemsHtml}</td>
