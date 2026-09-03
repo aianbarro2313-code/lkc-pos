@@ -640,12 +640,18 @@ function checkout() {
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
   const dateStr = formatCustomDateTime(new Date());
-  
+
+  // Dito natin sinisiguradong nadadala ang orderType (Dine-In/Take-Out) ng bawat item sa cart
+  const itemsWithTypes = cart.map(item => ({
+    ...item,
+    orderType: item.orderType || currentDefaultType
+  }));
+
   const newOrderRecord = {
     orderNum: orderCounter++,
     table: tableCustomer,
     date: dateStr,
-    items: JSON.parse(JSON.stringify(cart)),
+    items: itemsWithTypes, // Ginamit natin ang may kasamang tamang order type
     total: total,
     paymentMethod: paymentMethod,
     amountPaid: amountPaid,
