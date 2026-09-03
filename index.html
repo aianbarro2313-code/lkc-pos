@@ -579,6 +579,10 @@ function renderActiveOrders() {
     activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
   }
   
+  // Salain at linisin ang mga blangko o korap na active orders
+  activeOrders = activeOrders.filter(order => order && order.cart && order.cart.length > 0);
+  localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
+  
   if (activeOrders.length === 0) {
     grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
     return;
@@ -588,8 +592,8 @@ function renderActiveOrders() {
     <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
       <div>
         <div class="flex justify-between items-center mb-2 pb-2 border-b">
-          <h3 class="font-black text-brand-dark text-base">${order.table}</h3>
-          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span>
+          <h3 class="font-black text-brand-dark text-base">${order.table || 'Table'}</h3>
+          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time || ''}</span>
         </div>
         <ul class="space-y-2 text-xs text-gray-600 mb-4">
           ${(order.cart || []).map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
