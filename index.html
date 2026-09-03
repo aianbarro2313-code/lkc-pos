@@ -26,215 +26,207 @@ tailwind.config = {
 </style>
 </head>
 <body class="bg-brand-bg font-sans antialiased min-h-screen flex flex-col md:flex-row">
-
 <!-- Mobile Header -->
 <header class="bg-brand-dark text-white p-3 flex justify-between items-center md:hidden border-b border-white/15 z-30 sticky top-0">
-  <div class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-full border border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-xs overflow-hidden">
-      <img src="logo.png" alt="LKC" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='LKC';">
-    </div>
-    <div>
-      <h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
-      <p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
-    </div>
-  </div>
-  <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg">☰</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-xs overflow-hidden">
+<img src="logo.png" alt="LKC" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='LKC';">
+</div>
+<div>
+<h1 class="text-base font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+<p class="text-[9px] text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
+</div>
+</div>
+<button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-white/10 text-white font-bold text-lg">Menu</button>
 </header>
 
 <!-- Sidebar Navigation -->
 <aside id="sidebar-nav" class="hidden md:flex w-full md:w-64 bg-brand-dark text-white flex-col justify-between p-4 flex-shrink-0 z-20 md:h-screen md:sticky md:top-0">
-  <div>
-    <div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
-      <div class="w-16 h-16 rounded-full border-2 border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-lg mb-2 shadow-md overflow-hidden">
-        <img src="logo.png" alt="LKC" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='LKC';">
-      </div>
-      <h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
-      <p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
-    </div>
-    <nav class="space-y-2">
-      <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">POS & Take Order</button>
-      <button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Active Orders</button>
-      <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Order History & Summary</button>
-      <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Edit Menu & Categories</button>
-    </nav>
-  </div>
-  <div class="space-y-3 mt-4 md:mt-0">
-    <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="font-bold text-gray-300">Shift Status:</span>
-        <span id="shift-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300">CLOSED</span>
-      </div>
-      <div id="shift-info" class="text-[10px] text-gray-400">No active shift.</div>
-      <div class="grid grid-cols-2 gap-1.5 pt-1">
-        <button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px]">Start Shift</button>
-        <button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] opacity-50 cursor-not-allowed" disabled>End Shift</button>
-      </div>
-    </div>
-    <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs flex items-center justify-between">
-      <span class="text-gray-400 font-bold">Cloud Status:</span>
-      <span id="cloud-status" class="text-amber-300 font-medium">Connecting...</span>
-    </div>
-  </div>
+<div>
+<div class="hidden md:flex flex-col items-center mb-6 pt-2 text-center">
+<div class="w-16 h-16 rounded-full border-2 border-brand-orange bg-white flex items-center justify-center font-black text-brand-orange text-lg mb-2 shadow-md overflow-hidden">
+<img src="logo.png" alt="LKC" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='LKC';">
+</div>
+<h1 class="text-xl font-black tracking-wider text-brand-orange leading-tight">LEONARDO'S</h1>
+<p class="text-xs text-amber-200 tracking-widest uppercase font-semibold">Kambingan sa Chapel</p>
+</div>
+<nav class="space-y-2">
+<button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition">POS & Take Order</button>
+<button onclick="switchTab('active')" id="nav-active" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Active Orders</button>
+<button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Order History & Summary</button>
+<button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-white/10 transition">Edit Menu & Categories</button>
+</nav>
+</div>
+<div class="space-y-3 mt-4 md:mt-0">
+<div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-bold text-gray-300">Shift Status:</span>
+<span id="shift-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300">CLOSED</span>
+</div>
+<div id="shift-info" class="text-[10px] text-gray-400">No active shift.</div>
+<div class="grid grid-cols-2 gap-1.5 pt-1">
+<button onclick="startShift()" id="btn-start-shift" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px]">Start Shift</button>
+<button onclick="endShift()" id="btn-end-shift" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2 rounded-lg text-[10px] opacity-50 cursor-not-allowed" disabled>End Shift</button>
+</div>
+</div>
+<div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs flex items-center justify-between">
+<span class="text-gray-400 font-bold">Cloud Status:</span>
+<span id="cloud-status" class="text-amber-300 font-medium">Connecting...</span>
+</div>
+</div>
 </aside>
 
 <!-- Main Content Area -->
 <main class="flex-1 flex flex-col min-w-0">
-  
-  <!-- POS Tab -->
-  <div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6 relative overflow-y-auto">
-    <div class="flex-1 min-w-0">
-      <div class="mb-3 md:mb-4 flex justify-between items-center">
-        <div>
-          <h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
-          <p class="text-[11px] md:text-xs text-gray-500">Google Sheet Database Connected (Auto-Sync)</p>
-        </div>
-        <button onclick="fetchAllDataFromCloud()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Sync Cloud Now</button>
-      </div>
-      <div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
-    </div>
+<!-- POS Tab -->
+<div id="tab-pos" class="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:gap-6 relative overflow-y-auto">
+<div class="flex-1 min-w-0">
+<div class="mb-3 md:mb-4 flex justify-between items-center">
+<div>
+<h2 class="text-xl md:text-2xl font-black text-brand-dark">Select Menu Items</h2>
+<p class="text-[11px] md:text-xs text-gray-500">Google Sheet Database Connected (Auto-Sync)</p>
+</div>
+<button onclick="fetchAllDataFromCloud()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Sync Cloud Now</button>
+</div>
+<div id="pos-menu-grid" class="space-y-6 pb-24 md:pb-6"></div>
+</div>
 
-    <!-- Mobile Cart Button -->
-    <button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
-      <span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
-      <span id="mobile-cart-total">P0.00</span>
-    </button>
+<!-- Mobile Cart Button -->
+<button onclick="toggleMobileCart()" class="md:hidden fixed bottom-4 right-4 left-4 bg-brand-orange text-white py-3 px-5 rounded-2xl shadow-xl font-black text-sm flex justify-between items-center z-40">
+<span class="flex items-center gap-2">View Cart (<span id="mobile-cart-count">0</span>)</span>
+<span id="mobile-cart-total">P0.00</span>
+</button>
 
-    <!-- Cart Section / Drawer -->
-    <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
-      
-      <!-- Cart Header -->
-      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
-        <h3 class="font-bold text-brand-dark text-base md:text-lg">Current Order</h3>
-        <div class="flex items-center gap-3">
-          <button onclick="clearCart()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm">
-            <span>🗑️ Clear All</span>
-          </button>
-          <button onclick="toggleMobileCart()" class="md:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center text-sm transition">✕</button>
-        </div>
-      </div>
+<!-- Cart Section / Drawer -->
+<div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
+<div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
+<h3 class="font-bold text-brand-dark text-base md:text-lg">Current Order</h3>
+<div class="flex items-center gap-3">
+<button onclick="clearCart()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm">Clear All</button>
+<button onclick="toggleMobileCart()" class="md:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center text-sm transition">X</button>
+</div>
+</div>
+<div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
+<input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
+<div class="flex items-center justify-between text-xs pt-1">
+<span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
+<div class="flex gap-2">
+<label class="inline-flex items-center gap-1 cursor-pointer">
+<input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')">
+<span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
+</label>
+<label class="inline-flex items-center gap-1 cursor-pointer">
+<input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')">
+<span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
+</label>
+</div>
+</div>
+</div>
+<div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
+</div>
+<div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
+<div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
+<div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">0.00</span></div>
+<div class="flex justify-between items-center text-gray-600"><span>Drinks Subtotal</span><span id="cart-drinks-subtotal" class="font-bold text-brand-dark">0.00</span></div>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<div>
+<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
+<select id="payment-method" class="w-full p-2 text-xs border rounded-lg bg-white font-bold text-gray-700">
+<option value="Cash">Cash</option>
+<option value="GCash">GCash</option>
+</select>
+</div>
+<div>
+<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
+<input type="number" id="amount-paid" oninput="calculateChange()" placeholder="P0.00" class="w-full p-2 text-xs border rounded-lg bg-white font-bold">
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
+<span class="font-bold">Sukli / Change</span>
+<span id="cart-change" class="font-black text-sm">P0.00</span>
+</div>
+<div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
+<span>Total</span>
+<span id="cart-total" class="text-brand-orange">0.00</span>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow">Save Active Order</button>
+<button onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Pay & Complete</button>
+</div>
+</div>
+</div>
+</div>
 
-      <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
-        <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
-        <div class="flex items-center justify-between text-xs pt-1">
-          <span class="text-gray-500 font-bold text-[10px] uppercase">Default Order Type:</span>
-          <div class="flex gap-2">
-            <label class="inline-flex items-center gap-1 cursor-pointer">
-              <input type="radio" name="default-order-type" value="Dine-In" checked onchange="setDefaultType('Dine-In')">
-              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Dine-In</span>
-            </label>
-            <label class="inline-flex items-center gap-1 cursor-pointer">
-              <input type="radio" name="default-order-type" value="Take-Out" onchange="setDefaultType('Take-Out')">
-              <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Take-Out</span>
-            </label>
-          </div>
-        </div>
-      </div>
-      <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
-        <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
-      </div>
-      <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
-        <div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
-          <div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">0.00</span></div>
-          <div class="flex justify-between items-center text-gray-600"><span>Drinks Subtotal</span><span id="cart-drinks-subtotal" class="font-bold text-brand-dark">0.00</span></div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Payment Method</label>
-            <select id="payment-method" class="w-full p-2 text-xs border rounded-lg bg-white font-bold text-gray-700">
-              <option value="Cash">Cash</option>
-              <option value="GCash">GCash</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount Paid</label>
-            <input type="number" id="amount-paid" oninput="calculateChange()" placeholder="P0.00" class="w-full p-2 text-xs border rounded-lg bg-white font-bold">
-          </div>
-        </div>
-        <div class="flex justify-between items-center text-xs text-emerald-700 pt-1">
-          <span class="font-bold">Sukli / Change</span>
-          <span id="cart-change" class="font-black text-sm">P0.00</span>
-        </div>
-        <div class="flex justify-between items-center text-lg font-black text-brand-dark pt-2 border-t border-gray-200">
-          <span>Total</span>
-          <span id="cart-total" class="text-brand-orange">0.00</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <button onclick="saveActiveOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs shadow">Save Active Order</button>
-          <button onclick="checkout()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Pay & Complete</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- Active Orders Tab -->
+<div id="tab-active" class="flex-1 p-4 md:p-6 hidden">
+<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables</h2>
+<div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</div>
 
-  <!-- Active Orders Tab -->
-  <div id="tab-active" class="flex-1 p-4 md:p-6 hidden">
-    <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Active Orders / Tables</h2>
-    <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-  </div>
+<!-- Order History Tab -->
+<div id="tab-orders" class="flex-1 p-4 md:p-6 hidden">
+<h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+<p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p>
+<p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+<p class="text-xs text-gray-400 font-bold uppercase">Total Food Revenue</p>
+<p id="stat-total-food" class="text-2xl font-black text-brand-orange">P0.00</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+<p class="text-xs text-gray-400 font-bold uppercase">Total Drinks Revenue</p>
+<p id="stat-total-drinks" class="text-2xl font-black text-brand-dark">P0.00</p>
+</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[600px]">
+<thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
+<tr>
+<th class="p-3">Order #</th>
+<th class="p-3">Table/Customer</th>
+<th class="p-3">Date/Time</th>
+<th class="p-3">Items & Order Type</th>
+<th class="p-3 text-right">Total Amount</th>
+</tr>
+</thead>
+<tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
+<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
 
-  <!-- Order History Tab -->
-  <div id="tab-orders" class="flex-1 p-4 md:p-6 hidden">
-    <h2 class="text-xl md:text-2xl font-black text-brand-dark mb-4">Sales & Order History</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
-      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <p class="text-xs text-gray-400 font-bold uppercase">Total Orders</p>
-        <p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <p class="text-xs text-gray-400 font-bold uppercase">Total Food Revenue</p>
-        <p id="stat-total-food" class="text-2xl font-black text-brand-orange">P0.00</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <p class="text-xs text-gray-400 font-bold uppercase">Total Drinks Revenue</p>
-        <p id="stat-total-drinks" class="text-2xl font-black text-brand-dark">P0.00</p>
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-      <table class="w-full text-left border-collapse min-w-[600px]">
-        <thead class="bg-brand-cream text-xs uppercase font-bold text-gray-600 border-b border-gray-100">
-          <tr>
-            <th class="p-3">Order #</th>
-            <th class="p-3">Table/Customer</th>
-            <th class="p-3">Date/Time</th>
-            <th class="p-3">Items & Order Type</th>
-            <th class="p-3 text-right">Total Amount</th>
-          </tr>
-        </thead>
-        <tbody id="orders-table-body" class="divide-y divide-gray-100 text-sm">
-          <tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Inventory / Menu Tab -->
-  <div id="tab-inventory" class="flex-1 p-4 md:p-6 hidden space-y-6">
-    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div>
-          <h3 class="text-lg font-black text-brand-dark">Manage Categories</h3>
-          <p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya</p>
-        </div>
-        <button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold">+ Add Category</button>
-      </div>
-      <div id="category-badge-list" class="flex flex-wrap gap-2"></div>
-    </div>
-    <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div>
-          <h3 class="text-lg font-black text-brand-dark">Menu Items & Prices</h3>
-          <p class="text-xs text-gray-500">Maaari mong i-edit ang pangalan, presyo, at availability.</p>
-        </div>
-        <button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow">+ Add New Menu Item</button>
-      </div>
-      <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-    </div>
-  </div>
+<!-- Inventory / Menu Tab -->
+<div id="tab-inventory" class="flex-1 p-4 md:p-6 hidden space-y-6">
+<div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+<div>
+<h3 class="text-lg font-black text-brand-dark">Manage Categories</h3>
+<p class="text-xs text-gray-500">Magdagdag o magbawas ng mga kategorya</p>
+</div>
+<button onclick="addCategory()" class="bg-brand-dark text-white px-3 py-1.5 rounded-xl text-xs font-bold">+ Add Category</button>
+</div>
+<div id="category-badge-list" class="flex flex-wrap gap-2"></div>
+</div>
+<div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+<div>
+<h3 class="text-lg font-black text-brand-dark">Menu Items & Prices</h3>
+<p class="text-xs text-gray-500">Maaari mong i-edit ang pangalan, presyo, at availability.</p>
+</div>
+<button onclick="addNewMenuItem()" class="bg-brand-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow">+ Add New Menu Item</button>
+</div>
+<div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+</div>
+</div>
 </main>
 
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5647bNM03aXIMsrw9ddEJpO_GTaCeBpTxTYIFBAudq4DhqZGzB7NB7opXfELC9a26Zw/exec";
-
 const DEFAULT_MENU = [
   { id: 1, name: "Special Lomi", category: "LOMI", price: 120, available: true },
   { id: 2, name: "Ordinary Lomi", category: "LOMI", price: 90, available: true },
@@ -255,39 +247,15 @@ let activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
 let orderHistory = JSON.parse(localStorage.getItem('lc_order_history')) || [];
 let currentShift = JSON.parse(localStorage.getItem('lc_current_shift')) || { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
 
-// AUTOMATIC DATA CLEANER: Awtomatikong nililinis at inaayos ang format (kasama ang petsa at oras) pag-load pa lang
-function autoSanitizeStorage() {
-  if (Array.isArray(activeOrders)) {
-    let hasChanges = false;
-    activeOrders = activeOrders.map(order => {
-      let dt = order.fullDateTime || order.time || "";
-      // Kung walang "/" (oras lang o luma ang format), i-reformat agad nang awtotomatiko na may kasamang date at time
-      if (!dt.includes("/")) {
-        hasChanges = true;
-        let fixedDt = formatCustomDateTime(order.id || Date.now());
-        return { ...order, time: fixedDt, fullDateTime: fixedDt };
-      }
-      return order;
-    });
-    if (hasChanges) {
-      localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
-    }
-  }
-}
-
 window.onload = function() {
   if (!Array.isArray(menu)) menu = DEFAULT_MENU;
-  
-  // Patakbuhin agad ang automatic cleaner
-  autoSanitizeStorage();
-
   renderPOSMenu();
   renderInventory();
   updateOrderHistoryUI();
   updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
   fetchAllDataFromCloud();
   setInterval(() => { fetchAllDataFromCloud(true); }, 10000);
-};
+}
 
 function formatCustomDateTime(dateInput) {
   const d = new Date(dateInput);
@@ -300,8 +268,7 @@ function formatCustomDateTime(dateInput) {
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12;
-  const strHours = String(hours).padStart(2, '0');
-  return `${month}/${day}/${year} | ${strHours}:${minutes} ${ampm}`;
+  return `${month}/${day}/${year} | ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
 }
 
 function fetchAllDataFromCloud(isBackground = false) {
@@ -316,55 +283,21 @@ function fetchAllDataFromCloud(isBackground = false) {
       statusEl.innerText = "Online (Sheet Data)";
       statusEl.className = "text-emerald-300 font-medium";
       if (resData && resData.status === "success") {
-        if (resData.menu) {
-          try {
-            let parsedMenu = typeof resData.menu === 'string' ? JSON.parse(resData.menu) : resData.menu;
-            if (Array.isArray(parsedMenu) && parsedMenu.length > 0) {
-              menu = parsedMenu;
-            }
-          } catch(e) { console.error("Menu parse error:", e); }
+        if (resData.menu && Array.isArray(resData.menu) && resData.menu.length > 0) {
+          menu = resData.menu;
         }
-        if (!Array.isArray(menu)) menu = DEFAULT_MENU;
-
-        if (resData.orders && Array.isArray(resData.orders) && resData.orders.length > 0) {
+        if (resData.orders && Array.isArray(resData.orders)) {
           orderHistory = resData.orders.filter(o => {
-            let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
+            let ordNum = String(o["order #"] || "").toUpperCase();
             return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
           });
         }
-
-        if (resData.activeOrders) {
-          try {
-            let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
-            if (Array.isArray(remoteActiveOrders) && remoteActiveOrders.length > 0) {
-              activeOrders = remoteActiveOrders.map(o => {
-                let currentDt = o.fullDateTime || o.time || "";
-                if (!currentDt.includes("/")) {
-                  currentDt = formatCustomDateTime(o.id || Date.now());
-                }
-                return { ...o, time: currentDt, fullDateTime: currentDt };
-              });
-              localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
-            }
-          } catch(e) { console.error("ActiveOrders parse error:", e); }
-        }
-
-        if (resData.shiftStatus) {
-          try {
-            let remoteShift = typeof resData.shiftStatus === 'string' ? JSON.parse(resData.shiftStatus) : resData.shiftStatus;
-            if (remoteShift && typeof remoteShift.active !== 'undefined') {
-              currentShift = remoteShift;
-              localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
-              updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
-            }
-          } catch(e) { console.error("ShiftStatus parse error:", e); }
-        }
         saveLocalStorageData();
+        renderPOSMenu();
+        renderInventory();
+        updateOrderHistoryUI();
+        if (typeof renderActiveOrders === 'function') renderActiveOrders();
       }
-      renderPOSMenu();
-      renderInventory();
-      updateOrderHistoryUI();
-      if (typeof renderActiveOrders === 'function') renderActiveOrders();
     })
     .catch(err => {
       console.warn("Cloud connection error, using local data.", err);
@@ -396,10 +329,9 @@ function startShift() {
   if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
-  
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
   
-  // Mag-reset ng local order history para malinis ang screen sa bagong shift
+  // Linisin ang local order history at screen tuwing nagse-Start Shift
   orderHistory = [];
   orderCounter = 1;
   localStorage.setItem('lc_order_history', JSON.stringify(orderHistory));
@@ -413,19 +345,31 @@ function startShift() {
   updateOrderHistoryUI();
   alert("Bagong shift na nagsimula! Malinis na ang order history para sa bagong shift na ito.");
 }
+
 function endShift() {
   if (!currentShift.active) return alert("Walang aktibong shift!");
-  if (!confirm("Tapusin na ang shift na ito?")) return;
+  if (!confirm("Tapusin na ang shift na ito at i-archive ang mga orders?")) return;
   const finalSales = currentShift.totalSalesDuringShift || 0;
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
+  
   currentShift.active = false;
   let closedShiftPayload = JSON.parse(JSON.stringify(currentShift));
+  
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: closedShiftPayload });
   sendDataToCloud('logShift', { type: 'END', time: timeStr, totalIncome: finalSales }, { shiftStatus: closedShiftPayload });
+  
   localStorage.removeItem('lc_current_shift');
   updateShiftUIState(false, "");
-  alert(`Shift ended! Total Sales: P${finalSales.toFixed(2)} recorded.`);
+  
+  // Linisin ang local history para mawala rin sa screen ng web app
+  orderHistory = [];
+  localStorage.removeItem('lc_order_history');
+  saveLocalStorageData();
+  updateOrderHistoryUI();
+  
+  alert(`Shift ended! Na-archive na sa Google Sheets. Total Sales: P${finalSales.toFixed(2)}`);
+  fetchAllDataFromCloud();
 }
 
 function updateShiftUIState(isActive, timeStr) {
@@ -456,19 +400,9 @@ function getTypeBadgeHtml(type) {
     : '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Dine-In</span>';
 }
 
-function toggleMobileMenu() {
-  document.getElementById('sidebar-nav').classList.toggle('hidden');
-}
-
-function toggleMobileCart() {
-  document.getElementById('cart-drawer').classList.toggle('translate-y-full');
-}
-
-function setDefaultType(type) {
-  currentDefaultType = type;
-  cart.forEach(i => i.orderType = type);
-  updateCartUI();
-}
+function toggleMobileMenu() { document.getElementById('sidebar-nav').classList.toggle('hidden'); }
+function toggleMobileCart() { document.getElementById('cart-drawer').classList.toggle('translate-y-full'); }
+function setDefaultType(type) { currentDefaultType = type; cart.forEach(i => i.orderType = type); updateCartUI(); }
 
 function renderPOSMenu() {
   if (!Array.isArray(menu)) menu = DEFAULT_MENU;
@@ -556,7 +490,6 @@ function updateCartUI() {
   const total = foodSubtotal + drinksSubtotal;
   document.getElementById('mobile-cart-count').innerText = totalQty;
   document.getElementById('mobile-cart-total').innerText = `P${total.toFixed(2)}`;
-  
   if (cart.length === 0) {
     container.innerHTML = '<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>';
     document.getElementById('cart-food-subtotal').innerText = '0.00';
@@ -565,7 +498,6 @@ function updateCartUI() {
     document.getElementById('cart-change').innerText = 'P0.00';
     return;
   }
-  
   container.innerHTML = cart.map((item, idx) => `
     <div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
       <div class="flex items-center justify-between">
@@ -591,7 +523,6 @@ function updateCartUI() {
       </div>
     </div>
   `).join("");
-
   document.getElementById('cart-food-subtotal').innerText = foodSubtotal.toFixed(2);
   document.getElementById('cart-drinks-subtotal').innerText = drinksSubtotal.toFixed(2);
   document.getElementById('cart-total').innerText = total.toFixed(2);
@@ -602,10 +533,8 @@ function saveActiveOrder() {
   if (cart.length === 0) return alert("Please add items to cart first!");
   const tableName = document.getElementById('order-table').value || ("Table " + (activeOrders.length + 1));
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  
   const now = new Date();
   const formattedDateTime = formatCustomDateTime(now);
-
   const newActive = {
     id: Date.now(),
     table: tableName,
@@ -625,25 +554,15 @@ function saveActiveOrder() {
 
 function renderActiveOrders() {
   const grid = document.getElementById('active-orders-grid');
-  if (!Array.isArray(activeOrders)) {
-    activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
-  }
-  
+  if (!Array.isArray(activeOrders)) activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
   activeOrders = activeOrders.filter(order => order && order.cart && order.cart.length > 0);
   localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
-  
   if (activeOrders.length === 0) {
     grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
     return;
   }
-  
   grid.innerHTML = activeOrders.map(order => {
-    // Sisiguraduhing lumalabas ang complete Date and Time sa Active Orders card
     let displayDateTime = order.fullDateTime || order.time || "";
-    if (!displayDateTime.includes("/")) {
-      displayDateTime = formatCustomDateTime(order.id || Date.now());
-    }
-
     return `
       <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
         <div>
@@ -715,17 +634,16 @@ function checkout() {
   const paymentMethod = document.getElementById('payment-method').value;
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
-  
   const now = new Date();
   const dateStr = formatCustomDateTime(now);
   const datePrefix = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`;
   const uniqueOrderNum = `${datePrefix}-${orderCounter++}`;
-
+  
   const itemsWithTypes = cart.map(item => ({
     ...item,
     orderType: item.orderType || currentDefaultType
   }));
-
+  
   const newOrderRecord = {
     orderNum: uniqueOrderNum,
     table: tableCustomer,
@@ -756,75 +674,61 @@ function checkout() {
 function updateOrderHistoryUI() {
   const tbody = document.getElementById('orders-table-body');
   const validOrders = orderHistory.filter(o => {
-    let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
+    let ordNum = String(o["order #"] || o["ordernum"] || "").toUpperCase();
     return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
   });
   
   document.getElementById('stat-total-orders').innerText = validOrders.length;
+  let totalFoodRev = 0, totalDrinksRev = 0;
   
-  let totalFoodRev = 0;
-  let totalDrinksRev = 0;
-
   validOrders.forEach(o => {
     let rawItems = o["items & order type"] || o["items"] || [];
     if (typeof rawItems === 'string') {
       try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
     }
     const itemsList = Array.isArray(rawItems) ? rawItems : [];
-    
     if (itemsList.length > 0) {
       itemsList.forEach(i => {
         let iCat = (i.category || "").toUpperCase();
         let iPrice = parseFloat(i.price || 0);
         let iQty = parseInt(i.qty || i.quantity || 1);
         let lineTotal = iPrice * iQty;
-        if (iCat === 'DRINKS') {
-          totalDrinksRev += lineTotal;
-        } else {
-          totalFoodRev += lineTotal;
-        }
+        if (iCat === 'DRINKS') totalDrinksRev += lineTotal;
+        else totalFoodRev += lineTotal;
       });
     } else {
       let fallbackAmt = parseFloat(o["total amount"] || o["total"] || 0);
       totalFoodRev += fallbackAmt;
     }
   });
-
+  
   document.getElementById('stat-total-food').innerText = 'P' + totalFoodRev.toFixed(2);
   document.getElementById('stat-total-drinks').innerText = 'P' + totalDrinksRev.toFixed(2);
-
+  
   if (validOrders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
     return;
   }
-
+  
   tbody.innerHTML = validOrders.map(o => {
-    const rawOrderNum = o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || '---';
-    const orderNumStr = String(rawOrderNum);
-    const tableCust = o["table/customer"] || o["table"] || o["type of order"] || 'Walk-in';
+    const rawOrderNum = o["order #"] || o["ordernum"] || '---';
+    const tableCust = o["table/customer"] || o["table"] || 'Walk-in';
     const dateTime = o["date & time"] || o["date"] || '';
     const totalAmt = parseFloat(o["total amount"] || o["total"] || 0);
+    
     let rawItems = o["items & order type"] || o["items"] || [];
     if (typeof rawItems === 'string') {
       try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
     }
     const itemsList = Array.isArray(rawItems) ? rawItems : [];
     let itemsHtml = itemsList.map(i => {
-      let iName = i.name || i["item ordered"] || i.title || "Item";
+      let iName = i.name || "Item";
       let iQty = i.quantity || i.qty || 1;
-      let iType = i.orderType || i["type of order"] || "Dine-In";
+      let iType = i.orderType || "Dine-In";
       return `<div>${iQty}x ${iName} ${getTypeBadgeHtml(iType)}</div>`;
     }).join("");
-
-    if (!itemsHtml) {
-      let fallbackItem = o["item ordered"] || "Item";
-      let fallbackQty = o["quantity"] || 1;
-      let fallbackType = o["type of order"] || "Dine-In";
-      itemsHtml = `<div>${fallbackQty}x ${fallbackItem} ${getTypeBadgeHtml(fallbackType)}</div>`;
-    }
-
-    const displayOrderNum = orderNumStr.startsWith('#') ? orderNumStr : '#' + orderNumStr;
-
+    
+    const displayOrderNum = String(rawOrderNum).startsWith('#') ? rawOrderNum : '#' + rawOrderNum;
     return `
       <tr class="hover:bg-gray-50/50">
         <td class="p-3 font-bold text-brand-dark">${displayOrderNum}</td>
@@ -844,7 +748,6 @@ function renderInventory() {
       ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
     </span>
   `).join("");
-
   document.getElementById('inventory-list').innerHTML = menu.map(item => `
     <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
       <div class="flex justify-between items-start">
