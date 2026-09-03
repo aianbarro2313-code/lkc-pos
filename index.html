@@ -101,13 +101,18 @@ tailwind.config = {
 
     <!-- Cart Section / Drawer -->
     <div id="cart-drawer" class="fixed md:relative inset-x-0 bottom-0 top-16 md:top-0 md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl md:shadow-sm border border-gray-100 flex flex-col flex-shrink-0 z-50 transition-transform transform translate-y-full md:translate-y-0 h-[calc(100vh-4rem)] md:h-auto">
+      
+      <!-- Cart Header -->
       <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-cream/50 rounded-t-3xl md:rounded-t-2xl flex-shrink-0">
-        <h3 class="font-bold text-brand-dark text-lg">Current Order</h3>
+        <h3 class="font-bold text-brand-dark text-base md:text-lg">Current Order</h3>
         <div class="flex items-center gap-3">
-          <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">Clear All</button>
-          <button onclick="toggleMobileCart()" class="md:hidden text-gray-500 font-bold text-lg">✕</button>
+          <button onclick="clearCart()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm">
+            <span>🗑️ Clear All</span>
+          </button>
+          <button onclick="toggleMobileCart()" class="md:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center text-sm transition">✕</button>
         </div>
       </div>
+
       <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
         <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
         <div class="flex items-center justify-between text-xs pt-1">
@@ -176,12 +181,12 @@ tailwind.config = {
         <p id="stat-total-orders" class="text-2xl font-black text-brand-dark">0</p>
       </div>
       <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <p class="text-xs text-gray-400 font-bold uppercase">Total Revenue</p>
-        <p id="stat-total-sales" class="text-2xl font-black text-brand-orange">P0.00</p>
+        <p class="text-xs text-gray-400 font-bold uppercase">Total Food Revenue</p>
+        <p id="stat-total-food" class="text-2xl font-black text-brand-orange">P0.00</p>
       </div>
       <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <p class="text-xs text-gray-400 font-bold uppercase">Avg Order Value</p>
-        <p id="stat-avg-sale" class="text-2xl font-black text-brand-dark">P0.00</p>
+        <p class="text-xs text-gray-400 font-bold uppercase">Total Drinks Revenue</p>
+        <p id="stat-total-drinks" class="text-2xl font-black text-brand-dark">P0.00</p>
       </div>
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
@@ -558,12 +563,18 @@ function saveActiveOrder() {
   if (cart.length === 0) return alert("Please add items to cart first!");
   const tableName = document.getElementById('order-table').value || ("Table " + (activeOrders.length + 1));
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  
+  // Naka-format na agad gamit ang custom format para diretso readable
+  const now = new Date();
+  const formattedTimeStr = formatCustomDateTime(now).split('|')[1].trim();
+
   const newActive = {
     id: Date.now(),
     table: tableName,
     cart: JSON.parse(JSON.stringify(cart)),
     total: total,
-    time: formatCustomDateTime(new Date()).split('|')[1].trim()
+    time: formattedTimeStr,
+    fullDateTime: formatCustomDateTime(now)
   };
   activeOrders.push(newActive);
   saveLocalStorageData();
@@ -579,7 +590,6 @@ function renderActiveOrders() {
     activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
   }
   
-  // Salain at linisin ang mga blangko o korap na active orders
   activeOrders = activeOrders.filter(order => order && order.cart && order.cart.length > 0);
   localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
   
@@ -588,30 +598,43 @@ function renderActiveOrders() {
     return;
   }
   
-  grid.innerHTML = activeOrders.map(order => `
-    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-      <div>
-        <div class="flex justify-between items-center mb-2 pb-2 border-b">
-          <h3 class="font-black text-brand-dark text-base">${order.table || 'Table'}</h3>
-          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time || ''}</span>
+  grid.innerHTML = activeOrders.map(order => {
+    // Kinukuha at nililinis ang timestamp kung sakaling galing sa lumang format o Google Sheet
+    let rawTime = order.time || order.fullDateTime || "";
+    let displayTime = rawTime;
+    
+    if (rawTime.includes("T") || rawTime.includes("Z")) {
+      displayTime = formatCustomDateTime(rawTime);
+      if (displayTime.includes('|')) {
+        displayTime = displayTime.split('|')[1].trim();
+      }
+    }
+
+    return `
+      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center mb-2 pb-2 border-b">
+            <h3 class="font-black text-brand-dark text-base">${order.table || 'Table'}</h3>
+            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${displayTime}</span>
+          </div>
+          <ul class="space-y-2 text-xs text-gray-600 mb-4">
+            ${(order.cart || []).map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
+          </ul>
         </div>
-        <ul class="space-y-2 text-xs text-gray-600 mb-4">
-          ${(order.cart || []).map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
-        </ul>
+        <div class="pt-3 border-t space-y-2">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-xs font-bold text-gray-500">Total:</span>
+            <span class="font-black text-brand-orange text-lg">P${(order.total || 0).toFixed(2)}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs border">Edit</button>
+            <button onclick="checkoutActiveOrder(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs">Pay & Complete</button>
+          </div>
+          <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
+        </div>
       </div>
-      <div class="pt-3 border-t space-y-2">
-        <div class="flex justify-between items-center mb-1">
-          <span class="text-xs font-bold text-gray-500">Total:</span>
-          <span class="font-black text-brand-orange text-lg">P${(order.total || 0).toFixed(2)}</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs border">Edit</button>
-          <button onclick="checkoutActiveOrder(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs">Pay & Complete</button>
-        </div>
-        <button onclick="cancelActiveOrder(${order.id})" class="w-full text-center text-[10px] text-red-500 font-bold hover:underline pt-1">Cancel Order</button>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function editActiveOrder(orderId) {
@@ -658,7 +681,11 @@ function checkout() {
   const paymentMethod = document.getElementById('payment-method').value;
   if (paymentMethod === 'Cash' && amountPaid < total) return alert("Kulang ang bayad!");
   const tableCustomer = document.getElementById('order-table').value || "Walk-in";
-  const dateStr = formatCustomDateTime(new Date());
+  
+  const now = new Date();
+  const dateStr = formatCustomDateTime(now);
+  const datePrefix = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`;
+  const uniqueOrderNum = `${datePrefix}-${orderCounter++}`;
 
   const itemsWithTypes = cart.map(item => ({
     ...item,
@@ -666,7 +693,7 @@ function checkout() {
   }));
 
   const newOrderRecord = {
-    orderNum: orderCounter++,
+    orderNum: uniqueOrderNum,
     table: tableCustomer,
     date: dateStr,
     items: itemsWithTypes,
@@ -687,7 +714,7 @@ function checkout() {
   }
   
   updateOrderHistoryUI();
-  alert(`Order #${newOrderRecord.orderNum} completed successfully!`);
+  alert(`Order #${uniqueOrderNum} completed successfully!`);
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
 }
@@ -700,9 +727,37 @@ function updateOrderHistoryUI() {
   });
   
   document.getElementById('stat-total-orders').innerText = validOrders.length;
-  const totalRev = validOrders.reduce((s, o) => s + (parseFloat(o["total amount"] || o["total"] || 0)), 0);
-  document.getElementById('stat-total-sales').innerText = 'P' + totalRev.toFixed(2);
-  document.getElementById('stat-avg-sale').innerText = validOrders.length > 0 ? 'P' + (totalRev / validOrders.length).toFixed(2) : 'P0.00';
+  
+  let totalFoodRev = 0;
+  let totalDrinksRev = 0;
+
+  validOrders.forEach(o => {
+    let rawItems = o["items & order type"] || o["items"] || [];
+    if (typeof rawItems === 'string') {
+      try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
+    }
+    const itemsList = Array.isArray(rawItems) ? rawItems : [];
+    
+    if (itemsList.length > 0) {
+      itemsList.forEach(i => {
+        let iCat = (i.category || "").toUpperCase();
+        let iPrice = parseFloat(i.price || 0);
+        let iQty = parseInt(i.qty || i.quantity || 1);
+        let lineTotal = iPrice * iQty;
+        if (iCat === 'DRINKS') {
+          totalDrinksRev += lineTotal;
+        } else {
+          totalFoodRev += lineTotal;
+        }
+      });
+    } else {
+      let fallbackAmt = parseFloat(o["total amount"] || o["total"] || 0);
+      totalFoodRev += fallbackAmt;
+    }
+  });
+
+  document.getElementById('stat-total-food').innerText = 'P' + totalFoodRev.toFixed(2);
+  document.getElementById('stat-total-drinks').innerText = 'P' + totalDrinksRev.toFixed(2);
 
   if (validOrders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
@@ -735,7 +790,7 @@ function updateOrderHistoryUI() {
 
     return `
       <tr class="hover:bg-gray-50/50">
-        <td class="p-3 font-bold text-brand-dark">#${orderNum}</td>
+        <td class="p-3 font-bold text-brand-dark">${orderNum.startsWith('#') ? orderNum : '#' + orderNum}</td>
         <td class="p-3 font-medium text-gray-700">${tableCust}</td>
         <td class="p-3 text-xs text-gray-500">${dateTime}</td>
         <td class="p-3 text-xs text-gray-600">${itemsHtml}</td>
