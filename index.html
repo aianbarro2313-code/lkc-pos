@@ -307,10 +307,9 @@ function fetchAllDataFromCloud(isBackground = false) {
         if (resData.activeOrders) {
           try {
             let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
-            if (Array.isArray(remoteActiveOrders)) {
+            if (Array.isArray(remoteActiveOrders) && remoteActiveOrders.length > 0) {
               activeOrders = remoteActiveOrders;
               localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
-              if (typeof renderActiveOrders === 'function') renderActiveOrders();
             }
           } catch(e) { console.error("ActiveOrders parse error:", e); }
         }
@@ -330,6 +329,7 @@ function fetchAllDataFromCloud(isBackground = false) {
       renderPOSMenu();
       renderInventory();
       updateOrderHistoryUI();
+      if (typeof renderActiveOrders === 'function') renderActiveOrders();
     })
     .catch(err => {
       console.warn("Cloud connection error, using local data.", err);
@@ -575,10 +575,15 @@ function saveActiveOrder() {
 
 function renderActiveOrders() {
   const grid = document.getElementById('active-orders-grid');
+  if (!Array.isArray(activeOrders)) {
+    activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
+  }
+  
   if (activeOrders.length === 0) {
     grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
     return;
   }
+  
   grid.innerHTML = activeOrders.map(order => `
     <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
       <div>
@@ -587,13 +592,13 @@ function renderActiveOrders() {
           <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${order.time}</span>
         </div>
         <ul class="space-y-2 text-xs text-gray-600 mb-4">
-          ${order.cart.map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
+          ${(order.cart || []).map(i => `<li class="flex justify-between items-center"><div class="flex items-center gap-1.5"><span>${i.name} (x${i.qty})</span> ${getTypeBadgeHtml(i.orderType || 'Dine-In')}</div><span class="font-bold">P${(i.price * i.qty).toFixed(2)}</span></li>`).join("")}
         </ul>
       </div>
       <div class="pt-3 border-t space-y-2">
         <div class="flex justify-between items-center mb-1">
           <span class="text-xs font-bold text-gray-500">Total:</span>
-          <span class="font-black text-brand-orange text-lg">P${order.total.toFixed(2)}</span>
+          <span class="font-black text-brand-orange text-lg">P${(order.total || 0).toFixed(2)}</span>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="editActiveOrder(${order.id})" class="bg-gray-100 hover:bg-gray-200 text-brand-dark font-bold py-2 rounded-xl text-xs border">Edit</button>
