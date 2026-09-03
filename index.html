@@ -595,18 +595,18 @@ function renderActiveOrders() {
     </div>`).join("");
 }
 
-function editActiveOrder(orderId) {
-  const idx = activeOrders.findIndex(o => o.id == orderId);
-  if (idx !== -1) {
-    const order = activeOrders[idx];
-    cart = JSON.parse(JSON.stringify(order.cart));
-    document.getElementById('order-table').value = order.table;
-    activeOrders.splice(idx, 1);
-    saveLocalStorageData();
-    sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
-    switchTab('pos');
-    updateCartUI();
-  }
+function editActiveOrder(orderld) {
+  const idx = activeOrders.findIndex(o => o.id == orderld);
+  if (idx === -1) return;
+  const order = activeOrders[idx];
+  cart = JSON.parse(JSON.stringify(order.cart));
+  document.getElementById('order-table').value = order.table;
+  activeOrders.splice(idx, 1);
+  saveLocalStorageData();
+  sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
+  switchTab('pos');
+  updateCartUI();
+}
 }
 
 function cancelActiveOrder(orderId) {
@@ -618,8 +618,8 @@ function cancelActiveOrder(orderId) {
   }
 }
 
-function checkoutActiveOrder(orderId) {
-  const idx = activeOrders.findIndex(o => o.id == orderId);
+function checkoutActiveOrder(orderld) {
+  const idx = activeOrders.findIndex(o => o.id == orderld);
   if (idx === -1) return;
   const order = activeOrders[idx];
   cart = JSON.parse(JSON.stringify(order.cart));
