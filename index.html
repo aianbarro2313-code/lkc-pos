@@ -255,8 +255,32 @@ let activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
 let orderHistory = JSON.parse(localStorage.getItem('lc_order_history')) || [];
 let currentShift = JSON.parse(localStorage.getItem('lc_current_shift')) || { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
 
+// AUTOMATIC DATA CLEANER: Awtomatikong nililinis at inaayos ang format (kasama ang petsa at oras) pag-load pa lang
+function autoSanitizeStorage() {
+  if (Array.isArray(activeOrders)) {
+    let hasChanges = false;
+    activeOrders = activeOrders.map(order => {
+      let dt = order.fullDateTime || order.time || "";
+      // Kung walang "/" (oras lang o luma ang format), i-reformat agad nang awtotomatiko na may kasamang date at time
+      if (!dt.includes("/")) {
+        hasChanges = true;
+        let fixedDt = formatCustomDateTime(order.id || Date.now());
+        return { ...order, time: fixedDt, fullDateTime: fixedDt };
+      }
+      return order;
+    });
+    if (hasChanges) {
+      localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
+    }
+  }
+}
+
 window.onload = function() {
   if (!Array.isArray(menu)) menu = DEFAULT_MENU;
+  
+  // Patakbuhin agad ang automatic cleaner
+  autoSanitizeStorage();
+
   renderPOSMenu();
   renderInventory();
   updateOrderHistoryUI();
@@ -313,7 +337,13 @@ function fetchAllDataFromCloud(isBackground = false) {
           try {
             let remoteActiveOrders = typeof resData.activeOrders === 'string' ? JSON.parse(resData.activeOrders) : resData.activeOrders;
             if (Array.isArray(remoteActiveOrders) && remoteActiveOrders.length > 0) {
-              activeOrders = remoteActiveOrders;
+              activeOrders = remoteActiveOrders.map(o => {
+                let currentDt = o.fullDateTime || o.time || "";
+                if (!currentDt.includes("/")) {
+                  currentDt = formatCustomDateTime(o.id || Date.now());
+                }
+                return { ...o, time: currentDt, fullDateTime: currentDt };
+              });
               localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
             }
           } catch(e) { console.error("ActiveOrders parse error:", e); }
@@ -565,7 +595,7 @@ function saveActiveOrder() {
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   
   const now = new Date();
-  const formattedDateTime = formatCustomDateTime(now); // Buong Date & Time na (e.g. 09/03/2026 | 08:24 pm)
+  const formattedDateTime = formatCustomDateTime(now);
 
   const newActive = {
     id: Date.now(),
@@ -580,6 +610,7 @@ function saveActiveOrder() {
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   clearCart();
   document.getElementById('cart-drawer').classList.add('translate-y-full');
+  renderActiveOrders();
   alert(`Order saved for ${tableName} and synced!`);
 }
 
@@ -598,10 +629,10 @@ function renderActiveOrders() {
   }
   
   grid.innerHTML = activeOrders.map(order => {
-    // Siguraduhing buong Date & Time ang ipapakita sa active orders
+    // Sisiguraduhing lumalabas ang complete Date and Time sa Active Orders card
     let displayDateTime = order.fullDateTime || order.time || "";
     if (!displayDateTime.includes("/")) {
-      displayDateTime = formatCustomDateTime(order.id);
+      displayDateTime = formatCustomDateTime(order.id || Date.now());
     }
 
     return `
