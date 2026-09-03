@@ -564,7 +564,6 @@ function saveActiveOrder() {
   const tableName = document.getElementById('order-table').value || ("Table " + (activeOrders.length + 1));
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   
-  // Naka-format na agad gamit ang custom format para diretso readable
   const now = new Date();
   const formattedTimeStr = formatCustomDateTime(now).split('|')[1].trim();
 
@@ -599,7 +598,6 @@ function renderActiveOrders() {
   }
   
   grid.innerHTML = activeOrders.map(order => {
-    // Kinukuha at nililinis ang timestamp kung sakaling galing sa lumang format o Google Sheet
     let rawTime = order.time || order.fullDateTime || "";
     let displayTime = rawTime;
     
@@ -722,6 +720,7 @@ function checkout() {
 function updateOrderHistoryUI() {
   const tbody = document.getElementById('orders-table-body');
   const validOrders = orderHistory.filter(o => {
+    // Naka-wrap na sa String() para hindi mag-error kung number o undefined man ito
     let ordNum = String(o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || "").toUpperCase();
     return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
   });
@@ -765,7 +764,9 @@ function updateOrderHistoryUI() {
   }
 
   tbody.innerHTML = validOrders.map(o => {
-    const orderNum = o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || '---';
+    // Dito rin ay ginamitan ng String() para safe sa `.startsWith()`
+    const rawOrderNum = o["order #"] || o["ordernum"] || o["orderNumber"] || o["orderNum"] || '---';
+    const orderNumStr = String(rawOrderNum);
     const tableCust = o["table/customer"] || o["table"] || o["type of order"] || 'Walk-in';
     const dateTime = o["date & time"] || o["date"] || '';
     const totalAmt = parseFloat(o["total amount"] || o["total"] || 0);
@@ -790,7 +791,7 @@ function updateOrderHistoryUI() {
 
     return `
       <tr class="hover:bg-gray-50/50">
-        <td class="p-3 font-bold text-brand-dark">${orderNum.startsWith('#') ? orderNum : '#' + orderNum}</td>
+        <td class="p-3 font-bold text-brand-dark">${orderNumStr.startsWith('#') ? orderNumStr : '#' + orderNumStr}</td>
         <td class="p-3 font-medium text-gray-700">${tableCust}</td>
         <td class="p-3 text-xs text-gray-500">${dateTime}</td>
         <td class="p-3 text-xs text-gray-600">${itemsHtml}</td>
