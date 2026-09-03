@@ -396,14 +396,23 @@ function startShift() {
   if (currentShift.active) return alert("May kasalukuyan nang naka-start na shift!");
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
+  
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
+  
+  // Mag-reset ng local order history para malinis ang screen sa bagong shift
+  orderHistory = [];
+  orderCounter = 1;
+  localStorage.setItem('lc_order_history', JSON.stringify(orderHistory));
+  localStorage.setItem('lc_order_counter', orderCounter);
   localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
+  
   sendDataToCloud('saveActiveOrders', activeOrders, { shiftStatus: currentShift });
   sendDataToCloud('logShift', { type: 'START', time: timeStr, totalIncome: 0 }, { shiftStatus: currentShift });
+  
   updateShiftUIState(true, timeStr);
-  alert("Shift started successfully and synced to Google Sheet!");
+  updateOrderHistoryUI();
+  alert("Bagong shift na nagsimula! Malinis na ang order history para sa bagong shift na ito.");
 }
-
 function endShift() {
   if (!currentShift.active) return alert("Walang aktibong shift!");
   if (!confirm("Tapusin na ang shift na ito?")) return;
