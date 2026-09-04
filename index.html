@@ -106,6 +106,7 @@ tailwind.config = {
 <button onclick="toggleMobileCart()" class="md:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center text-sm transition">X</button>
 </div>
 </div>
+
 <div class="p-3 bg-gray-50 border-b border-gray-100 space-y-2 flex-shrink-0">
 <input type="text" id="order-table" placeholder="Table # / Customer Name (Optional)" class="w-full p-2.5 text-xs border rounded-lg focus:outline-none focus:border-brand-orange bg-white">
 <div class="flex items-center justify-between text-xs pt-1">
@@ -122,9 +123,11 @@ tailwind.config = {
 </div>
 </div>
 </div>
+
 <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2.5">
 <div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>
 </div>
+
 <div class="p-4 bg-brand-cream border-t border-gray-100 space-y-2.5 rounded-b-2xl flex-shrink-0">
 <div class="space-y-1.5 pb-2 border-b border-gray-200/60 text-xs">
 <div class="flex justify-between items-center text-gray-600"><span>Food Subtotal</span><span id="cart-food-subtotal" class="font-bold text-brand-dark">0.00</span></div>
@@ -227,6 +230,7 @@ tailwind.config = {
 
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5647bNM03aXIMsrw9ddEJpO_GTaCeBpTxTYIFBAudq4DhqZGzB7NB7opXfELC9a26Zw/exec";
+
 const DEFAULT_MENU = [
   { id: 1, name: "Special Lomi", category: "LOMI", price: 120, available: true },
   { id: 2, name: "Ordinary Lomi", category: "LOMI", price: 90, available: true },
@@ -248,14 +252,14 @@ let orderHistory = JSON.parse(localStorage.getItem('lc_order_history')) || [];
 let currentShift = JSON.parse(localStorage.getItem('lc_current_shift')) || { active: false, startTime: null, startDateTimeStr: null, totalSalesDuringShift: 0 };
 
 window.onload = function() {
-  if (!Array.isArray(menu)) menu = DEFAULT_MENU;
+  if (!Array.isArray(menu) || menu.length === 0) menu = DEFAULT_MENU;
   renderPOSMenu();
   renderInventory();
   updateOrderHistoryUI();
   updateShiftUIState(currentShift.active, currentShift.startDateTimeStr);
   fetchAllDataFromCloud();
   setInterval(() => { fetchAllDataFromCloud(true); }, 10000);
-}
+};
 
 function formatCustomDateTime(dateInput) {
   const d = new Date(dateInput);
@@ -286,9 +290,12 @@ function fetchAllDataFromCloud(isBackground = false) {
         if (resData.menu && Array.isArray(resData.menu) && resData.menu.length > 0) {
           menu = resData.menu;
         }
+        if (resData.activeOrders && Array.isArray(resData.activeOrders)) {
+          activeOrders = resData.activeOrders;
+        }
         if (resData.orders && Array.isArray(resData.orders)) {
           orderHistory = resData.orders.filter(o => {
-            let ordNum = String(o["order #"] || "").toUpperCase();
+            let ordNum = String(o["order #"] || o["ordernum"] || "").toUpperCase();
             return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
           });
         }
@@ -331,7 +338,6 @@ function startShift() {
   const timeStr = formatCustomDateTime(now);
   currentShift = { active: true, startTime: now.getTime(), startDateTimeStr: timeStr, totalSalesDuringShift: 0 };
   
-  // Linisin ang local order history at screen tuwing nagse-Start Shift
   orderHistory = [];
   orderCounter = 1;
   localStorage.setItem('lc_order_history', JSON.stringify(orderHistory));
@@ -352,7 +358,6 @@ function endShift() {
   const finalSales = currentShift.totalSalesDuringShift || 0;
   const now = new Date();
   const timeStr = formatCustomDateTime(now);
-  
   currentShift.active = false;
   let closedShiftPayload = JSON.parse(JSON.stringify(currentShift));
   
@@ -362,12 +367,10 @@ function endShift() {
   localStorage.removeItem('lc_current_shift');
   updateShiftUIState(false, "");
   
-  // Linisin ang local history para mawala rin sa screen ng web app
   orderHistory = [];
   localStorage.removeItem('lc_order_history');
   saveLocalStorageData();
   updateOrderHistoryUI();
-  
   alert(`Shift ended! Na-archive na sa Google Sheets. Total Sales: P${finalSales.toFixed(2)}`);
   fetchAllDataFromCloud();
 }
@@ -400,9 +403,19 @@ function getTypeBadgeHtml(type) {
     : '<span class="inline-block bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Dine-In</span>';
 }
 
-function toggleMobileMenu() { document.getElementById('sidebar-nav').classList.toggle('hidden'); }
-function toggleMobileCart() { document.getElementById('cart-drawer').classList.toggle('translate-y-full'); }
-function setDefaultType(type) { currentDefaultType = type; cart.forEach(i => i.orderType = type); updateCartUI(); }
+function toggleMobileMenu() {
+  document.getElementById('sidebar-nav').classList.toggle('hidden');
+}
+
+function toggleMobileCart() {
+  document.getElementById('cart-drawer').classList.toggle('translate-y-full');
+}
+
+function setDefaultType(type) {
+  currentDefaultType = type;
+  cart.forEach(i => i.orderType = type);
+  updateCartUI();
+}
 
 function renderPOSMenu() {
   if (!Array.isArray(menu)) menu = DEFAULT_MENU;
@@ -490,6 +503,7 @@ function updateCartUI() {
   const total = foodSubtotal + drinksSubtotal;
   document.getElementById('mobile-cart-count').innerText = totalQty;
   document.getElementById('mobile-cart-total').innerText = `P${total.toFixed(2)}`;
+
   if (cart.length === 0) {
     container.innerHTML = '<div class="text-center text-gray-400 my-12 text-sm">No items added yet.</div>';
     document.getElementById('cart-food-subtotal').innerText = '0.00';
@@ -498,6 +512,7 @@ function updateCartUI() {
     document.getElementById('cart-change').innerText = 'P0.00';
     return;
   }
+
   container.innerHTML = cart.map((item, idx) => `
     <div class="flex flex-col bg-brand-cream p-2.5 rounded-xl border border-gray-100 gap-2">
       <div class="flex items-center justify-between">
@@ -523,6 +538,7 @@ function updateCartUI() {
       </div>
     </div>
   `).join("");
+
   document.getElementById('cart-food-subtotal').innerText = foodSubtotal.toFixed(2);
   document.getElementById('cart-drinks-subtotal').innerText = drinksSubtotal.toFixed(2);
   document.getElementById('cart-total').innerText = total.toFixed(2);
@@ -557,10 +573,12 @@ function renderActiveOrders() {
   if (!Array.isArray(activeOrders)) activeOrders = JSON.parse(localStorage.getItem('lc_active_orders')) || [];
   activeOrders = activeOrders.filter(order => order && order.cart && order.cart.length > 0);
   localStorage.setItem('lc_active_orders', JSON.stringify(activeOrders));
+
   if (activeOrders.length === 0) {
     grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">No active orders right now.</div>';
     return;
   }
+
   grid.innerHTML = activeOrders.map(order => {
     let displayDateTime = order.fullDateTime || order.time || "";
     return `
@@ -638,12 +656,11 @@ function checkout() {
   const dateStr = formatCustomDateTime(now);
   const datePrefix = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`;
   const uniqueOrderNum = `${datePrefix}-${orderCounter++}`;
-  
   const itemsWithTypes = cart.map(item => ({
     ...item,
     orderType: item.orderType || currentDefaultType
   }));
-  
+
   const newOrderRecord = {
     orderNum: uniqueOrderNum,
     table: tableCustomer,
@@ -655,16 +672,14 @@ function checkout() {
     change: amountPaid >= total ? amountPaid - total : 0,
     shiftTime: currentShift.active ? currentShift.startDateTimeStr : "No Active Shift"
   };
-  
+
   orderHistory.unshift(newOrderRecord);
   saveLocalStorageData();
   sendDataToCloud('saveOrder', newOrderRecord);
-  
   if (currentShift.active) {
     currentShift.totalSalesDuringShift += total;
     localStorage.setItem('lc_current_shift', JSON.stringify(currentShift));
   }
-  
   updateOrderHistoryUI();
   alert(`Order #${uniqueOrderNum} completed successfully!`);
   clearCart();
@@ -677,57 +692,68 @@ function updateOrderHistoryUI() {
     let ordNum = String(o["order #"] || o["ordernum"] || "").toUpperCase();
     return ordNum.indexOf("SHIFT") === -1 && ordNum !== "---" && ordNum !== "";
   });
-  
+
   document.getElementById('stat-total-orders').innerText = validOrders.length;
   let totalFoodRev = 0, totalDrinksRev = 0;
-  
+
   validOrders.forEach(o => {
-    let rawItems = o["items & order type"] || o["items"] || [];
+    let rawItems = o["items & order type"] || o["items"] || o["Items"] || [];
     if (typeof rawItems === 'string') {
       try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
     }
     const itemsList = Array.isArray(rawItems) ? rawItems : [];
+
     if (itemsList.length > 0) {
       itemsList.forEach(i => {
-        let iCat = (i.category || "").toUpperCase();
-        let iPrice = parseFloat(i.price || 0);
-        let iQty = parseInt(i.qty || i.quantity || 1);
+        let iCat = (i.category || i.Category || "").toUpperCase();
+        let iPrice = parseFloat(i.price || i.Price || 0);
+        let iQty = parseInt(i.qty || i.quantity || i.Qty || 1);
         let lineTotal = iPrice * iQty;
-        if (iCat === 'DRINKS') totalDrinksRev += lineTotal;
-        else totalFoodRev += lineTotal;
+        
+        if (iCat === 'DRINKS' || iCat === 'DRINK') {
+          totalDrinksRev += lineTotal;
+        } else {
+          totalFoodRev += lineTotal;
+        }
       });
     } else {
-      let fallbackAmt = parseFloat(o["total amount"] || o["total"] || 0);
+      let fallbackAmt = parseFloat(o["total amount"] || o["total"] || o["Total"] || 0);
       totalFoodRev += fallbackAmt;
     }
   });
-  
+
   document.getElementById('stat-total-food').innerText = 'P' + totalFoodRev.toFixed(2);
   document.getElementById('stat-total-drinks').innerText = 'P' + totalDrinksRev.toFixed(2);
-  
+
   if (validOrders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No past orders yet.</td></tr>';
     return;
   }
-  
+
   tbody.innerHTML = validOrders.map(o => {
     const rawOrderNum = o["order #"] || o["ordernum"] || '---';
     const tableCust = o["table/customer"] || o["table"] || 'Walk-in';
-    const dateTime = o["date & time"] || o["date"] || '';
+    const dateTime = o["date & time"] || o["date"] || "";
     const totalAmt = parseFloat(o["total amount"] || o["total"] || 0);
     
-    let rawItems = o["items & order type"] || o["items"] || [];
+    let rawItems = o["items & order type"] || o["items"] || o["Items"] || [];
     if (typeof rawItems === 'string') {
       try { rawItems = JSON.parse(rawItems); } catch(e) { rawItems = []; }
     }
     const itemsList = Array.isArray(rawItems) ? rawItems : [];
-    let itemsHtml = itemsList.map(i => {
-      let iName = i.name || "Item";
-      let iQty = i.quantity || i.qty || 1;
-      let iType = i.orderType || "Dine-In";
-      return `<div>${iQty}x ${iName} ${getTypeBadgeHtml(iType)}</div>`;
-    }).join("");
     
+    let itemsHtml = "";
+    if (itemsList.length > 0) {
+      itemsHtml = itemsList.map(i => {
+        let iName = i.name || i.Name || "Item";
+        let iQty = i.quantity || i.qty || i.Qty || 1;
+        let iType = i.orderType || "Dine-In";
+        return `<div>${iQty}x ${iName} ${getTypeBadgeHtml(iType)}</div>`;
+      }).join("");
+    } else {
+      itemsHtml = `<span class="text-gray-400 italic">Direct Total Recorded</span>`;
+    }
+
     const displayOrderNum = String(rawOrderNum).startsWith('#') ? rawOrderNum : '#' + rawOrderNum;
     return `
       <tr class="hover:bg-gray-50/50">
@@ -748,6 +774,7 @@ function renderInventory() {
       ${cat} <button onclick="removeCategory('${cat}')" class="text-red-500 font-black">×</button>
     </span>
   `).join("");
+
   document.getElementById('inventory-list').innerHTML = menu.map(item => `
     <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between gap-3">
       <div class="flex justify-between items-start">
@@ -864,7 +891,7 @@ function switchTab(tabId) {
   const activeNav = document.getElementById(`nav-${tabId}`);
   if (activeTab) activeTab.classList.remove('hidden');
   if (activeNav) activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brand-orange text-white shadow-lg transition";
-  
+
   if (tabId === 'active') renderActiveOrders();
   if (tabId === 'orders') updateOrderHistoryUI();
   if (tabId === 'inventory') renderInventory();
