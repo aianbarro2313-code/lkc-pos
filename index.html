@@ -310,7 +310,6 @@ function fetchAllDataFromCloud(isBackground = false) {
           });
         }
         
-        // FIXED ORDER HISTORY PARSING & GROUPING FROM SHEET ROWS
         if (resData.orders && Array.isArray(resData.orders)) {
           let rawOrders = resData.orders.filter(o => {
             let ordNum = String(o["order #"] || o["ordernum"] || "").toUpperCase();
@@ -681,6 +680,7 @@ function editActiveOrder(orderId) {
   activeOrders.splice(idx, 1);
   saveLocalStorageData();
   sendDataToCloud('saveActiveOrders', activeOrders);
+  renderActiveOrders(); // Inalis agad sa view para hindi madoble
   switchTab('pos');
   updateCartUI();
   document.getElementById('cart-drawer').classList.remove('translate-y-full');
@@ -704,6 +704,7 @@ function checkoutActiveOrder(orderId) {
   activeOrders.splice(idx, 1);
   saveLocalStorageData();
   sendDataToCloud('saveActiveOrders', activeOrders);
+  renderActiveOrders(); // Inalis agad sa view para hindi madoble
   updateCartUI();
   switchTab('pos');
   document.getElementById('cart-drawer').classList.remove('translate-y-full');
